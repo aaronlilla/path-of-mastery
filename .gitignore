@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dist-test/
+release/
+target/
+*.tsbuildinfo
+*.pdb
+.vite/
+npm-debug.log*
+.env
+.env.*
+
+# staged by apps/desktop/scripts/stage-engine.mjs
+apps/desktop/resources/engine/
+
+# knowledge base download cache
+.kb-cache/

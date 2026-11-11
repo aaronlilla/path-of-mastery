@@ -1,0 +1,13 @@
+engine-data/** -text
+resources/atlas/sources/** -text
+resources/atlas/packs/*.json -text
+resources/atlas/archive.json -text
+resources/mastery-starters/** -text
+apps/desktop/resources/** -text
+apps/desktop/src/renderer/public/game/** -text
+*.png binary
+*.webp binary
+*.jpg binary
+*.br binary
+*.bin binary
+*.node binary

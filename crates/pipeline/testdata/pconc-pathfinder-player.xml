@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Ranger" ascendClassName="Pathfinder" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="0" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem skillPart="2" nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SkillGemSupportUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Vicious Projectiles" skillId="SupportViciousProjectiles" gemId="Metadata/Items/Gems/SkillGemSupportViciousProjectiles" variantId="SupportViciousProjectiles" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Deadly Ailments" skillId="SupportDeadlyAilments" gemId="Metadata/Items/Gems/SkillGemSupportDeadlyAilments" variantId="SupportDeadlyAilments" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SkillGemSupportVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Grace" skillId="Grace" gemId="Metadata/Items/Gems/SkillGemGrace" variantId="Grace" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Herald of Agony" skillId="HeraldOfAgony" gemId="Metadata/Items/Gems/SkillGemHeraldOfAgony" variantId="HeraldOfAgony" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Flame Dash" skillId="FlameDash" gemId="Metadata/Items/Gems/SkillGemFlameDash" variantId="FlameDash" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="Bossing: Wither totem" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Wither" skillId="Wither" gemId="Metadata/Items/Gems/SkillGemWither" variantId="Wither" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Spell Totem" skillId="SupportSpellTotem" gemId="Metadata/Items/Gems/SkillGemSupportSpellTotem" variantId="SupportSpellTotem" level="1" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Steelskin" skillId="QuickGuard" gemId="Metadata/Items/Gems/SkillGemQuickGuard" variantId="QuickGuard" level="10" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Plague Bearer" skillId="PlagueBearer" gemId="Metadata/Items/Gems/SkillGemPlagueBearer" variantId="PlagueBearer" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Dash" skillId="Dash" gemId="Metadata/Items/Gems/SkillGemDash" variantId="Dash" level="20" quality="0" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="2" ascendClassId="3" masteryEffects="{1205,62897},{38579,16264},{21801,1727},{42361,65015},{47294,1251},{3042,34242},{292,47642},{27371,57074},{20736,10815}" nodes="50459,529,903,1461,1648,1767,1822,2715,3187,3469,3656,3676,4011,4502,5616,5823,7112,7263,8001,8012,9206,9355,9535,9864,9877,11811,12412,13885,14400,16236,16882,17790,18769,19069,19228,19858,21835,22266,23449,23616,24050,24133,25058,25067,25766,27283,27788,28012,30110,30338,31315,31359,31508,31585,32117,32555,32802,33783,34678,34763,35894,36801,36858,37504,37619,37663,38190,38348,38662,39718,39938,40362,41420,41866,41989,42907,44988,45035,46289,46408,46896,47362,48099,49900,50338,51212,53013,53114,53213,54142,54868,58968,59252,59370,59482,59606,60735,60942,61653,61834,63795,63843,64709,64769,65210,64111,32662,40813,20480,1697,32640,65296,40631,61805,1205,38579,21801,42361,47294,3042,292,27371,20736" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="60735" itemId="20"/><Socket nodeId="61834" itemId="21"/></Sockets></Spec>
+	</Tree>
+	<Notes>League-start Pathfinder Poisonous Concoction, about 1 divine. Written by hand as a seasoned player.</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: RARE
+Rapture Ward
+Imperial Buckler
+Item Level: 74
+Quality: 20
+Sockets: G
+LevelReq: 69
+Implicits: 1
+6% increased Movement Speed
++82 to maximum Life
+68% increased Evasion Rating
++268 to Accuracy Rating
++9% chance to Suppress Spell Damage</Item><Item id="2">Rarity: RARE
+Doom Visor
+Lion Pelt
+Item Level: 73
+Quality: 20
+Sockets: G-G-B
+LevelReq: 70
+Implicits: 0
++76 to maximum Life
++142 to Evasion Rating
++29% to Chaos Resistance
++38 to Intelligence</Item><Item id="3">Rarity: RARE
+Gale Pelt
+Assassin's Garb
+Item Level: 75
+Quality: 20
+Sockets: G-G-G-G-B
+LevelReq: 68
+Implicits: 1
+3% increased Movement Speed
+94% increased Evasion Rating
++168 to Evasion Rating
++38% to Fire Resistance
++40% to Cold Resistance
++35% to Lightning Resistance</Item><Item id="4">Rarity: RARE
+Viper Grasp
+Gripped Gloves
+Item Level: 74
+Quality: 20
+Sockets: B-R R
+LevelReq: 70
+Implicits: 1
+16% increased Projectile Attack Damage
++72 to maximum Life
++35% to Fire Resistance
++33% to Lightning Resistance
++287 to Accuracy Rating</Item><Item id="5">Rarity: RARE
+Corpse Track
+Slink Boots
+Item Level: 73
+Quality: 20
+Sockets: G G
+LevelReq: 69
+Implicits: 0
+25% increased Movement Speed
++70 to maximum Life
++36% to Cold Resistance
++24 to Strength
++9% chance to Suppress Spell Damage</Item><Item id="6">Rarity: RARE
+Plague Talisman
+Jade Amulet
+Item Level: 74
+LevelReq: 55
+Implicits: 1
++26 to Dexterity
++62 to maximum Life
++14% to Damage over Time Multiplier
++34 to Strength
++21% to Chaos Resistance</Item><Item id="7">Rarity: RARE
+Storm Loop
+Two-Stone Ring
+Item Level: 72
+LevelReq: 44
+Implicits: 1
++14% to Fire and Cold Resistances
++55 to maximum Life
++38% to Lightning Resistance
++31 to Intelligence</Item><Item id="8">Rarity: RARE
+Sorrow Coil
+Two-Stone Ring
+Item Level: 72
+LevelReq: 44
+Implicits: 1
++14% to Fire and Cold Resistances
++51 to maximum Life
++36% to Lightning Resistance
++274 to Accuracy Rating</Item><Item id="9">Rarity: RARE
+Mind Lash
+Leather Belt
+Item Level: 74
+LevelReq: 60
+Implicits: 1
++33 to maximum Life
++81 to maximum Life
++40% to Fire Resistance
++33% to Cold Resistance
++27 to Strength</Item><Item id="11">Rarity: MAGIC
+Concentrated Divine Life Flask of Allaying
+Item Level: 75
+Quality: 20
+LevelReq: 61
+Implicits: 0
+61% increased Amount Recovered
+33% reduced Recovery rate
+Grants Immunity to Bleeding for 13 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 13 seconds if used while affected by Corrupted Blood</Item><Item id="12">Rarity: MAGIC
+Examiner's Quicksilver Flask of Persistence
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+28% increased Duration
+43% Chance to Avoid being Stunned during Effect</Item><Item id="13">Rarity: MAGIC
+Dabbler's Sulphur Flask of the Ibex
+Item Level: 75
+Quality: 20
+LevelReq: 58
+Implicits: 1
+Creates Consecrated Ground on Use
+30% reduced Duration
+25% increased effect
+53% increased Evasion Rating during Effect</Item><Item id="14">Rarity: MAGIC
+Examiner's Silver Flask of the Beluga
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+28% increased Duration
+48% chance to Avoid being Chilled during Effect
+48% chance to Avoid being Frozen during Effect</Item><Item id="15">Rarity: UNIQUE
+Witchfire Brew
+Stibnite Flask
+Quality: 20
+LevelReq: 48
+Implicits: 1
+Creates a Smoke Cloud on Use
+Grants Level 21 Despair Curse Aura during Effect</Item><Item id="20">Rarity: RARE
+Gloom Eye
+Cobalt Jewel
+Item Level: 74
+LevelReq: 0
+Implicits: 0
+6% increased maximum Life
++7% to Chaos Damage over Time Multiplier
++5% to Damage over Time Multiplier</Item><Item id="21">Rarity: RARE
+Rot Spark
+Cobalt Jewel
+Item Level: 74
+LevelReq: 0
+Implicits: 0
+6% increased maximum Life
+11% increased Chaos Damage
++5% to Damage over Time Multiplier</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="1"/><Slot name="Helmet" itemId="2"/><Slot name="Body Armour" itemId="3"/><Slot name="Gloves" itemId="4"/><Slot name="Boots" itemId="5"/><Slot name="Amulet" itemId="6"/><Slot name="Ring 1" itemId="7"/><Slot name="Ring 2" itemId="8"/><Slot name="Belt" itemId="9"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="conditionKilledRecently" boolean="true"/><Input name="multiplierWitheredStackCount" number="2"/><Input name="heraldOfAgonyVirulenceStack" number="20"/></Config>
+</PathOfBuilding>

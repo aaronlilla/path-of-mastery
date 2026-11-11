@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Ranger" ascendClassName="Deadeye" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Lightning Arrow" skillId="LightningArrow" gemId="Metadata/Items/Gems/SkillGemLightningArrow" variantId="LightningArrow" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Added Lightning Damage" skillId="SupportAddedLightningDamage" gemId="Metadata/Items/Gems/SupportGemAddedLightningDamage" variantId="SupportAddedLightningDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Lightning Penetration" skillId="SupportLightningPenetration" gemId="Metadata/Items/Gems/SupportGemLightningPenetration" variantId="SupportLightningPenetration" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Chain" skillId="SupportChain" gemId="Metadata/Items/Gems/SupportGemChain" variantId="SupportChain" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Mirage Archer" skillId="SupportMirageArcher" gemId="Metadata/Items/Gems/SupportGemMirageArcher" variantId="SupportMirageArcher" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Barrage Support" skillId="SupportBarrage" gemId="Metadata/Items/Gems/SupportGemBarrage" variantId="SupportBarrage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Elemental Weakness" skillId="ElementalWeakness" gemId="Metadata/Items/Gems/SkillGemElementalWeakness" variantId="ElementalWeakness" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="2" ascendClassId="2" masteryEffects="{42533,64775},{25349,56951},{27371,6462},{6427,36967}" nodes="50459,56856,59928,63723,5233,3644,14930,34400,14056,6741,24865,34031,56001,17201,19711,6580,11651,5408,63139,61306,444,52904,39821,24848,59837,26067,62136,2872,1729,45313,28995,48807,48287,30380,18025,25933,64587,5197,33287,55676,65210,32117,54142,2094,48099,21435,49109,25178,9373,15842,30894,52230,29379,43787,56589,60002,30155,65224,42964,50338,42533,31508,6654,6913,24133,37619,27283,65308,31928,37884,53793,62017,17566,64235,7085,1201,465,45035,41380,58921,16213,23951,57449,16544,24083,36687,56855,13231,930,25349,27371,13375,20953,65427,45202,36287,51881,23912,39665,2185,38149,20807,6427,49459,32514,12948,55750,65502,9469,59220,17934,29359,36704,20010,49621,42104,57080,47743,12068,16851,3469,23471,63620" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+Hopeshredder
+Ranger Bow
+Sockets: B B G G G G
+Elder Item
+Source: Drops from unique{The Elder}
+Variant: Pre 3.4.0
+Variant: Current
+Requires Level 60, 212 Dex
+Adds (130-150) to (270-300) Cold Damage
+{variant:2}(15-25)% increased Attack Speed
+{variant:2}+(400-500) to Accuracy Rating
+{variant:1}+(400-500) to Accuracy Rating
+4% increased Movement Speed per Frenzy Charge
+2% chance to Avoid Damage of each Element from Hits per Frenzy Charge
+12 to 14 Added Cold Damage per Frenzy Charge
+0.5% of Attack Damage Leeched as Life per Frenzy Charge
+{variant:1}400 Cold Damage taken per second per Frenzy Charge while moving
+{variant:2}200 Cold Damage taken per second per Frenzy Charge while moving</Item><Item id="2">Rarity: RARE
+Solver Quiver
+Primal Arrow Quiver
+Item Level: 75
+Quality: 20
+LevelReq: 68
+Implicits: 1
+25% increased Elemental Damage with Attack Skills
+44% increased Damage with Bow Skills
++100 to maximum Life
+Adds 5 to 83 Lightning Damage to Attacks
+</Item><Item id="3">Rarity: UNIQUE
+Flamesight
+Solaris Circlet
+Sockets: B B B B
+Variant: Pre 3.19.0
+Variant: Current
+Requires Level 59, 122 Int
+(240-280)% increased Energy Shield
++(30-40)% to Fire Resistance
+(30-40)% increased Elemental Damage
+{variant:1}25% chance to Scorch Enemies
+{variant:1}Cannot inflict Ignite
+{variant:2}(25-50)% chance to Scorch Enemies
+{variant:2}Cannot inflict Ignite
+{variant:1}10% increased Elemental Damage per Sextant affecting the area</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Necrotic Armour
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G-B-B-G-G-G
+Implicits: 0
++145 to maximum Life
++51 to Intelligence
+{crafted}7% increased maximum Life
+{crafted}7% increased maximum Mana
++21% to Chaos Resistance</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Warlock Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B B B B
+Implicits: 0
++31% to Chaos Resistance
+{crafted}+13% to Lightning and Chaos Resistances
++28 to Intelligence
+Adds 2 to 23 Lightning Damage to Attacks
+Adds 5 to 10 Fire Damage to Attacks
+Adds 5 to 10 Cold Damage to Attacks</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G R R R
+Implicits: 1
+{crafted}{enchant}Adds 1 to 160 Lightning Damage if you haven't Killed Recently
+Drops Burning Ground while moving, dealing 2500 Fire Damage per second for 4 seconds
+{crafted}18% increased Movement Speed
+{crafted}8% increased Movement Speed if you haven't been Hit Recently
++115 to maximum Life</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 75
+LevelReq: 60
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:attribute}{suffix}+17 to all Attributes
+{tags:elemental,cold,resistance}{suffix}+24% to Cold Resistance
+{tags:resource,life}{prefix}+115 to maximum Life
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Opal Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 1
+20% increased Elemental Damage
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:resource,life}{prefix}+100 to maximum Life
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Opal Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 1
+20% increased Elemental Damage
+{tags:resource,life}{prefix}+55 to maximum Life
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 28
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:resource,life}{prefix}+85 to maximum Life
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+</Item><Item id="12">Rarity: MAGIC
+Amethyst Flask
+Item Level: 75
+Quality: 20
+LevelReq: 18
+Implicits: 0
+</Item><Item id="13">Rarity: MAGIC
+Aquamarine Flask
+Item Level: 75
+Quality: 20
+LevelReq: 27
+Implicits: 1
+Creates Chilled Ground on Use
+</Item><Item id="14">Rarity: MAGIC
+Bismuth Flask
+Item Level: 75
+Quality: 20
+LevelReq: 8
+Implicits: 0
+</Item><Item id="15">Rarity: MAGIC
+Colossal Hybrid Flask
+Item Level: 75
+Quality: 20
+LevelReq: 40
+Implicits: 0
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="bandit" string="None"/><Input name="buffPhasing" boolean="true"/><Input name="buffTailwind" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/></Config>
+</PathOfBuilding>

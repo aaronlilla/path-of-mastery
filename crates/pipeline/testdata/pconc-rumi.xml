@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Shadow" ascendClassName="Assassin" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+		<PlayerStat stat="FullDPS" value="2809909.6422516834"/>
+		<PlayerStat stat="CombinedDPS" value="2809909.6422516834"/>
+		<PlayerStat stat="Life" value="4143"/>
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem skillPart="2" nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SupportGemVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SupportGemUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Greater Volley" skillId="SupportGreaterVolley" gemId="Metadata/Items/Gems/SupportGemGreaterVolley" variantId="SupportGreaterVolley" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Critical Strike Affliction" skillId="SupportCriticalStrikeAffliction" gemId="Metadata/Items/Gems/SupportGemPoison" variantId="SupportCriticalStrikeAffliction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Cull the Weak" skillId="SupportCullTheWeak" gemId="Metadata/Items/Gems/SupportGemCullTheWeak" variantId="SupportCullTheWeak" level="3" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Precision" skillId="Precision" gemId="Metadata/Items/Gems/SkillGemPrecision" variantId="Precision" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Clarity" skillId="Clarity" gemId="Metadata/Items/Gems/SkillGemClarity" variantId="Clarity" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Despair" skillId="Despair" gemId="Metadata/Items/Gems/SkillGemVulnerability" variantId="Despair" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Molten Shell" skillId="MoltenShell" gemId="Metadata/Items/Gems/SkillGemMoltenShell" variantId="MoltenShell" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Cast when Damage Taken" skillId="SupportCastWhenDamageTaken" gemId="Metadata/Items/Gems/SupportGemCastOnDamageTaken" variantId="SupportCastWhenDamageTaken" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Summon Lightning Golem" skillId="SummonLightningGolem" gemId="Metadata/Items/Gems/SkillGemSummonLightningGolem" variantId="SummonLightningGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="6" ascendClassId="1" masteryEffects="{58302,9755},{292,34242},{41016,29214},{27371,28676},{60834,34420},{20736,40906},{65528,6462}" nodes="44683,58229,10861,1461,4011,8640,20807,28012,36287,42104,45272,45838,49621,57080,58302,59252,59606,35011,41387,46676,6064,21264,25058,9877,5823,46408,60180,35894,21835,27788,40362,13885,292,25260,19858,9206,36221,12412,53114,45593,12801,8938,25067,24050,3656,20546,24133,64235,31315,18865,55247,63799,61320,37671,21301,37619,15842,18670,37504,41866,8135,11659,27929,8948,27659,11128,2292,50690,42133,17788,6538,49978,41016,11239,39718,27371,38129,9015,23439,39524,30225,4184,11420,34661,44955,60834,51212,46289,49639,31585,3676,17790,63639,54142,30894,21958,33755,1031,7938,4397,41689,28754,10763,13375,20953,65427,45202,41119,28658,14804,22266,32555,20736,19598,23024,19083,9014,51220,63251,18770,29454,62744,65528,3187,2715" secondaryAscendClassId="11">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="2">Rarity: RARE
+Solver Shield
+Archon Kite Shield
+Item Level: 75
+Quality: 20
+LevelReq: 68
+Sockets: R R R
+Implicits: 1
++12% to all Elemental Resistances
++45% to Cold Resistance
+6% additional Physical Damage Reduction
++36% to Fire Resistance
+{crafted}58% increased Armour and Evasion
+64% increased Chance to Block
++223 to Armour
++61 to maximum Energy Shield</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G R R R
+Implicits: 1
+{crafted}{enchant}40% increased Poisonous Concoction Damage
+55% increased Armour and Energy Shield
+{crafted}58% increased Armour and Evasion
++161 to Armour</Item><Item id="4">Rarity: UNIQUE
+Cospri's Will
+Assassin's Garb
+Variant: Pre 3.0.0
+Variant: Pre 3.20.0
+Variant: Current
+Sockets: G-G-B-G-G-G
+Implicits: 1
+3% increased Movement Speed
+{variant:1,2}(120-160)% increased Evasion Rating
+{variant:3}(150-200)% increased Evasion Rating
+{variant:1,2}+(17-29)% to Chaos Resistance
+{variant:3}+(31-53)% to Chaos Resistance
+You can apply an additional Curse
+Your Hexes can affect Hexproof Enemies
+{variant:1,3}Always Poison on Hit against Cursed Enemies
+{variant:2}60% chance to Poison on Hit against Cursed Enemies</Item><Item id="5">Rarity: UNIQUE
+The Embalmer
+Carnal Mitts
+Sockets: G B B B
+Requires Level 50, 39 Dex, 39 Int
+Socketed Gems are Supported by Level 20 Vile Toxins
+Adds (13-17) to (23-29) Chaos Damage
++(50-70) to maximum Life
++(17-29)% to Chaos Resistance
+(20-25)% increased Poison Duration</Item><Item id="6">Rarity: UNIQUE
+Foulborn The Red Trail
+Titan Greaves
+Sockets: R-R R R
+Variant: Pre 3.21.0
+Variant: Current
+League: Breach
+Source: Upgraded from unique{The Infinite Pursuit} using currency{Blessing of Uul-Netol}
+Requires Level 68, 120 Str
+{variant:1}(60-80)% increased Armour
+{variant:2}(60-100)% increased Armour
+{variant:1}+(50-70) to maximum Life
+{variant:2}+(60-100) to maximum Life
+{variant:1}25% increased Movement Speed
+{variant:2}30% increased Movement Speed
+{mutated}Gain an Endurance Charge each second while Stationary
+Gain a Frenzy Charge on Hit while Bleeding
+{variant:1}15% increased Movement Speed while Bleeding
+50% chance to be inflicted with Bleeding when Hit by an Attack
+Gore Footprints</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Pearlescent Amulet
+Item Level: 75
+LevelReq: 65
+Catalyst: Prismatic
+CatalystQuality: 20
+Implicits: 1
++9% to all Elemental Resistances
+{tags:elemental,lightning,resistance}{suffix}+36% to Lightning Resistance
+{tags:elemental,resistance}{suffix}+14% to all Elemental Resistances
+{tags:defences,armour}{prefix}31% increased Armour
+{tags:elemental,fire,lightning,resistance}{suffix}{crafted}+13% to Fire and Lightning Resistances
+{tags:resource,life}{prefix}+85 to maximum Life
+{tags:defences,evasion}{prefix}28% increased Evasion Rating
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+20% increased Chaos Damage
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:chaos_damage,damage,chaos}{suffix}31% increased Chaos Damage
+{tags:physical_damage,chaos_damage,unveiled_mod,damage,physical,chaos}{suffix}{crafted}14% increased Global Physical Damage
+{tags:physical_damage,chaos_damage,unveiled_mod,damage,physical,chaos}{suffix}{crafted}14% increased Chaos Damage
+{tags:attribute}{suffix}+38 to Strength
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 1
+20% increased Chaos Damage
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:defences,armour}{prefix}+211 to Armour
+{tags:unveiled_mod,damage}{prefix}{crafted}15% increased Damage
+{tags:attribute}{suffix}+33 to Strength
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 66
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 2
+{crafted}{enchant}Enemies Withered by you have -6% to all Resistances
++30 to Strength
+{tags:unveiled_mod,defences,armour,evasion}{prefix}{crafted}+218 to Armour and Evasion Rating
+{tags:defences,armour}{prefix}+431 to Armour
+{tags:resource,life}{prefix}+85 to maximum Life
+{tags:flask}{suffix}7% increased Flask Effect Duration
+{tags:flask}{suffix}15% reduced Flask Charges used
+</Item><Item id="11">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+59% increased Amount Recovered
+33% reduced Recovery rate
+</Item><Item id="12">Rarity: UNIQUE
+Replica Rumi's Concoction
+Granite Flask
+League: Heist
+Source: Steal from a unique{Curio Display} during a Grand Heist
+LevelReq: 68
+90% reduced Duration
+Gain 1 Endurance Charge on use
+Petrified during Effect
++(35-50)% Chance to Block Attack Damage during Effect
++(20-30)% Chance to Block Spell Damage during Effect
+</Item><Item id="13">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 0
+26% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="14">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 0
+26% chance to gain a Flask Charge when you deal a Critical Strike
+Grants Immunity to Chill for 12 seconds if used while Chilled
+Grants Immunity to Freeze for 12 seconds if used while Frozen
+</Item><Item id="15">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 46
+Implicits: 2
+{crafted}{enchant}65% increased effect
+{crafted}{enchant}Gains no Charges during Effect
+51% increased Armour during Effect
+30% reduced Duration
+25% increased effect
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="summonLightningGolemEnableWrath" boolean="true"/><Input name="useFrenzyCharges" boolean="true"/><Input name="useEnduranceCharges" boolean="true"/><Input name="buffPhasing" boolean="true"/><Input name="multiplierNearbyRareOrUniqueEnemies" number="1"/><Input name="multiplierPoisonAppliedRecently" number="11"/><Input name="conditionGainedFrenzyChargeRecently" boolean="true"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="multiplierWitheredStackCount" number="1.1148191999999997"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Ranger" ascendClassName="Pathfinder" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SupportGemUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SupportGemVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Deadly Ailments" skillId="SupportDeadlyAilments" gemId="Metadata/Items/Gems/SupportGemDeadlyAilments" variantId="SupportDeadlyAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Added Chaos Damage" skillId="SupportAddedChaosDamage" gemId="Metadata/Items/Gems/SupportGemAddedChaosDamage" variantId="SupportAddedChaosDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Vicious Projectiles" skillId="SupportViciousProjectiles" gemId="Metadata/Items/Gems/SupportGemPhysicalProjectileAttackDamage" variantId="SupportViciousProjectiles" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Clarity" skillId="Clarity" gemId="Metadata/Items/Gems/SkillGemClarity" variantId="Clarity" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Precision" skillId="Precision" gemId="Metadata/Items/Gems/SkillGemPrecision" variantId="Precision" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Purity of Fire" skillId="PurityOfFire" gemId="Metadata/Items/Gems/SkillGemFireResistAura" variantId="PurityOfFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Enfeeble" skillId="Enfeeble" gemId="Metadata/Items/Gems/SkillGemEnfeeble" variantId="Enfeeble" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="2" ascendClassId="3" masteryEffects="{44316,34242},{3042,47642},{21801,59574},{19750,58876},{27371,28676}" nodes="50459,64111,63293,36242,51101,14156,1697,20480,32662,32640,61306,444,52904,39821,19858,9206,41866,60942,44316,36221,37504,19069,34678,3469,64709,23471,36874,2094,3042,52230,29379,43787,56589,16236,25766,32802,7263,23449,64769,12412,24133,64235,36287,20807,21228,31222,10843,37619,45593,12801,8938,59606,1461,60180,27788,25260,46277,49900,40362,56295,52714,25058,9877,5823,4011,9355,49978,44988,37663,58968,31359,11811,1648,21801,19144,16167,10829,238,11497,5408,35503,36881,35894,21835,10511,52095,57746,21301,20546,8948,27659,37671,29937,6363,5237,27929,2292,53114,10661,8544,27203,25067,48362,55485,13714,46578,28330,19939,65167,31315,8135,11659,21435,17566,24083,16544,19750,49109,56116,27371,44103,32091,49343" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="2">Rarity: UNIQUE
+Replica Mistwall
+Lacquered Buckler
+League: Heist
+Source: Steal from a unique{Curio Display} during a Grand Heist
+Sockets: G G G
+Implicits: 1
+6% increased Movement Speed
+(120-150)% increased Evasion Rating
+10% increased Movement Speed
++(10-20)% to Fire and Cold Resistances
++(8-15)% chance to Avoid Physical Damage from Hits while Phasing
+You have Phasing if you have Blocked Recently
+You are at Maximum Chance to Block Spell Damage if you have not Blocked Recently</Item><Item id="3">Rarity: UNIQUE
+Alpha's Howl
+Sinner Tricorne
+Sockets: B G R G
+Requires Level 64, 138 Dex
++2 to Level of Socketed Aura Gems
+(80-100)% increased Evasion Rating
++(20-30)% to Cold Resistance
+Cannot be Frozen
+25% chance to Avoid being Chilled
+16% increased Mana Reservation Efficiency of Skills</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Necrotic Armour
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G-B-G-G-B-G
+Implicits: 1
+{crafted}{enchant}40% reduced Attribute Requirements</Item><Item id="5">Rarity: NORMAL
+Paladin Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 0</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 1
+{crafted}{enchant}16% increased Attack and Cast Speed if you've Killed Recently</Item><Item id="7">Rarity: NORMAL
+Citrine Amulet
+Item Level: 75
+LevelReq: 16
+Implicits: 1
++20 to Strength and Dexterity
+</Item><Item id="8">Rarity: NORMAL
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Implicits: 1
+20% increased Chaos Damage
+</Item><Item id="9">Rarity: NORMAL
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Implicits: 1
+20% increased Chaos Damage
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 8
+Implicits: 2
+{crafted}{enchant}+300 to Evasion Rating while you have Phasing
++30 to Strength
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+23% reduced Charges per use
+</Item><Item id="13">Rarity: MAGIC
+Sulphur Flask
+Item Level: 75
+Quality: 20
+LevelReq: 46
+Implicits: 1
+Creates Consecrated Ground on Use
+51% increased Evasion Rating during Effect
+30% reduced Duration
+25% increased effect
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 3" itemId="13" active="true"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="buffPhasing" boolean="true"/><Input name="conditionKilledRecently" boolean="true"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/></Config>
+</PathOfBuilding>

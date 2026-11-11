@@ -1,0 +1,138 @@
+{
+  "builtAt": "2026-11-11T09:05:07.095Z",
+  "livePatch": "3.29.3.6",
+  "dataPatch": "3.29.3.3",
+  "bytes": 56799232,
+  "sources": [
+    {
+      "id": "cdn",
+      "type": "datamined",
+      "status": "reused",
+      "rows": 89954,
+      "patch": "3.29.3.3",
+      "url": "https://patch.poecdn.com/3.29.3.3/"
+    },
+    {
+      "id": "forum",
+      "type": "official",
+      "status": "reused",
+      "rows": 189,
+      "patch": "3.29.3.3",
+      "url": "https://www.pathofexile.com/forum/view-forum/patch-notes"
+    },
+    {
+      "id": "app",
+      "type": "community",
+      "status": "fresh",
+      "rows": 3688,
+      "patch": "3.29",
+      "url": "https://github.com/PathOfBuildingCommunity/PathOfBuilding/tree/dev/src/Data"
+    },
+    {
+      "id": "wiki",
+      "type": "wiki",
+      "status": "reused",
+      "rows": 7,
+      "patch": "3.29.3.3",
+      "url": "https://www.poewiki.net/"
+    },
+    {
+      "id": "repoe",
+      "type": "community",
+      "status": "failed",
+      "rows": 0,
+      "patch": null,
+      "url": null
+    }
+  ],
+  "validation": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "rows gem >= 500",
+        "ok": true,
+        "detail": "904"
+      },
+      {
+        "name": "rows gem_level >= 5000",
+        "ok": true,
+        "detail": "33040"
+      },
+      {
+        "name": "rows base_item >= 3000",
+        "ok": true,
+        "detail": "5012"
+      },
+      {
+        "name": "rows mod >= 10000",
+        "ok": true,
+        "detail": "40355"
+      },
+      {
+        "name": "rows passive >= 2000",
+        "ok": true,
+        "detail": "4186"
+      },
+      {
+        "name": "rows ascendancy >= 19",
+        "ok": true,
+        "detail": "21"
+      },
+      {
+        "name": "rows area >= 500",
+        "ok": true,
+        "detail": "1929"
+      },
+      {
+        "name": "rows quest >= 50",
+        "ok": true,
+        "detail": "198"
+      },
+      {
+        "name": "rows quest_reward >= 100",
+        "ok": true,
+        "detail": "1388"
+      },
+      {
+        "name": "Poisonous Concoction level 1 requirement matches the engine data",
+        "ok": true,
+        "detail": "CDN 12, engine 12"
+      },
+      {
+        "name": "Fireball is an active gem",
+        "ok": true,
+        "detail": "is_support=0"
+      },
+      {
+        "name": "Allflame league tables exist",
+        "ok": true,
+        "detail": "2 rows"
+      },
+      {
+        "name": "passive-ids table",
+        "ok": true,
+        "detail": "4186 ids"
+      },
+      {
+        "name": "patch-note docs >= 20",
+        "ok": true,
+        "detail": "188"
+      },
+      {
+        "name": "Allflame content update doc exists",
+        "ok": true,
+        "detail": "Content Update 3.29.0 — Path of Exile: Curse of the Allflame — The Curse of the Allflame Challenge League"
+      },
+      {
+        "name": "Tabula Rasa unique exists",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "gem-offers table exists",
+        "ok": true,
+        "detail": ""
+      }
+    ]
+  }
+}

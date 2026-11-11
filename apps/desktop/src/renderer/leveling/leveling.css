@@ -1,0 +1,117 @@
+/* Leveling tab. Every class here starts with lv- (test/css-scope-areas.json). It is a Builds tab, so "where you are" is the
+   Builds area colour (ember, --area-build); gold is only the tab's one primary action, Add checkpoint trees. */
+.lv-root { font-family: Geist, sans-serif; font-size: 13.5px; color: var(--text); }
+.lv-root :focus-visible { outline: 2px solid rgb(var(--area-build-rgb)); outline-offset: 2px; }
+.lv-panel { position: absolute; inset: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr) 300px; gap: 16px; padding: 14px; box-sizing: border-box; overflow: hidden; }
+.lv-panel[data-layout='narrow'] { grid-template-columns: 170px minmax(0, 1fr); gap: 12px; }
+.lv-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-3); }
+.lv-h { display: flex; align-items: center; gap: 8px; font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); }
+.lv-num { font-variant-numeric: tabular-nums; }
+.lv-muted { color: var(--text-muted); }
+.lv-sp { flex: 1; }
+
+.lv-acts, .lv-now { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; }
+.lv-acts { padding: 4px; }
+.lv-act { flex: none; display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .08); background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); color: var(--text-2); font: 600 13px Geist, sans-serif; cursor: pointer; text-align: left; }
+.lv-act:hover { border-color: rgba(var(--area-build-rgb), .4); background: linear-gradient(180deg, var(--surface-3), var(--surface-2)), rgba(var(--area-build-rgb), .05); }
+.lv-act[aria-pressed='true'] { border-color: rgba(var(--area-build-rgb), .7); color: var(--text-strong); background: rgba(var(--area-build-rgb), .14); box-shadow: inset 2px 0 0 rgb(var(--area-build-rgb)); }
+.lv-actname { flex: 1; }
+.lv-count { font: 500 11.5px 'Geist Mono', monospace; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.lv-ring { flex: none; width: 20px; height: 20px; border-radius: 50%; -webkit-mask: radial-gradient(circle, transparent 5px, #000 6px); mask: radial-gradient(circle, transparent 5px, #000 6px); }
+
+.lv-steps { min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden; padding: 0 8px 24px 4px; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; }
+.lv-stephead { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+.lv-title { display: flex; align-items: baseline; gap: 12px; margin: 0; font: 600 24px/1.15 'Cormorant Garamond', serif; color: var(--text-display, var(--text-strong)); }
+.lv-title .lv-count { font: 500 12px Geist, sans-serif; font-variant-numeric: tabular-nums; }
+.lv-note { margin: 0 0 8px; padding: 8px 12px; border-radius: 10px; background: rgba(var(--line-rgb), .05); color: var(--text-3); }
+.lv-banner { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; padding: 8px 10px 8px 12px; border-radius: 10px; border: 1px solid rgba(var(--area-build-rgb), .35); background: rgba(var(--area-build-rgb), .08); color: var(--text-strong); }
+.lv-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.lv-step { position: relative; display: flex; align-items: flex-start; gap: 8px; padding: 5px 10px 5px 6px; border-radius: 9px; border: 1px solid rgba(var(--line-rgb), .06); background: rgba(var(--line-rgb), .03); }
+/* Arrive, hand-in, text and flask steps: flat one-line rows, no card. */
+.lv-step[data-flat] { min-height: 28px; box-sizing: border-box; padding-top: 2px; padding-bottom: 2px; background: transparent; border-color: transparent; }
+/* Done steps step back by colour, not opacity, so their text still meets 4.5:1. */
+.lv-step[data-done] .lv-body, .lv-step[data-done] .lv-body * { color: var(--text-muted); }
+.lv-step[data-done] .lv-main { text-decoration: line-through; text-decoration-color: rgba(var(--line-rgb), .3); }
+/* The next step to do: ember left edge and tint. */
+.lv-step[data-next] { border-color: rgba(var(--area-build-rgb), .45); background: rgba(var(--area-build-rgb), .1); box-shadow: inset 3px 0 0 rgb(var(--area-build-rgb)); }
+.lv-step[data-next]:focus-visible { outline-offset: 1px; }
+.lv-nextpill { float: left; margin: 3px 8px 0 0; padding: 0 7px; height: 18px; display: inline-flex; align-items: center; border-radius: 9px; background: rgb(var(--area-build-rgb)); color: #1a0c04; font: 700 10.5px/1 Geist, sans-serif; letter-spacing: .04em; }
+/* Dark text on the bright dark-mode ember (7.6:1); white on the deeper light-mode ember (5.4:1). */
+.lv-nextpill:where([data-mode="light"] *) { color: #fff; }
+.lv-k-arrive .lv-main { color: var(--text-2); display: inline; line-height: 1.45; }
+.lv-k-swap, .lv-k-tree, .lv-k-lab { border-color: rgba(var(--line-rgb), .14); background: rgba(var(--line-rgb), .05); }
+.lv-k-quest-reward, .lv-k-buy, .lv-k-links { border-color: rgba(var(--line-rgb), .1); }
+/* 24 px hit area around an 18 px box. Done = ember fill. */
+.lv-chk { position: relative; flex: none; width: 24px; height: 24px; box-sizing: border-box; padding: 0; border: 0; border-radius: 6px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; }
+.lv-chk::before { content: ''; position: absolute; inset: 3px; border-radius: 5px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1.5px solid rgba(var(--line-rgb), .22); box-sizing: border-box; }
+.lv-chk[aria-checked='true']::before { background: rgb(var(--area-build-rgb)); border-color: transparent; }
+.lv-chk[aria-checked='true'] { color: #1a0c04; }
+.lv-chk[aria-checked='true']:where([data-mode="light"] *) { color: #fff; }
+.lv-chk pom-icon { position: relative; }
+.lv-body { flex: 1; min-width: 0; padding-top: 2px; }
+.lv-main { display: block; line-height: 1.45; }
+.lv-swap { display: flex; align-items: center; gap: 8px; }
+.lv-verb { font-weight: 600; color: var(--gold-text); }
+.lv-tag { display: inline-block; min-width: 58px; margin-right: 8px; font: 500 11px 'Geist Mono', monospace; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.lv-sub { display: block; color: var(--text-3); font-size: 12.5px; line-height: 1.45; }
+.lv-gearlines .lv-block { display: block; }
+/* Arrive, hand-in, text and flask steps are always one line, the next one too; every other step but the next
+   is a one-line summary so a screen holds most of an act. The row's title holds the whole text. */
+.lv-step:not([data-next]) .lv-sub, .lv-step:not([data-next]) .lv-notes li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-step:not([data-next]) .lv-gearlines .lv-block { display: inline; margin: 0; }
+.lv-step[data-flat] .lv-main { display: inline; }
+.lv-step[data-flat] .lv-body { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-step[data-flat] .lv-notes, .lv-step[data-flat] .lv-notes li { display: inline; margin: 0; padding: 0; }
+.lv-step[data-flat] .lv-notes li::before { content: ' · '; }
+.lv-k-buy .lv-chips, .lv-k-quest-reward .lv-chips { display: inline-flex; margin: 0 0 0 6px; vertical-align: middle; }
+.lv-block { margin-top: 2px; }
+.lv-nodes { margin-top: 4px; color: var(--text-muted); }
+.lv-notes { margin: 2px 0 0; padding-left: 16px; color: var(--text-muted); font-size: 12.5px; }
+.lv-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.lv-gem { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .1); background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); font: 600 12px Geist, sans-serif; color: var(--text); vertical-align: middle; }
+.lv-gem i { width: 8px; height: 8px; border-radius: 50%; }
+.lv-linkrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.lv-slot { font: 500 11px 'Geist Mono', monospace; color: var(--text-muted); min-width: 92px; }
+.lv-pips { display: inline-flex; gap: 3px; }
+.lv-pips i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+
+.lv-now { padding: 4px; }
+.lv-card { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: rgba(var(--line-rgb), .035); border: 1px solid rgba(var(--line-rgb), .07); }
+.lv-big { font: 600 18px Geist, sans-serif; color: var(--text-strong); }
+.lv-label { font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); text-transform: uppercase; }
+.lv-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
+.lv-stage { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .08); background: var(--surface-2); color: var(--text-3); font: 500 11px 'Geist Mono', monospace; font-variant-numeric: tabular-nums; }
+.lv-stage b { font: 700 12px Geist, sans-serif; color: var(--text-2); }
+.lv-stage[data-now] { border-color: rgba(var(--area-build-rgb), .7); background: rgba(var(--area-build-rgb), .14); }
+.lv-stage[data-now] b { color: var(--text-strong); }
+.lv-pick { display: block; }
+.lv-pick select { width: 100%; }
+.lv-opts { gap: 12px; }
+.lv-opt { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.lv-pick .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.lv-card .btn.gold { align-self: flex-start; }
+
+/* Below 1000 px of tab width: the NOW column becomes this sticky strip; its controls live in the Guide settings popover. */
+.lv-nowbar { position: sticky; top: 0; z-index: 4; display: flex; align-items: center; gap: 10px; min-height: 44px; box-sizing: border-box; margin: 0 0 6px; padding: 6px 8px 6px 12px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .08); background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); box-shadow: 0 6px 16px rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); white-space: nowrap; }
+/* Wraps to a second line rather than cutting anything off: only the stage name may shorten. */
+.lv-nowbar { flex-wrap: wrap; row-gap: 6px; }
+.lv-nowtext { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 13px; }
+.lv-stagename { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lv-facts { flex: none; }
+.lv-nowbar > .btn { margin-left: auto; }
+.lv-stageid { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 6px; border: 1px solid rgba(var(--area-build-rgb), .7); background: rgba(var(--area-build-rgb), .14); color: var(--text-strong); font: 700 12px Geist, sans-serif; font-variant-numeric: tabular-nums; }
+.lv-treechip { flex: none; height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 11px; border: 1px solid rgba(var(--line-rgb), .12); color: var(--text-2); font-size: 12px; }
+.lv-pop { position: absolute; top: calc(100% + 6px); right: 0; z-index: 10; width: 320px; max-height: min(70vh, 560px); overflow-y: auto; box-sizing: border-box; padding: 8px; display: flex; flex-direction: column; gap: 8px; border-radius: 12px; border: 1px solid rgba(var(--line-rgb), .12); background: var(--glass-strong, var(--surface-2)); box-shadow: var(--elev-3, 0 18px 50px rgba(0, 0, 0, .5)); white-space: normal; }
+
+/* Error and loading. */
+.lv-errbox { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 460px; padding: 24px; text-align: center; color: var(--text-2); }
+.lv-errbox b { color: var(--text-strong); font-size: 15px; }
+.lv-loading .lv-acts, .lv-loading .lv-steps { display: flex; flex-direction: column; gap: 8px; }
+.lv-loadcap { display: flex; align-items: center; gap: 8px; margin: 6px 0 8px; color: var(--text-3); }
+.lv-skel { display: block; flex: none; border-radius: 9px; background: linear-gradient(90deg, rgba(var(--line-rgb), .05), rgba(var(--line-rgb), .11), rgba(var(--line-rgb), .05)); background-size: 200% 100%; animation: lv-shimmer 1.2s linear infinite; }
+.lv-skel-act { height: 38px; }
+.lv-skel-row { height: 30px; }
+@keyframes lv-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* LF-34: the step verbs' gold meets 4.5:1 on the light-mode Next tint (the greys come from .text-aa in ui.css). */
+.lv-root:where([data-mode="light"] *) { --gold-text: #6f450c; }

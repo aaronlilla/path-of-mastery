@@ -1,0 +1,48 @@
+{
+ "skill": "Flicker Strike",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Raider frenzy flicker",
+    "ascendancy": "Raider",
+    "supports": [
+     "Melee Physical Damage",
+     "Brutality",
+     "Multistrike"
+    ],
+    "why": "Raider frenzy charges and speed feed Flicker Strike's charge scaling"
+   },
+   {
+    "name": "Slayer flicker",
+    "ascendancy": "Slayer",
+    "supports": [
+     "Melee Physical Damage",
+     "Ruthless",
+     "Multistrike"
+    ],
+    "why": "Slayer leech and overkill damage with fast hits"
+   },
+   {
+    "name": "Champion flicker",
+    "ascendancy": "Champion",
+    "supports": [
+     "Melee Physical Damage",
+     "Brutality",
+     "Fortify"
+    ],
+    "why": "Champion fortify and armour, melee phys"
+   }
+  ]
+ }
+}

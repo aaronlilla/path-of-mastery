@@ -1,0 +1,11 @@
+title = "Path of Mastery"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Game data and recorded test streams: long identifiers and ids that look like keys, no credentials"
+paths = [
+  '''engine-data/.*\.json''',
+  '''apps/desktop/test/fixtures/stream-claude\.jsonl''',
+]

@@ -1,0 +1,31 @@
+{
+  "leagueId": {
+    "status": "known",
+    "value": "Allflame",
+    "evidenceId": "official-leagues"
+  },
+  "realm": {
+    "status": "known",
+    "value": "pc",
+    "evidenceId": "official-leagues"
+  },
+  "mode": {
+    "status": "known",
+    "value": {
+      "economy": "trade",
+      "hardcore": false,
+      "ruthless": false
+    },
+    "evidenceId": "official-leagues"
+  },
+  "patchVersion": {
+    "status": "known",
+    "value": "3.29.3b",
+    "evidenceId": "official-patch-thread"
+  },
+  "datasetVersion": {
+    "status": "unknown",
+    "reason": "Not applicable to an empty starter content pack."
+  },
+  "createdAt": "2026-10-16T05:37:43.517Z"
+}

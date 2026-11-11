@@ -1,0 +1,17 @@
+Path of Mastery game knowledge base (kb.sqlite.br): sources and attribution
+
+Every row in the knowledge base records its source, source URL, game patch and fetch time.
+
+- Grinding Gear Games, Path of Exile game files (patch CDN, patch.poecdn.com), read with pathofexile-dat
+  (MIT, https://github.com/SnosMe/poe-dat-viewer) and dat-schema (MIT, https://github.com/poe-tool-dev/dat-schema).
+  Path of Exile and its content are the property of Grinding Gear Games.
+- Grinding Gear Games, Path of Exile forum patch notes (https://www.pathofexile.com/forum/view-forum/patch-notes).
+- exile-leveling by HeartofPhos (MIT, https://github.com/HeartofPhos/exile-leveling): quest and vendor gem offers,
+  zones, routes. Its licence ships beside the data in resources/leveling/<league>/LICENSE-exile-leveling.
+- Path of Building Community (https://github.com/PathOfBuildingCommunity/PathOfBuilding): unique item text and boss
+  tables, via this repository's engine-data export.
+- Path of Exile Wiki (https://www.poewiki.net): divination card rewards (snapshot used by the Build Filter). Wiki content
+  is licensed CC BY-NC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/); each wiki row links its page.
+- Latest patch version pointer: poe-tool-dev/latest-patch-version (MIT).
+
+This product is not affiliated with or endorsed by Grinding Gear Games.

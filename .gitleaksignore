@@ -1,0 +1,5 @@
+# Findings that are not secrets (file:rule:line). The Supabase key in config.ts is the project's publishable key, public by design.
+apps/desktop/src/main/accounts/config.ts:generic-api-key:7
+apps/desktop/test/accounts-auth.test.ts:generic-api-key:122
+apps/desktop/test/wealth-ggg.test.ts:generic-api-key:5
+crates/item/src/item.rs:generic-api-key:277

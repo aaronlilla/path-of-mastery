@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="100" targetVersion="3_0" bandit="None" className="Templar" ascendClassName="Inquisitor" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="None" pantheonMinorGod="None">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Essence Drain" skillId="EssenceDrain" gemId="Metadata/Items/Gems/SkillGemEssenceDrain" variantId="EssenceDrain" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SupportGemVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Lifetap" skillId="SupportLifetap" gemId="Metadata/Items/Gems/SupportGemLifetap" variantId="SupportLifetap" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Arcane Surge" skillId="SupportArcaneSurge" gemId="Metadata/Items/Gems/SupportGemArcaneSurge" variantId="SupportArcaneSurge" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Sacrifice" skillId="SupportSacrifice" gemId="Metadata/Items/Gems/SupportGemSacrifice" variantId="SupportSacrifice" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Increased Critical Damage" skillId="SupportIncreasedCriticalDamage" gemId="Metadata/Items/Gems/SupportGemIncreasedCriticalDamage" variantId="SupportIncreasedCriticalDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Skitterbots" skillId="SummonSkitterbots" gemId="Metadata/Items/Gems/SkillGemSummonSkitterbots" variantId="SummonSkitterbots" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Despair" skillId="Despair" gemId="Metadata/Items/Gems/SkillGemVulnerability" variantId="Despair" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Immortal Call" skillId="ImmortalCall" gemId="Metadata/Items/Gems/SkillGemImmortalCall" variantId="ImmortalCall" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Seismic Cry" skillId="SeismicCry" gemId="Metadata/Items/Gems/SkillGemSeismicCry" variantId="SeismicCry" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Bodyswap" skillId="Bodyswap" gemId="Metadata/Items/Gems/SkillGemCorpseWarp" variantId="Bodyswap" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Wither" skillId="Wither" gemId="Metadata/Items/Gems/SkillGemWither" variantId="Wither" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Spell Totem" skillId="SupportSpellTotem" gemId="Metadata/Items/Gems/SupportGemSpellTotem" variantId="SupportSpellTotem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="5" ascendClassId="1" masteryEffects="{41415,34242},{16123,2987},{23547,59574},{5230,65233}" nodes="61525,61871,35214,53884,662,3154,35739,19417,43193,37486,63965,35724,41472,1203,49254,420,9294,4568,54694,44799,26866,61471,36949,10031,15064,31931,44908,50288,46910,33740,15405,50862,2913,41415,55485,65034,6712,65108,3533,11088,7374,44967,50422,58218,5743,64210,26270,60472,23027,46842,36452,63398,7444,16123,22702,53957,4977,24229,42760,36678,4177,48556,29629,48971,47949,63447,39841,23547,19103,35260,39761,48282,51559,37639,60740,47427,26481,41190,56671,44362,21958,14936,44184,33755,53493,16790,44723,19635,1031,7918,42485,40075,55190,26712,35288,29353,44202,33631,26620,26196,34171,5230,2643,61419,53279,7960,52502,20987,36634,7388,60398,46340,28475,49178,30733,46578,13714,27611,65696,65698,65701,65702,65703,65706,44169,49080,65680,65684,65686,65688,66704,66707,66710,66713" secondaryAscendClassId="16">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="502"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="500"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/><Socket nodeId="49080" itemId="501"/><Socket nodeId="44169" itemId="503"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: RARE
+Solver Staff
+Eventuality Rod
+Item Level: 100
+Quality: 20
+LevelReq: 70
+Warlord Item
+Implicits: 4
+{crafted}{enchant}Quality does not increase Physical Damage
+{crafted}{enchant}1% increased Critical Strike Chance per 4% Quality
++50% to Global Critical Strike Multiplier
+18% increased Critical Strike Chance
+165% increased Spell Damage
+138% increased Spell Damage
+40% increased Mana Regeneration Rate
+Adds 149 to 280 Chaos Damage
+Culling Strike
+25% increased Area of Effect if you've dealt a Culling Strike Recently
+{crafted}10% chance to deal Double Damage
++38% to Global Critical Strike Multiplier
+Corrupted
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Warlord Item
+Hunter Item
+Implicits: 3
+{crafted}{enchant}40% increased Essence Drain Damage
+6% increased maximum Life
++2% to maximum Lightning Resistance
++35 to Strength and Dexterity
+{crafted}+13 to all Attributes
+Nearby Enemies have -12% to Chaos Resistance
++144 to maximum Life
+Adds 39 to 61 Chaos Damage to Spells
+Minions deal 30% increased Damage
+Corrupted
+</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Sacred Chainmail
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Implicits: 2
+{eater}10% Chance to Block Attack Damage
+{exarch}+31% to Critical Strike Multiplier for Spell Damage
+110% increased Armour and Energy Shield
+{crafted}74% increased Energy Shield
++375 to Armour
++80 to maximum Energy Shield
++35% to Chaos Resistance
++35 to Strength and Intelligence
++58 to Strength
+</Item><Item id="5">Rarity: UNIQUE
+Foulborn Meginord's Vise
+Steel Gauntlets
+Variant: Pre 1.1.0
+Variant: Pre 2.6.0
+Variant: Pre 3.19.0
+Variant: Current
+Requires Level 35, 52 Str
+{variant:4}Melee Strike Skills deal Splash Damage to surrounding targets
+{variant:1,2,3}+100 to Strength
+{variant:4}{mutated}+700 Strength Requirement
+{variant:4}{mutated}(10-15)% chance to deal Triple Damage
+{variant:1,2,3}10% increased Global Physical Damage
+{variant:1}(5-15)% reduced Attack Speed
+{variant:1,2,3}(40-60)% increased Armour
+{variant:4}(150-200)% increased Armour
+{variant:4}100% increased Knockback Distance
+{variant:3}Regenerate 2% of Life per second with at least 400 Strength
+{variant:4}Melee Hits with Strike Skills always Knockback</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Warlord Item
+Hunter Item
+Implicits: 4
+{crafted}{enchant}+8% chance to Suppress Spell Damage if you've
+{crafted}{enchant}taken Spell Damage Recently
+6% increased maximum Life
++9% chance to Suppress Spell Damage
++30% to Cold Resistance
+10% chance to Avoid Cold Damage from Hits
++129 to maximum Life
++58 to Strength
+12% increased Strength
++60 to maximum Life
+Regenerate 5.3 Mana per second
++48 to Armour
++28 to maximum Life
+Corrupted
+</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Agate Amulet
+Item Level: 100
+LevelReq: 65
+Warlord Item
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 4
+{crafted}Allocates Force of Darkness
+{tags:frenzy_charge}+1 to Minimum Frenzy Charges
+{tags:attribute}6% increased Strength
+{tags:attribute}6% increased Intelligence
+{tags:damage,critical}{suffix}+41% to Global Critical Strike Multiplier
+{tags:gem}{prefix}+1 to Level of all Skill Gems
+{tags:chaos,gem}{prefix}+1 to Level of all Chaos Skill Gems
+{tags:frenzy_charge,unveiled_mod}{suffix}+1 to Minimum Frenzy Charges
+{tags:frenzy_charge,unveiled_mod}{suffix}4% chance to gain a Frenzy Charge on Kill
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:influence_mod,damage}{prefix}1% increased Damage per 15 Strength
+Corrupted
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 100
+LevelReq: 65
+Crusader Item
+Redeemer Item
+Catalyst: Unstable
+CatalystQuality: 20
+Implicits: 2
+{tags:damage,critical}+20% to Global Critical Strike Multiplier
+{tags:damage}25% increased Damage
+{tags:damage,critical}{suffix}+25% to Global Critical Strike Multiplier
+{tags:resource,life}{prefix}+114 to maximum Life
+{tags:attribute}{suffix}+55 to Strength
+{tags:influence_mod,damage,minion}{prefix}Minions deal 25% increased Damage
+{tags:caster_damage,influence_mod,damage,caster}{prefix}25% increased Spell Damage
+{tags:unveiled_mod,attribute}{suffix}+35 to Strength and Intelligence
+Corrupted
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 100
+LevelReq: 65
+Warlord Item
+Crusader Item
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 3
+{tags:attribute}6% increased Strength
+{tags:attribute}6% increased Intelligence
+{tags:damage,critical}+20% to Global Critical Strike Multiplier
+{tags:chaos_damage,damage,chaos}{suffix}34% increased Chaos Damage
+{tags:unveiled_mod,attribute}{suffix}+35 to Strength and Intelligence
+{tags:influence_mod,damage,critical}{suffix}+22% to Global Critical Strike Multiplier
+{tags:resource,life}{prefix}+114 to maximum Life
+{tags:caster_damage,influence_mod,damage,caster}{prefix}25% increased Spell Damage
+{tags:unveiled_mod,damage}{prefix}{crafted}17% increased Damage
+Corrupted
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 100
+LevelReq: 68
+Hunter Item
+Redeemer Item
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 3
+{crafted}{enchant}Enemies Withered by you have -6% to all Resistances
+{tags:flask,damage,critical}+25% to Critical Strike Multiplier during any Flask Effect
+{tags:resource,life}10% increased maximum Life
+{tags:resource,life}{prefix}+144 to maximum Life
+{tags:attribute}{suffix}12% increased Attributes
+{tags:influence_mod,damage}{prefix}40% increased Damage with Hits against Chilled Enemies
+{tags:attribute}{suffix}+60 to Strength
+{tags:chaos_damage,damage,chaos}{prefix}30% increased Chaos Damage
+{tags:unveiled_mod,attribute}{suffix}+35 to Strength and Intelligence
+Corrupted
+</Item><Item id="11">Rarity: MAGIC
+Bismuth Flask
+Item Level: 100
+Quality: 20
+LevelReq: 64
+Implicits: 0
+20% additional Elemental Resistances during Effect
+35% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="12">Rarity: MAGIC
+Topaz Flask
+Item Level: 100
+Quality: 20
+LevelReq: 67
+Implicits: 0
+60% increased Armour during Effect
+35% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="13">Rarity: MAGIC
+Ruby Flask
+Item Level: 100
+Quality: 20
+LevelReq: 64
+Implicits: 0
+20% additional Elemental Resistances during Effect
+</Item><Item id="14">Rarity: MAGIC
+Sulphur Flask
+Item Level: 100
+Quality: 20
+LevelReq: 64
+Implicits: 1
+Creates Consecrated Ground on Use
+20% additional Elemental Resistances during Effect
+</Item><Item id="15">Rarity: MAGIC
+Sulphur Flask
+Item Level: 100
+Quality: 20
+LevelReq: 64
+Implicits: 1
+Creates Consecrated Ground on Use
+20% additional Elemental Resistances during Effect
+</Item><Item id="16">Rarity: RARE
+Solver Jewel
+Cobalt Jewel
+Item Level: 100
+LevelReq: 0
+Implicits: 2
+5% increased Damage
+Minions deal 5% increased Damage
++15% to Critical Strike Multiplier for Spell Damage
++12% to Global Critical Strike Multiplier
+7% increased maximum Life
+Minions deal 16% increased Damage
+Corrupted
+</Item><Item id="500">Rarity: RARE
+Solver Jewel
+Large Cluster Jewel
+Cluster Jewel Skill: affliction_chaos_damage
+Cluster Jewel Node Count: 8
+Item Level: 100
+LevelReq: 67
+Implicits: 3
+{crafted}Adds 8 Passive Skills
+{crafted}2 Added Passive Skills are Jewel Sockets
+{crafted}Added Small Passive Skills grant: 12% increased Chaos Damage
+Added Small Passive Skills also grant: Regenerate 0.2% of Life per Second
+Added Small Passive Skills have 35% increased Effect
+Added Small Passive Skills also grant: +10 to Maximum Life
+Added Small Passive Skills also grant: +8 to Strength
+</Item><Item id="501">Rarity: RARE
+Solver Jewel
+Medium Cluster Jewel
+Cluster Jewel Skill: affliction_projectile_damage
+Cluster Jewel Node Count: 4
+Item Level: 100
+LevelReq: 67
+Implicits: 2
+{crafted}Adds 4 Passive Skills
+{crafted}Added Small Passive Skills grant: 10% increased Projectile Damage
+1 Added Passive Skill is Eye to Eye
+1 Added Passive Skill is Shrieking Bolts
+Added Small Passive Skills also grant: +8 to Strength
+Added Small Passive Skills also grant: +4 to All Attributes
+</Item><Item id="502">Rarity: UNIQUE
+Dissolution of the Flesh
+Prismatic Jewel
+Source: Drops from unique{The Searing Exarch}
+Limited to: 1
+Removes all Energy Shield
+Life that would be lost by taking Damage is instead Reserved
+until you take no Damage to Life for 2 seconds
+(20-30)% more Maximum Life
+</Item><Item id="503">Rarity: UNIQUE
+Megalomaniac
+Medium Cluster Jewel
+League: Delirium
+Source: Drops from the Simulacrum Encounter
+Has Alt Variant: true
+Has Alt Variant Two: true
+Variant: Adrenaline
+Variant: Advance Guard
+Variant: Aerialist
+Variant: Aerodynamics
+Variant: Agent of Destruction
+Variant: Aggressive Defence
+Variant: Alchemist
+Variant: Ancestral Echo
+Variant: Ancestral Guidance
+Variant: Ancestral Inspiration
+Variant: Ancestral Might
+Variant: Ancestral Preservation
+Variant: Ancestral Reach
+Variant: Antifreeze
+Variant: Antivenom
+Variant: Arcane Adept
+Variant: Arcane Heroism
+Variant: Arcane Pyrotechnics
+Variant: Arcing Shot
+Variant: Assert Dominance
+Variant: Astonishing Affliction
+Variant: Basics of Pain
+Variant: Battle-Hardened
+Variant: Battlefield Dominator
+Variant: Blacksmith
+Variant: Blanketed Snow
+Variant: Blast-Freeze
+Variant: Blessed
+Variant: Blessed Rebirth
+Variant: Blizzard Caller
+Variant: Blood Artist
+Variant: Bloodscent
+Variant: Blowback
+Variant: Bodyguards
+Variant: Born of Chaos
+Variant: Brand Loyalty
+Variant: Brewed for Potency
+Variant: Broadside
+Variant: Brush with Death
+Variant: Brutal Infamy
+Variant: Burden Projection
+Variant: Burning Bright
+Variant: Calamitous
+Variant: Call to the Slaughter
+Variant: Capacitor
+Variant: Careful Handling
+Variant: Chilling Presence
+Variant: Chip Away
+Variant: Circling Oblivion
+Variant: Clarity of Purpose
+Variant: Cold Conduction
+Variant: Cold to the Core
+Variant: Cold-Blooded Killer
+Variant: Combat Rhythm
+Variant: Compound Injury
+Variant: Confident Combatant
+Variant: Conjured Wall
+Variant: Conservation of Energy
+Variant: Cooked Alive
+Variant: Corrosive Elements
+Variant: Cremator
+Variant: Cry Wolf
+Variant: Cult-Leader
+Variant: Daring Ideas
+Variant: Dark Ideation
+Variant: Dark Messenger
+Variant: Darting Movements
+Variant: Deadly Repartee
+Variant: Deep Chill
+Variant: Deep Cuts
+Variant: Destructive Aspect
+Variant: Devastator
+Variant: Disciples
+Variant: Disease Vector
+Variant: Disorienting Display
+Variant: Disorienting Wounds
+Variant: Distilled Perfection
+Variant: Doedre's Apathy
+Variant: Doedre's Gluttony
+Variant: Doedre's Spite
+Variant: Doryani's Lesson
+Variant: Dragon Hunter
+Variant: Dread March
+Variant: Drive the Destruction
+Variant: Eldritch Inspiration
+Variant: Electric Presence
+Variant: Elegant Form
+Variant: Empowered Envoy
+Variant: Endbringer
+Variant: Enduring Composure
+Variant: Enduring Focus
+Variant: Enduring Ward
+Variant: Energy From Naught
+Variant: Essence Rush
+Variant: Eternal Suffering
+Variant: Evil Eye
+Variant: Expansive Might
+Variant: Expendability
+Variant: Expert Sabotage
+Variant: Exploit Weakness
+Variant: Explosive Force
+Variant: Exposure Therapy
+Variant: Eye of the Storm
+Variant: Eye to Eye
+Variant: Fan of Blades
+Variant: Fan the Flames
+Variant: Fasting
+Variant: Fearsome Warrior
+Variant: Feast of Flesh
+Variant: Feasting Fiends
+Variant: Feed the Fury
+Variant: Fettle
+Variant: Fiery Aegis
+Variant: Fire Attunement
+Variant: Flexible Sentry
+Variant: Flow of Life
+Variant: Follow-Through
+Variant: Forbidden Words
+Variant: Force Multiplier
+Variant: Frantic Aspect
+Variant: Fuel the Fight
+Variant: Furious Assault
+Variant: Genius
+Variant: Gladiator's Fortitude
+Variant: Gladiatorial Combat
+Variant: Graceful Execution
+Variant: Grand Design
+Variant: Grim Oath
+Variant: Guerilla Tactics
+Variant: Haemorrhage
+Variant: Haunting Shout
+Variant: Heart of Iron
+Variant: Heavy Hitter
+Variant: Heraldry
+Variant: Hex Breaker
+Variant: Hibernator
+Variant: Hit and Run
+Variant: Holistic Health
+Variant: Holy Conquest
+Variant: Holy Word
+Variant: Hound's Mark
+Variant: Hulking Corpses
+Variant: Improvisor
+Variant: Insatiable Killer
+Variant: Inspired Oppression
+Variant: Insulated
+Variant: Intensity
+Variant: Introspection
+Variant: Invigorating Portents
+Variant: Iron Breaker
+Variant: Lasting Impression
+Variant: Lead By Example
+Variant: Life from Death
+Variant: Liquid Inspiration
+Variant: Lord of Drought
+Variant: Low Tolerance
+Variant: Mage Bane
+Variant: Mage Hunter
+Variant: Magnifier
+Variant: Martial Mastery
+Variant: Martial Momentum
+Variant: Martial Prowess
+Variant: Master of Command
+Variant: Master of Fear
+Variant: Master of Fire
+Variant: Master of the Maelstrom
+Variant: Master the Fundamentals
+Variant: Mender's Wellspring
+Variant: Militarism
+Variant: Mindfulness
+Variant: Misery Everlasting
+Variant: Mob Mentality
+Variant: Molten One's Mark
+Variant: Mortifying Aspect
+Variant: Mystical Ward
+Variant: Natural Vigour
+Variant: No Witnesses
+Variant: Non-Flammable
+Variant: Numbing Elixir
+Variant: One with the Shield
+Variant: Openness
+Variant: Opportunistic Fusilade
+Variant: Overlord
+Variant: Overshock
+Variant: Overwhelming Malice
+Variant: Paralysis
+Variant: Peace Amidst Chaos
+Variant: Peak Vigour
+Variant: Phlebotomist
+Variant: Powerful Assault
+Variant: Powerful Ward
+Variant: Practiced Caster
+Variant: Precise Focus
+Variant: Precise Retaliation
+Variant: Pressure Points
+Variant: Primordial Bond
+Variant: Prismatic Carapace
+Variant: Prismatic Dance
+Variant: Prismatic Heart
+Variant: Prodigious Defence
+Variant: Provocateur
+Variant: Pure Agony
+Variant: Pure Aptitude
+Variant: Pure Guile
+Variant: Pure Might
+Variant: Purposeful Harbinger
+Variant: Quick Getaway
+Variant: Quick and Deadly
+Variant: Rattling Bellow
+Variant: Raze and Pillage
+Variant: Readiness
+Variant: Remarkable
+Variant: Rend
+Variant: Renewal
+Variant: Repeater
+Variant: Replenishing Presence
+Variant: Righteous Path
+Variant: Riot Queller
+Variant: Rot-Resistant
+Variant: Rote Reinforcement
+Variant: Rotten Claws
+Variant: Run Through
+Variant: Sadist
+Variant: Sage
+Variant: Sap Psyche
+Variant: Savage Response
+Variant: Savour the Moment
+Variant: Scintillating Idea
+Variant: Seal Mender
+Variant: Second Skin
+Variant: Seeker Runes
+Variant: Self-Control
+Variant: Self-Fulfilling Prophecy
+Variant: Septic Spells
+Variant: Set and Forget
+Variant: Shifting Shadow
+Variant: Shrieking Bolts
+Variant: Skeletal Atrophy
+Variant: Skullbreaker
+Variant: Sleepless Sentries
+Variant: Smite the Weak
+Variant: Smoking Remains
+Variant: Snaring Spirits
+Variant: Snowstorm
+Variant: Special Reserve
+Variant: Spiked Concoction
+Variant: Spiteful Presence
+Variant: Spring Back
+Variant: Steady Torment
+Variant: Stoic Focus
+Variant: Storm Drinker
+Variant: Storm's Hand
+Variant: Stormrider
+Variant: Streamlined
+Variant: Strike Leader
+Variant: Stubborn Student
+Variant: Student of Decay
+Variant: Sublime Form
+Variant: Sublime Sensation
+Variant: Supercharge
+Variant: Surefooted Striker
+Variant: Surging Vitality
+Variant: Surprise Sabotage
+Variant: Tempered Arrowheads
+Variant: Tempt the Storm
+Variant: Thaumophage
+Variant: Thunderstruck
+Variant: Titanic Swings
+Variant: Touch of Cruelty
+Variant: Towering Threat
+Variant: Uncompromising
+Variant: Unholy Grace
+Variant: Unrestrained Focus
+Variant: Unspeakable Gifts
+Variant: Untouchable
+Variant: Unwavering Focus
+Variant: Unwaveringly Evil
+Variant: Vast Power
+Variant: Veteran Defender
+Variant: Vicious Bite
+Variant: Vicious Guard
+Variant: Vicious Skewering
+Variant: Victim Maker
+Variant: Vile Reinvigoration
+Variant: Vital Focus
+Variant: Vivid Hues
+Variant: Volatile Presence
+Variant: Wall of Muscle
+Variant: Warning Call
+Variant: Wasting Affliction
+Variant: Weight Advantage
+Variant: Wicked Pall
+Variant: Widespread Destruction
+Variant: Will Shaper
+Variant: Wind-up
+Variant: Winter Prowler
+Variant: Wish for Death
+Variant: Wizardry
+Variant: Wound Aggravation
+Variant: Wrapped in Flame
+Selected Variant: 78
+Selected Alt Variant: 104
+Selected Alt Variant Two: 119
+Adds 4 Passive Skills
+Added Small Passive Skills grant Nothing
+{variant:78}1 Added Passive Skill is Doedre's Apathy
+{variant:104}1 Added Passive Skill is Eye to Eye
+{variant:119}1 Added Passive Skill is Force Multiplier</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="bandit" string="None"/><Input name="multiplierWitheredStackCount" number="15"/><Input name="buffLifetap" boolean="true"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

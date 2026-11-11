@@ -1,0 +1,12 @@
+[package]
+name = "pom-passives"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pom-engine = { path = "../engine" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+roxmltree = "0.20"
+base64 = "0.22"
+flate2 = "1"

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Scion" ascendClassName="Ascendant" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Lightning Arrow" skillId="LightningArrow" gemId="Metadata/Items/Gems/SkillGemLightningArrow" variantId="LightningArrow" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Decay" skillId="SupportDecay" gemId="Metadata/Items/Gems/SupportGemDecay" variantId="SupportDecay" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Mana Leech" skillId="SupportManaLeech" gemId="Metadata/Items/Gems/SupportGemManaLeech" variantId="SupportManaLeech" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Mirage Archer" skillId="SupportMirageArcher" gemId="Metadata/Items/Gems/SupportGemMirageArcher" variantId="SupportMirageArcher" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Vicious Projectiles" skillId="SupportViciousProjectiles" gemId="Metadata/Items/Gems/SupportGemPhysicalProjectileAttackDamage" variantId="SupportViciousProjectiles" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Cruelty" skillId="SupportCruelty" gemId="Metadata/Items/Gems/SupportGemCruelty" variantId="SupportCruelty" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Purity of Fire" skillId="PurityOfFire" gemId="Metadata/Items/Gems/SkillGemFireResistAura" variantId="PurityOfFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Defiance Banner" skillId="DefianceBanner" gemId="Metadata/Items/Gems/SkillGemDefianceBanner" variantId="DefianceBanner" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Withering Step" skillId="WitheringStep" gemId="Metadata/Items/Gems/SkillGemWitheringStep" variantId="WitheringStep" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="0" ascendClassId="1" masteryEffects="{4707,40307},{24552,36967}" nodes="58833,35754,61437,33875,193,4194,49532,38689,31598,34567,45403,58029,19144,35503,36881,33508,48828,55485,13714,46578,28330,65034,15073,62021,65167,19939,42041,8930,18402,10829,16167,14056,22703,43374,49178,30733,48287,14930,34400,61190,10311,45503,61262,24914,21435,17566,24083,34513,40907,58921,16213,23951,57449,16544,4707,6580,11651,5408,11497,238,48823,34510,50041,19711,24552,42720,36687,930,29089,46344,8566,54142,61306,63139,15842,30894,65224,42964,50338,57240,25178,9373,31508,6654,6913,23066,18103,48614,21758,63843,27283,9535,39938,54868,59606,39718,5616,46408,28012,59252,44988,37663,58968,9355,4011,51212,46289,27276,5823,51220,62831,41689,42443,53213,7112,13885,45272,9864,46896,33783,3656,58244,4973,5129,24050,36945,30338" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: RARE
+Solver Bow
+Solarine Bow
+Item Level: 75
+Quality: 20
+LevelReq: 70
+Sockets: G-B-G-G-G-R
+Implicits: 1
+Adds 127 to 191 Fire Damage
+{crafted}+2 to Level of Socketed Support Gems
++16% to Damage over Time Multiplier
++1 to Level of Socketed Gems</Item><Item id="2">Rarity: RARE
+Solver Quiver
+Two-Point Arrow Quiver
+Item Level: 75
+Quality: 20
+LevelReq: 68
+Implicits: 1
+25% increased Global Accuracy Rating
+44% increased Damage with Bow Skills
++16% to Damage over Time Multiplier with Attack Skills
++44 to Dexterity
+{crafted}+21 to Strength and Dexterity
++130 to maximum Life
+Adds 28 to 51 Fire Damage to Attacks
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Majestic Pelt
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G G G G
+Implicits: 1
+{crafted}{enchant}40% increased Lightning Arrow Damage
++38 to Dexterity
+{crafted}+21 to Strength and Dexterity
++100 to maximum Life
++58 to Evasion Rating
++29 to maximum Life
++2 to Level of all Minion Skill Gems
++45% to Cold Resistance</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Conquest Lamellar
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B R R R G R
+Implicits: 0
++160 to maximum Life
++26% to Chaos Resistance
+{crafted}18% increased Evasion and Energy Shield
+{crafted}+17 to maximum Life</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Velour Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G G G G
+Implicits: 0
++70 to maximum Life
++16% to Chaos Resistance
+{crafted}+13% to Cold and Chaos Resistances
++28 to Evasion Rating
++23 to maximum Life</Item><Item id="6">Rarity: RARE
+Solver Boots
+Velour Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G G G G
+Implicits: 0
++70 to maximum Life
+32% increased Movement Speed
+{crafted}+40 to maximum Life
+{crafted}Regenerate 4 Mana per second</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 75
+LevelReq: 64
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:resource,life}{prefix}+70 to maximum Life
+{tags:chaos,resistance}{suffix}+16% to Chaos Resistance
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+{tags:elemental_damage,damage,elemental,fire,attack}{prefix}Adds 18 to 33 Fire Damage to Attacks
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 1
+20% increased Chaos Damage
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:chaos,resistance}{suffix}+16% to Chaos Resistance
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+{tags:elemental_damage,damage,elemental,fire,attack}{prefix}Adds 18 to 33 Fire Damage to Attacks
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+20% increased Chaos Damage
+{tags:chaos,resistance}{suffix}+16% to Chaos Resistance
+{tags:dot_multi,damage}{suffix}+14% to Damage over Time Multiplier
+{tags:unveiled_mod,damage}{prefix}{crafted}15% increased Damage
+{tags:elemental_damage,damage,elemental,cold,attack}{prefix}Adds 9 to 16 Cold Damage to Attacks
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 64
+Catalyst: Prismatic
+CatalystQuality: 20
+Implicits: 2
+{crafted}{enchant}Enemies Withered by you have -6% to all Resistances
++30 to Strength
+{tags:chaos,resistance}{suffix}+31% to Chaos Resistance
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+</Item><Item id="12">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+9% increased Movement Speed during Effect
+23% reduced Charges per use
+</Item><Item id="13">Rarity: MAGIC
+Silver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+23% reduced Charges per use
+</Item><Item id="14">Rarity: MAGIC
+Amethyst Flask
+Item Level: 75
+Quality: 20
+LevelReq: 18
+Implicits: 0
+</Item><Item id="15">Rarity: MAGIC
+Aquamarine Flask
+Item Level: 75
+Quality: 20
+LevelReq: 27
+Implicits: 1
+Creates Chilled Ground on Use
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyIgnited" boolean="true"/><Input name="bandit" string="None"/><Input name="bannerPlanted" boolean="true"/><Input name="bannerValour" number="50"/><Input name="useFrenzyCharges" boolean="true"/><Input name="overrideFrenzyCharges" number="3"/><Input name="buffTailwind" boolean="true"/><Input name="conditionGainedFrenzyChargeRecently" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="multiplierWitheredStackCount" number="15"/></Config>
+</PathOfBuilding>

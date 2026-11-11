@@ -1,0 +1,48 @@
+{
+ "skill": "Lightning Arrow",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Deadeye lightning arrow",
+    "ascendancy": "Deadeye",
+    "supports": [
+     "Added Lightning Damage",
+     "Lightning Penetration",
+     "Chain"
+    ],
+    "why": "Deadeye projectile scaling and Far Shot; chain and penetration scale lightning damage"
+   },
+   {
+    "name": "Raider LA",
+    "ascendancy": "Raider",
+    "supports": [
+     "Added Lightning Damage",
+     "Lightning Penetration",
+     "Faster Attacks"
+    ],
+    "why": "Raider charges and attack speed"
+   },
+   {
+    "name": "Trickster LA",
+    "ascendancy": "Trickster",
+    "supports": [
+     "Added Lightning Damage",
+     "Elemental Damage with Attacks",
+     "Faster Attacks"
+    ],
+    "why": "Trickster evasion and damage with ES"
+   }
+  ]
+ }
+}

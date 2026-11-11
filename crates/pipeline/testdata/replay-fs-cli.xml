@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Duelist" ascendClassName="Champion" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Flicker Strike" skillId="FlickerStrike" gemId="Metadata/Items/Gems/SkillGemFlickerStrike" variantId="FlickerStrike" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Melee Physical Damage" skillId="SupportMeleePhysicalDamage" gemId="Metadata/Items/Gems/SupportGemMeleePhysicalDamage" variantId="SupportMeleePhysicalDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Brutality" skillId="SupportBrutality" gemId="Metadata/Items/Gems/SupportGemBrutality" variantId="SupportBrutality" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Fortify" skillId="SupportFortify" gemId="Metadata/Items/Gems/SupportGemFortify" variantId="SupportFortify" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Multistrike" skillId="SupportMultistrike" gemId="Metadata/Items/Gems/SupportGemMultistrike" variantId="SupportMultistrike" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Purity of Ice" skillId="PurityOfIce" gemId="Metadata/Items/Gems/SkillGemColdResistAura" variantId="PurityOfIce" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Purity of Fire" skillId="PurityOfFire" gemId="Metadata/Items/Gems/SkillGemFireResistAura" variantId="PurityOfFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Vulnerability" skillId="Vulnerability" gemId="Metadata/Items/Gems/SkillGemNewVulnerability" variantId="Vulnerability" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Flesh and Stone" skillId="FleshAndStone" gemId="Metadata/Items/Gems/SkillGemFleshAndStone" variantId="FleshAndStone" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="4" ascendClassId="3" masteryEffects="{6912,1626},{52220,59010},{35118,35582},{4424,11049},{58540,50175}" nodes="50986,24984,17818,6741,24865,476,40867,42911,47389,11412,25111,13374,41433,31700,60508,33940,35185,30691,23199,27301,27140,64816,43374,6912,48807,25933,48438,18302,34009,34666,43412,1325,29933,34031,21435,49109,61198,5152,24383,49412,31080,12795,32739,18025,14056,54776,50360,36874,23471,20010,19711,6580,11651,25178,9373,54142,61306,63139,5408,35436,28728,15438,50862,44606,26523,58449,39768,50197,50422,26866,44908,2913,58402,10575,29199,15064,31931,6764,14606,2454,38777,26564,47421,1572,55854,50570,52220,40907,49318,1909,56381,8533,24914,34400,23852,9194,59833,13498,40841,33582,34191,60529,35118,52090,19388,4424,13273,26294,60887,39904,47854,63413,17429,61262,7440,16756,30251,42800,487,58540,34284,17020,8410" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+Foulborn Uul-Netol's Embrace
+Vaal Axe
+League: Breach
+Source: Upgraded from unique{Uul-Netol's Kiss} using currency{Blessing of Uul-Netol}
+Variant: Pre 3.11.0
+Variant: Pre 3.21.0
+Variant: Current
+Sockets: R R R R R R
+Implicits: 1
+{variant:2,3}25% chance to Maim on Hit
+Trigger Level 20 Bone Nova when you Hit a Bleeding Enemy
+(280-320)% increased Physical Damage
+{mutated}80% reduced Intelligence
+{variant:3}25% chance to cause Bleeding on Hit
+{variant:1,2}Attacks have 25% chance to inflict Bleeding when Hitting Cursed Enemies</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Haunted Bascinet
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 1
+{crafted}{enchant}40% increased Flicker Strike Damage
++51 to Dexterity
++130 to maximum Life
++41% to Lightning Resistance
+{crafted}+17% to Cold and Lightning Resistances
++65 to Armour
++29 to maximum Life
++58 to Evasion Rating
++29 to maximum Life</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Conquest Lamellar
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G-R-R-R-R G
+Implicits: 1
+{crafted}{enchant}40% reduced Attribute Requirements
++160 to maximum Life
++38 to Dexterity
++36% to Lightning Resistance
+{crafted}+17% to Fire and Lightning Resistances
++65 to Armour
++29 to maximum Life
++58 to Evasion Rating
++29 to maximum Life</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Paladin Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 0
++70 to maximum Life
++31% to Chaos Resistance
+{crafted}+40 to maximum Life
+{crafted}Regenerate 4 Mana per second
++30% to Lightning Resistance</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 0
+{crafted}18% increased Movement Speed
+{crafted}8% increased Movement Speed if you haven't been Hit Recently
++70 to maximum Life
++31% to Chaos Resistance
+32% reduced Attribute Requirements</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 75
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:resource,life}{prefix}+70 to maximum Life
+{tags:chaos,resistance}{suffix}+10% to Chaos Resistance
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+{tags:attack}{suffix}+108 to Accuracy Rating
+{tags:attribute}{suffix}+51 to Intelligence
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 75
+LevelReq: 64
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:chaos,resistance}{suffix}+10% to Chaos Resistance
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+{tags:attack}{suffix}+366 to Accuracy Rating
+{tags:attribute}{suffix}+33 to Intelligence
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 75
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+{tags:attack}{suffix}+108 to Accuracy Rating
+{tags:attribute}{suffix}+51 to Intelligence
+{tags:attribute}{suffix}+33 to Dexterity
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Rustic Sash
+Item Level: 75
+LevelReq: 64
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 2
+{crafted}{enchant}Enemies Maimed by you take 8% increased Damage Over Time
+18% increased Global Physical Damage
+{tags:resource,life}{prefix}+85 to maximum Life
+{tags:chaos,resistance}{suffix}+31% to Chaos Resistance
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+40 to maximum Life
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 4 Mana per second
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+</Item><Item id="12">Rarity: MAGIC
+Amethyst Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+26% chance to gain a Flask Charge when you deal a Critical Strike
+9% increased Movement Speed during Effect
+</Item><Item id="13">Rarity: MAGIC
+Aquamarine Flask
+Item Level: 75
+Quality: 20
+LevelReq: 49
+Implicits: 1
+Creates Chilled Ground on Use
+26% chance to gain a Flask Charge when you deal a Critical Strike
+15% additional Elemental Resistances during Effect
+</Item><Item id="14">Rarity: MAGIC
+Basalt Flask
+Item Level: 75
+Quality: 20
+LevelReq: 27
+Implicits: 1
+Taunts nearby Enemies on use
+</Item><Item id="15">Rarity: MAGIC
+Bismuth Flask
+Item Level: 75
+Quality: 20
+LevelReq: 8
+Implicits: 0
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyBleeding" boolean="true"/><Input name="bandit" string="None"/><Input name="useFrenzyCharges" boolean="true"/><Input name="overrideFrenzyCharges" number="2"/><Input name="buffFortification" boolean="true"/><Input name="conditionImpaledRecently" boolean="true"/><Input name="conditionEnemyMaimed" boolean="true"/><Input name="conditionEnemyCrushed" boolean="true"/><Input name="FlickerStrikeBypassCD" boolean="true"/><Input name="conditionGainedFrenzyChargeRecently" boolean="true"/><Input name="conditionEnemyBleeding" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/></Config>
+</PathOfBuilding>

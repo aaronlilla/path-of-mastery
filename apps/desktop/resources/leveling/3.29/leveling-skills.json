@@ -1,0 +1,810 @@
+{
+ "note": "Curated leveling skill candidates by gemId. rank: lower is better. supports: gemIds the planner may add when available. Supports checked for compatibility 2026-10-11 (sweep): removed Pierce from Viper Strike, melee-only supports from Spectral Throw and Splitting Steel, Multiple Projectiles from non-projectile spells, Elemental Proliferation and Hallow from Raise Zombie.",
+ "skills": [
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemPoisonArrow",
+   "kind": "attack",
+   "damage": [
+    "chaos",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "Bow"
+   ],
+   "rank": 1,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemPierce"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemShrapnelShot",
+   "kind": "attack",
+   "damage": [
+    "lightning",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "Bow"
+   ],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemPierce",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemParallelProjectiles"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemIceShot",
+   "kind": "attack",
+   "damage": [
+    "cold",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "Bow"
+   ],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemPierce",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemParallelProjectiles"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemSplitArrow",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Bow"
+   ],
+   "rank": 8,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemPierce",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemParallelProjectiles"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemBurningArrow",
+   "kind": "attack",
+   "damage": [
+    "fire",
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Bow"
+   ],
+   "rank": 10,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemPierce",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemParallelProjectiles"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemKineticBolt",
+   "kind": "attack",
+   "damage": [
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Wand"
+   ],
+   "rank": 12,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemPierce",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemParallelProjectiles"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemViperStrike",
+   "kind": "attack",
+   "damage": [
+    "chaos",
+    "melee"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Sword",
+    "Thrusting One Handed Sword",
+    "Two Handed Sword"
+   ],
+   "rank": 3,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemFasterAttack"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemCobraLash",
+   "kind": "attack",
+   "damage": [
+    "chaos",
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger"
+   ],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemLesserPoison",
+    "Metadata/Items/Gems/SupportGemOnslaught",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemPierce"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemCleave",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "One Handed Axe",
+    "One Handed Sword",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Sword"
+   ],
+   "rank": 5,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemPerforate",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "One Handed Axe",
+    "One Handed Sword",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Sword"
+   ],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemSplittingSteel",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "One Handed Axe",
+    "One Handed Sword",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Sword"
+   ],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemGroundSlam",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "One Handed Axe",
+    "One Handed Mace",
+    "Sceptre",
+    "Staff",
+    "Two Handed Axe",
+    "Two Handed Mace"
+   ],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemGlacialHammer",
+   "kind": "attack",
+   "damage": [
+    "cold",
+    "melee"
+   ],
+   "weaponTypes": [
+    "One Handed Mace",
+    "Sceptre",
+    "Staff",
+    "Two Handed Mace"
+   ],
+   "rank": 3,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemMoltenStrike",
+   "kind": "attack",
+   "damage": [
+    "fire",
+    "melee",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemFrostBlades",
+   "kind": "attack",
+   "damage": [
+    "cold",
+    "melee",
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 5,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemDualStrike",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe"
+   ],
+   "rank": 7,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemDoubleStrike",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 8,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemHeavyStrike",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee"
+   ],
+   "weaponTypes": [
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 9,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemThrownWeapon",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "projectile"
+   ],
+   "weaponTypes": [
+    "Claw",
+    "Dagger",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 9,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemShieldCrush",
+   "kind": "attack",
+   "damage": [
+    "physical",
+    "melee",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 7,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemSmite",
+   "kind": "attack",
+   "damage": [
+    "lightning",
+    "melee",
+    "aoe"
+   ],
+   "weaponTypes": [
+    "None",
+    "One Handed Axe",
+    "One Handed Mace",
+    "One Handed Sword",
+    "Sceptre",
+    "Staff",
+    "Thrusting One Handed Sword",
+    "Two Handed Axe",
+    "Two Handed Mace",
+    "Two Handed Sword"
+   ],
+   "rank": 5,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemHolyStrike",
+   "kind": "attack",
+   "damage": [
+    "lightning",
+    "melee"
+   ],
+   "weaponTypes": [
+    "One Handed Mace",
+    "Sceptre",
+    "Staff",
+    "Two Handed Mace"
+   ],
+   "rank": 10,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemRuthless",
+    "Metadata/Items/Gems/SupportGemChanceToBleed",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemMaim",
+    "Metadata/Items/Gems/SupportGemMeleeSplash",
+    "Metadata/Items/Gems/SupportGemFasterAttack",
+    "Metadata/Items/Gems/SupportGemStun",
+    "Metadata/Items/Gems/SupportGemSpiritStrike"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemFreezingPulse",
+   "kind": "spell",
+   "damage": [
+    "cold",
+    "projectile"
+   ],
+   "weaponTypes": [],
+   "rank": 1,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemSpark",
+   "kind": "spell",
+   "damage": [
+    "lightning",
+    "projectile"
+   ],
+   "weaponTypes": [],
+   "rank": 2,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemFireball",
+   "kind": "spell",
+   "damage": [
+    "fire",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 3,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemMagmaOrb",
+   "kind": "spell",
+   "damage": [
+    "fire",
+    "projectile",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemFrostBolt",
+   "kind": "spell",
+   "damage": [
+    "cold",
+    "projectile"
+   ],
+   "weaponTypes": [],
+   "rank": 4,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemBlight",
+   "kind": "spell",
+   "damage": [
+    "chaos",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 3,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemEtherealKnives",
+   "kind": "spell",
+   "damage": [
+    "physical",
+    "projectile"
+   ],
+   "weaponTypes": [],
+   "rank": 3,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemLesserMultipleProjectiles",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemLightningTendrils",
+   "kind": "spell",
+   "damage": [
+    "lightning",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 5,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemSanctify",
+   "kind": "spell",
+   "damage": [
+    "fire",
+    "physical",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemShrapnelTrap",
+   "kind": "spell",
+   "damage": [
+    "fire",
+    "physical",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemStormblastMine",
+   "kind": "spell",
+   "damage": [
+    "lightning",
+    "aoe"
+   ],
+   "weaponTypes": [],
+   "rank": 8,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemArcaneSurge",
+    "Metadata/Items/Gems/SupportGemAddedFireDamage",
+    "Metadata/Items/Gems/SupportGemAddedColdDamage",
+    "Metadata/Items/Gems/SupportGemAddedLightningDamage",
+    "Metadata/Items/Gems/SupportGemEfficacy",
+    "Metadata/Items/Gems/SupportGemFasterCast",
+    "Metadata/Items/Gems/SupportGemSpellCascade"
+   ]
+  },
+  {
+   "gemId": "Metadata/Items/Gems/SkillGemRaiseZombie",
+   "kind": "minion",
+   "damage": [
+    "physical"
+   ],
+   "weaponTypes": [],
+   "rank": 6,
+   "supports": [
+    "Metadata/Items/Gems/SupportGemMinionDamage",
+    "Metadata/Items/Gems/SupportGemMinionLife",
+    "Metadata/Items/Gems/SupportGemEfficacy"
+   ]
+  }
+ ]
+}

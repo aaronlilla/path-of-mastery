@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Ranger" ascendClassName="Warden" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="None" pantheonMinorGod="None">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Tornado Shot" skillId="TornadoShot" gemId="Metadata/Items/Gems/SkillGemTornadoShot" variantId="TornadoShot" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Grace" skillId="Grace" gemId="Metadata/Items/Gems/SkillGemGrace" variantId="Grace" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Purity of Ice" skillId="PurityOfIce" gemId="Metadata/Items/Gems/SkillGemColdResistAura" variantId="PurityOfIce" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Withering Step" skillId="WitheringStep" gemId="Metadata/Items/Gems/SkillGemWitheringStep" variantId="WitheringStep" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="2" ascendClassId="1" masteryEffects="{44316,34242},{3042,47642},{49820,45317},{47294,1251},{13387,17942},{54413,13757}" nodes="50459,58427,4849,27536,24432,12146,2060,5926,24214,11597,2094,39821,25178,9373,54142,56149,29870,720,65210,32117,37504,903,2715,3187,19858,9206,41866,44316,36221,65224,42964,50338,57240,53114,25067,31315,39718,5616,38662,45593,12801,48099,19069,34678,3469,64709,60942,3042,26528,58271,27788,25260,46277,49900,1461,59606,40362,52714,11239,41989,47362,13885,51212,30338,46408,46289,42686,40644,24050,1767,35894,21575,63251,18770,29454,62744,36287,49820,42649,6785,20852,4502,33783,3656,9864,59482,46896,47294,4973,5129,25058,21835,9535,39938,54868,18769,61653,38190,1822,1600,31583,63639,62069,38129,47743,12068,16851,13387,6913,6654,9877,15344,45033,53324,54307,24067,9769,49515,54413,59866,4656,30679,6383" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: RARE
+Solver Bow
+Solarine Bow
+Item Level: 84
+Quality: 20
+LevelReq: 70
+Implicits: 1
+Adds 127 to 191 Fire Damage
+Your Hits inflict Decay, dealing 700 Chaos Damage per second for 8 seconds
+{crafted}Adds 55 to 101 Fire Damage
+</Item><Item id="2">Rarity: RARE
+Solver Quiver
+Primal Arrow Quiver
+Item Level: 84
+Quality: 20
+LevelReq: 66
+Implicits: 1
+25% increased Elemental Damage with Attack Skills
++33 to Dexterity and Intelligence
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Velour Gloves
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Implicits: 0
++33 to Dexterity and Intelligence
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="6">Rarity: RARE
+Solver Boots
+Velour Boots
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Implicits: 1
+{crafted}{enchant}Adds 45 to 68 Fire Damage if you've Killed Recently
+Drops Burning Ground while moving, dealing 2500 Fire Damage per second for 4 seconds
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Turquoise Amulet
+Item Level: 84
+LevelReq: 67
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Dexterity and Intelligence
+{tags:unveiled_mod,attribute}{suffix}+33 to Dexterity and Intelligence
+{tags:elemental,lightning,resistance}{suffix}+45% to Lightning Resistance
+{tags:elemental,fire,cold,resistance}{suffix}{crafted}+13% to Fire and Cold Resistances
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 84
+LevelReq: 67
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:unveiled_mod,attribute}{suffix}+33 to Dexterity and Intelligence
+{tags:elemental,lightning,resistance}{suffix}+45% to Lightning Resistance
+{tags:elemental,fire,cold,resistance}{suffix}{crafted}+13% to Fire and Cold Resistances
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 84
+LevelReq: 67
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:unveiled_mod,attribute}{suffix}+33 to Dexterity and Intelligence
+{tags:elemental,lightning,resistance}{suffix}+45% to Lightning Resistance
+{tags:elemental,fire,cold,resistance}{suffix}{crafted}+13% to Fire and Cold Resistances
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Crystal Belt
+Item Level: 84
+LevelReq: 79
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++70 to maximum Energy Shield
+{tags:unveiled_mod,attribute}{suffix}+33 to Dexterity and Intelligence
+{tags:elemental,fire,cold,resistance}{suffix}{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="11">Rarity: MAGIC
+Sulphur Flask
+Item Level: 84
+Quality: 20
+LevelReq: 57
+Implicits: 1
+Creates Consecrated Ground on Use
+31% chance to Freeze, Shock and Ignite during Effect
+</Item><Item id="12">Rarity: MAGIC
+Bismuth Flask
+Item Level: 84
+Quality: 20
+LevelReq: 64
+Implicits: 0
+18% additional Elemental Resistances during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="13">Rarity: MAGIC
+Ruby Flask
+Item Level: 84
+Quality: 20
+LevelReq: 64
+Implicits: 0
+18% additional Elemental Resistances during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="14">Rarity: MAGIC
+Topaz Flask
+Item Level: 84
+Quality: 20
+LevelReq: 64
+Implicits: 0
+18% additional Elemental Resistances during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="15">Rarity: MAGIC
+Sapphire Flask
+Item Level: 84
+Quality: 20
+LevelReq: 64
+Implicits: 0
+18% additional Elemental Resistances during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 84
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Weapon 2" itemId="2"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="bandit" string="None"/><Input name="buffPhasing" boolean="true"/><Input name="buffElusive" boolean="true"/><Input name="conditionKilledRecently" boolean="true"/><Input name="conditionEnemyIgnited" boolean="true"/></Config>
+</PathOfBuilding>

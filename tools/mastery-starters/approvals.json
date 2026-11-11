@@ -1,0 +1,5 @@
+{
+  "reviewer": "maintainer",
+  "reason": "Approved as build-only starters; the Atlas and Filter lanes come later.",
+  "approved": ["cyclone-slayer-allflame", "lacerate-gladiator-allflame", "toxic-rain-pathfinder-allflame", "explosive-arrow-hierophant-allflame", "spectre-necromancer-allflame", "winter-orb-occultist-allflame"]
+}

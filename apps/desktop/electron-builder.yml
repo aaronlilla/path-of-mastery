@@ -1,0 +1,101 @@
+appId: gg.pathofmastery.desktop
+productName: Path of Mastery
+# Nothing in the app needs compiling for Electron, and the rebuild step reinstalls (and in a workspace, prunes) node_modules.
+npmRebuild: false
+# electron-builder 26 only looks for electron in apps/desktop/node_modules, but npm hoists it to the workspace root, so give it the installed version.
+# Keep equal to node_modules/electron/package.json (^33.2.1 in package.json).
+electronVersion: 33.4.11
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**/*
+  - package.json
+  # The app's own compiled tests and source maps stay out of the package.
+  - "!dist/**/*.test.js"
+  - "!dist/**/*.test.js.map"
+  - "!dist/**/*.map"
+  # The workspace packages ship their built dist only, not their sources, tests, scripts, notes or source maps.
+  - "!node_modules/@pom/*/{src,test,scripts,dist-test}/**"
+  - "!node_modules/@pom/*/{*.md,tsconfig*.json}"
+  - "!node_modules/@pom/*/dist/**/*.map"
+# The pinned NeverSink release and its MIT licence ship beside the app (see src/main/lootFilterIpc.ts).
+extraResources:
+  # The native engine (a .node file cannot load from inside app.asar). scripts/stage-engine.mjs fills resources/engine.
+  - from: resources/engine
+    to: engine
+  # Claude Desktop launches the MCP bridge as its own process, so it ships beside app.asar, not inside it.
+  - from: dist/mcp
+    to: mcp
+  - from: resources/neversink
+    to: neversink
+  # What each divination card turns into: the offline fallback for the Build Filter's card rules.
+  - from: resources/lootfilter
+    to: lootfilter
+  - from: resources/leveling
+    to: leveling
+  # What real current-league builds use: aggregated counts, no names.
+  - from: resources/buildpatterns
+    to: buildpatterns
+  # Atlas catalogs and their source evidence, and the qualified starter pack.
+  # Both live at the repository root, next to engine-data.
+  - from: ../../resources/atlas
+    to: atlas
+    filter:
+      - archive.json
+      - packs/**/*
+      # Every sprite sheet the Atlas canvas draws, at all five zoom levels (the hover-only mastery overlay stays out).
+      - sources/*/official/assets/*
+      # League variants name an older sheet set; main serves it by hash.
+      - sources/*/official/assets-league/*
+      - sources/*/official/assets-league.json
+      - "!sources/*/official/assets/atlas-mastery-overlay.png"
+  - from: ../../resources/mastery-starters
+    to: mastery-starters
+  # The game knowledge base snapshot (scripts/kb-build.mjs). The app inflates it into user data on first run and
+  # refreshes it there (src/main/kb).
+  - from: resources/kb
+    to: kb
+  # The timeless jewel tables, compressed (scripts/pack-timeless.mjs). The app inflates them into user data the first
+  # time a build or the search needs them (src/main/timelessData.ts).
+  - from: resources/timeless
+    to: timeless
+  # The game data the engine reads (and nothing else from engine-data: no golden answer keys). The engine host gets
+  # this folder through POM_ENGINE_DATA (src/main/engineDataDir.ts).
+  - from: ../../engine-data
+    to: engine-data
+    filter:
+      - data_*.json
+      - tree_*.json
+      - parse_cache.bin
+      - synergies.json
+protocols:
+  # Sign-in callback, share, import and build links, and Marketplace items (pathofmastery://item/...).
+  - name: Path of Mastery link
+    schemes:
+      - pathofmastery
+# App-shell updates are handled by our own updater (see src/main/updater/appShellUpdater.ts),
+# not electron-updater's auto-update wiring, so no `publish` config is declared here.
+mac:
+  category: public.app-category.utilities
+  # Not notarized (no Apple account): an ad-hoc signature is the least Apple Silicon will run; the first open is
+  # right-click > Open. Ad-hoc needs hardenedRuntime off (electron-builder docs, mac.identity / mac.hardenedRuntime).
+  identity: "-"
+  hardenedRuntime: false
+  target:
+    - target: dmg
+      arch: arm64
+win:
+  icon: build/icon.ico
+  target:
+    - nsis
+linux:
+  target:
+    - target: AppImage
+      arch: x64
+  category: Game
+nsis:
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  oneClick: false
+  allowToChangeInstallationDirectory: true

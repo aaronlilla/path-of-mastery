@@ -1,0 +1,23 @@
+{
+  "about": "Mechanic class registry (patch-proof mapping clear). Keys are parsed mod names, flags, tag vars, gem stat ids and support structure, never item, gem or node names. The solver's clear score and pom-cli mechanics-scan read it. A new source of a known class needs one row here or nothing; a new line the parser does not read needs a text rule (mechanic_text_rules.json). skillTypes: Data/Global.lua SkillType values.",
+  "skillTypes": { "Attack": 1, "Spell": 2, "Projectile": 3, "Area": 8, "Chains": 19, "Melee": 20, "MeleeSingleTarget": 21, "Triggered": 37, "Vaal": 38, "Herald": 67 },
+  "classes": [
+    { "class": "strike-targets", "modNames": ["AdditionalStrikeTarget"], "statIds": ["melee_attack_number_of_spirit_strikes"] },
+    { "class": "melee-splash", "statIds": ["melee_splash"], "structure": { "adds": "Area", "requires": "MeleeSingleTarget" }, "damageStat": "splash_damage_+%_final" },
+    { "class": "area-of-effect", "note": "found by skill type Area, not by scaling mods" },
+    { "class": "projectile-multihit", "modNames": ["ChainCountMax", "BeamChainCountMax", "ForkCountMax", "PierceCount", "SplitCount", "ProjectileCount"], "flags": ["PierceAllTargets", "ForkOnce", "ForkTwice"] },
+    { "class": "projectile-explode-only", "statIds": ["projectile_behaviour_only_explode"], "note": "the projectile flies to its target spot and explodes: pierce, chain, fork and split reach no second enemy" },
+    { "class": "attack-repeat", "modNames": ["RepeatCount"] },
+    { "class": "explode-on-kill", "modNames": ["ExplodeMod"], "flags": ["CanExplode"] },
+    { "class": "ailment-spread", "statIds": ["support_ignite_proliferation_radius"], "output": "IgniteDPS" },
+    { "class": "cull-instant-kill", "modNames": ["CullPercent", "CriticalCullPercent"], "statIds": ["kill_enemy_on_hit_if_under_10%_life"] },
+    { "class": "on-kill-recovery", "modNames": ["LifeOnKill", "ManaOnKill", "EnergyShieldOnKill"] },
+    { "class": "skill-intrinsic-extra-targets", "statContains": ["number_of_extra_targets"] },
+    { "class": "pack-density-scaling", "tagVars": ["NearbyEnemies"] },
+    { "class": "mirage-duplication", "modNames": ["MirageArcherMaxCount"], "statIds": ["skill_can_own_mirage_archers"] },
+    { "class": "minion-totem-multiplicity", "modNames": ["ActiveTotemLimit", "ActiveBallistaLimit"] }
+  ],
+  "keywords": ["splash", "spread", "explod", "prolifer", "cull", "shatter", "destroyed", "corpse", "additional nearby enem", "strike skills"],
+  "inertStatPrefixes": ["quality_display_"],
+  "inertStatContains": ["_description_"]
+}

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Shadow" ascendClassName="Assassin" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="None" pantheonMinorGod="None">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SupportGemUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Lifetap" skillId="SupportLifetap" gemId="Metadata/Items/Gems/SupportGemLifetap" variantId="SupportLifetap" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Fortify" skillId="SupportFortify" gemId="Metadata/Items/Gems/SupportGemFortify" variantId="SupportFortify" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Added Chaos Damage" skillId="SupportAddedChaosDamage" gemId="Metadata/Items/Gems/SupportGemAddedChaosDamage" variantId="SupportAddedChaosDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SupportGemVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Skitterbots" skillId="SummonSkitterbots" gemId="Metadata/Items/Gems/SkillGemSummonSkitterbots" variantId="SummonSkitterbots" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Despair" skillId="Despair" gemId="Metadata/Items/Gems/SkillGemVulnerability" variantId="Despair" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Steelskin" skillId="QuickGuard" gemId="Metadata/Items/Gems/SkillGemSteelskin" variantId="QuickGuard" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Enduring Cry" skillId="EnduringCry" gemId="Metadata/Items/Gems/SkillGemEnduringCry" variantId="EnduringCry" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Wither" skillId="Wither" gemId="Metadata/Items/Gems/SkillGemWither" variantId="Wither" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Spell Totem" skillId="SupportSpellTotem" gemId="Metadata/Items/Gems/SupportGemSpellTotem" variantId="SupportSpellTotem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Chain Hook" skillId="ChainHook" gemId="Metadata/Items/Gems/SkillGemChainHook" variantId="ChainHook" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Defiance Banner" skillId="DefianceBanner" gemId="Metadata/Items/Gems/SkillGemDefianceBanner" variantId="DefianceBanner" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Pyroclast Mine" skillId="PyroclastMine" gemId="Metadata/Items/Gems/SkillGemFireNovaMine" variantId="PyroclastMine" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Chaos Golem" skillId="SummonChaosGolem" gemId="Metadata/Items/Gems/SkillGemSummonChaosGolem" variantId="SummonChaosGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Flesh Offering" skillId="FleshOffering" gemId="Metadata/Items/Gems/SkillGemFleshOffering" variantId="FleshOffering" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="6" ascendClassId="1" masteryEffects="{292,34242},{21801,59574},{62235,49522},{26148,9755}" nodes="44683,58229,23024,51402,47531,19598,6064,9014,46676,12850,38129,45272,63639,41689,51212,46289,5823,27276,62831,51220,46408,44988,37663,58968,9355,35894,21835,25058,9877,45593,12801,8938,49978,27788,40362,13885,292,25260,41989,47362,21801,39861,31359,11811,1648,49900,46277,47484,35851,60592,26148,49621,42104,57080,20807,36287,1461,7263,64769,12412,36849,23886,63251,18770,29454,62744,54307,44103,20812,51786,24496,56116,10829,32091,19506,8348,6534,17814,41866,60942,32555,54922,60204,64709,19858,9206,32802,20127,36221,37785,37504,16236,25766,2715,903,53114,11239,39718,59606,54142,3187,7085,45491,30338,25067,18703,4944,53002,23471,3469,31315,6383,62235,45202,9373,65210,32117,10511,52095,57746,21301,20546,48477" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="2">Rarity: RARE
+Solver Shield
+Archon Kite Shield
+Item Level: 84
+Quality: 20
+LevelReq: 68
+Implicits: 1
++12% to all Elemental Resistances
++33 to Strength and Dexterity
+{crafted}+17% to Cold and Lightning Resistances
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Torturer's Mask
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Eater of Worlds Item
+Implicits: 2
+{crafted}{enchant}40% increased Poisonous Concoction Damage
+{eater}18% increased Duration of Ailments on Enemies
++33 to Strength and Dexterity
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Phantom Mitts
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Implicits: 2
+{eater}3% increased Damage per 100 Dexterity
+{exarch}+12% to Chaos Damage over Time Multiplier
++33 to Dexterity and Intelligence
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Implicits: 2
+{crafted}{enchant}16% increased Attack and Cast Speed if you've Killed Recently
+{exarch}5% increased Action Speed
++33 to Strength and Dexterity
+{crafted}+17% to Fire and Cold Resistances
+</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 84
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:attribute}{suffix}+29 to all Attributes
+{tags:attribute}{suffix}+51 to Intelligence
+{tags:elemental,resistance}{suffix}{crafted}+9% to all Elemental Resistances
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 84
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:unveiled_mod,attribute}{suffix}+33 to Strength and Dexterity
+{tags:attribute}{suffix}+51 to Intelligence
+{tags:elemental,resistance}{suffix}{crafted}+9% to all Elemental Resistances
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring (Fire/Lightning)
+Item Level: 84
+LevelReq: 48
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Lightning Resistances
+{tags:unveiled_mod,attribute}{suffix}+33 to Strength and Dexterity
+{tags:elemental,resistance}{suffix}{crafted}+9% to all Elemental Resistances
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 84
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:unveiled_mod,attribute}{suffix}+33 to Strength and Dexterity
+{tags:attribute}{suffix}+51 to Intelligence
+{tags:elemental,fire,lightning,resistance}{suffix}{crafted}+17% to Fire and Lightning Resistances
+</Item><Item id="11">Rarity: MAGIC
+Bismuth Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 1
+{crafted}{enchant}Reused at the end of this Flask's effect
+56% increased Evasion Rating during Effect
++32 to Maximum Charges
+</Item><Item id="12">Rarity: MAGIC
+Sulphur Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 2
+{crafted}{enchant}Used when Charges reach full
+Creates Consecrated Ground on Use
+56% increased Evasion Rating during Effect
+26% reduced Charges per use
+</Item><Item id="13">Rarity: MAGIC
+Topaz Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 1
+{crafted}{enchant}Used when you Use a Travel Skill
+56% increased Armour during Effect
+25% reduced Duration
+25% increased effect
+</Item><Item id="14">Rarity: MAGIC
+Ruby Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 0
+56% increased Evasion Rating during Effect
+25% reduced Duration
+25% increased effect
+</Item><Item id="15">Rarity: MAGIC
+Jade Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 0
+56% increased Evasion Rating during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 84
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="multiplierWarcryPower" number="20"/><Input name="useEnduranceCharges" boolean="true"/><Input name="buffOnslaught" boolean="true"/><Input name="minionBuffOnslaught" boolean="true"/><Input name="buffFortification" boolean="true"/><Input name="multiplierCritRecently" number="2"/><Input name="conditionNonCritRecently" boolean="true"/><Input name="conditionHitRecentlyWithWeapon" boolean="true"/><Input name="conditionKilledRecently" boolean="true"/><Input name="conditionKilledLast3Seconds" boolean="true"/><Input name="conditionKilledPoisonedLast2Seconds" boolean="true"/><Input name="conditionKilledAffectedByDoT" boolean="true"/><Input name="conditionPoisonedEnemyRecently" boolean="true"/><Input name="multiplierLifeSpentRecently" number="614"/><Input name="conditionUsedSkillRecently" boolean="true"/><Input name="multiplierSkillUsedRecently" number="12"/><Input name="conditionAttackedRecently" boolean="true"/><Input name="conditionUsedMovementSkillRecently" boolean="true"/><Input name="conditionUsedWarcryRecently" boolean="true"/><Input name="conditionUsedWarcryInPast8Seconds" boolean="true"/><Input name="conditionCursedEnemyRecently" boolean="true"/><Input name="conditionTauntedEnemyRecently" boolean="true"/><Input name="conditionEnemyCursed" boolean="true"/><Input name="multiplierWitheredStackCount" number="8.007214285714285"/><Input name="buffLifetap" boolean="true"/></Config>
+</PathOfBuilding>

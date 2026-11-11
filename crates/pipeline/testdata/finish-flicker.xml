@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Templar" ascendClassName="Inquisitor" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="None" pantheonMinorGod="None">
+		<PlayerStat stat="FullDPS" value="1715807.274361642"/>
+		<PlayerStat stat="CombinedDPS" value="1715807.274361642"/>
+		<PlayerStat stat="Life" value="2383"/>
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Flicker Strike" skillId="FlickerStrike" gemId="Metadata/Items/Gems/SkillGemFlickerStrike" variantId="FlickerStrike" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Fortify" skillId="SupportFortify" gemId="Metadata/Items/Gems/SupportGemFortify" variantId="SupportFortify" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Greater Multistrike" skillId="SupportGreaterMultistrike" gemId="Metadata/Items/Gems/SupportGemGreaterMultistrike" variantId="SupportGreaterMultistrike" level="3" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Brutality" skillId="SupportBrutality" gemId="Metadata/Items/Gems/SupportGemBrutality" variantId="SupportBrutality" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Melee Physical Damage" skillId="SupportMeleePhysicalDamage" gemId="Metadata/Items/Gems/SupportGemMeleePhysicalDamage" variantId="SupportMeleePhysicalDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Ruthless" skillId="SupportRuthless" gemId="Metadata/Items/Gems/SupportGemRuthless" variantId="SupportRuthless" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Pride" skillId="Pride" gemId="Metadata/Items/Gems/SkillGemPride" variantId="Pride" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Purity of Ice" skillId="PurityOfIce" gemId="Metadata/Items/Gems/SkillGemColdResistAura" variantId="PurityOfIce" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Steelskin" skillId="QuickGuard" gemId="Metadata/Items/Gems/SkillGemSteelskin" variantId="QuickGuard" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Withering Step" skillId="WitheringStep" gemId="Metadata/Items/Gems/SkillGemWitheringStep" variantId="WitheringStep" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Vulnerability" skillId="Vulnerability" gemId="Metadata/Items/Gems/SkillGemNewVulnerability" variantId="Vulnerability" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Ancestral Cry" skillId="AncestralCry" gemId="Metadata/Items/Gems/SkillGemAncestralCry" variantId="AncestralCry" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Stone Golem" skillId="SummonStoneGolem" gemId="Metadata/Items/Gems/SkillGemSummonRockGolem" variantId="SummonStoneGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="5" ascendClassId="1" masteryEffects="{35221,39178},{35118,1626},{51583,2987},{37956,23936},{12169,32255},{19750,62285},{6912,35582}" nodes="61525,61871,2913,13714,14056,15405,20228,22703,24914,27140,27301,30733,33740,34400,35556,39916,43374,44908,46578,46910,49178,50862,55485,64816,65034,53884,662,40059,60769,37486,43193,27055,19417,5289,57061,65107,60153,16860,12169,2225,59494,16380,35221,26866,18025,49318,1909,56381,8533,35118,6237,15599,49254,44529,14606,2454,38777,58449,26523,44606,31080,38664,34666,43412,34009,476,30691,37647,48807,25933,48438,18302,51583,12795,39768,23066,18103,16544,24083,61262,17818,6741,28498,24544,12033,37956,23199,17566,2491,18901,62319,21435,4833,37584,19750,34601,6912,56460,9194,59833,13498,40841,30842,17251,1325,31471,41472,61471,49109,36859,1761,41599,15631,31931,65760,65762,65765,65766,65767,65770,10532,65728,65732" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="500"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/><Socket nodeId="10532" itemId="501"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+The Yielding Mortality
+Imperial Staff
+Variant: Pre 3.25.0
+Variant: Pre 3.26.0
+Variant: Current
+League: Harvest
+Source: Upgraded from unique{The Enmity Divine} via currency{Haemocombustion Scroll}
+Requires Level 66, 113 Str, 113 Int
+Implicits: 2
+{variant:1}+18% Chance to Block Attack Damage
+{variant:2,3}+25% Chance to Block Spell Damage
+Socketed Gems are supported by Level 1 Chance to Bleed
+Grants Summon Greater Harbinger of Brutality Skill
++5% Chance to Block Attack Damage while wielding a Staff
+{variant:1,2}+(30-40)% to Damage over Time Multiplier for Bleeding from Critical Strikes
+{variant:3}+(60-80)% to Damage over Time Multiplier for Bleeding from Critical Strikes
+{variant:1,2}Adds (160-185) to (200-225) Physical Damage
+{variant:3}Adds (225-265) to (315-385) Physical Damage
+(30-40)% increased Critical Strike Chance
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Haunted Bascinet
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Implicits: 1
+{crafted}{enchant}40% increased Flicker Strike Damage
++31% to Chaos Resistance
+{crafted}58% increased Armour and Evasion
++49 to Intelligence
+</Item><Item id="4">Rarity: UNIQUE
+Foulborn Utula's Hunger
+Majestic Plate
+Requires Level 53, 145 Str
+(60-100)% increased Armour
+Recover (1-3)% of Life on Kill
+(30-40)% increased Stun and Block Recovery
+{mutated}+(1200-1800) to maximum Energy Shield if there are no Defence Modifiers on other Equipped Items</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Velour Gloves
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Implicits: 3
+{crafted}{enchant}Trigger Commandment of Force on Hit
+{exarch}10% increased Attack Speed
+{eater}+50 to Accuracy Rating per Frenzy Charge
++31% to Chaos Resistance
+{crafted}+13% to Lightning and Chaos Resistances
+</Item><Item id="6">Rarity: UNIQUE
+Voidwalker
+Murder Boots
+Shaper Item
+Source: Drops from unique{The Shaper}
+Variant: Pre 3.0.0
+Variant: Current
+Requires Level 69, 82 Dex, 42 Int
++(30-50) to Dexterity
+(140-180)% increased Evasion and Energy Shield
+30% increased Movement Speed
+20% chance to Avoid Projectiles while Phasing
+You have Phasing if you've Killed Recently
+{variant:1}Projectiles Pierce all Targets while you have Phasing
+{variant:2}Projectiles Pierce 5 additional Targets while you have Phasing
+Celestial Footprints
+</Item><Item id="7">Rarity: UNIQUE
+Eyes of the Greatwolf
+Greatwolf Talisman
+Requires Level 52
+Has Alt Variant: true
+Selected Variant: 11
+Selected Alt Variant: 19
+Variant: Attributes
+Variant: Global Defences
+Variant: Chaos Damage
+Variant: Attack Damage
+Variant: Cold Damage
+Variant: Fire Damage
+Variant: Lightning Damage
+Variant: Spell Damage
+Variant: Global Physical Damage
+Variant: Mana
+Variant: Damage
+Variant: Physical Damage Reduction
+Variant: Chance to Freeze, Shock and Ignite
+Variant: Crit Chance
+Variant: Area of Effect
+Variant: Attack/Cast Speed
+Variant: Item Quantity (Pre 3.25.0)
+Variant: Life
+Variant: Crit Multiplier
+Variant: Maximum number of Raised Zombies
+Variant: Frenzy Charge on Kill
+Variant: Power Charge on Kill
+Variant: Endurance Charge on Kill
+Variant: Life Regen
+Variant: Cold taken as Fire
+Variant: Cold taken as Lightning
+Variant: Fire taken as Cold
+Variant: Fire taken as Lightning
+Variant: Lightning taken as Cold
+Variant: Lightning taken as Fire
+Variant: Gain Physical as random Element
+Variant: Extra Pierces
+Variant: Damage over Time Multiplier
+Implicits: 33
+{variant:1}{tags:attribute}(12-16)% increased Attributes
+{variant:11}(25-35)% increased Damage
+{variant:4}{tags:attack}(20-30)% increased Attack Damage
+{variant:8}{tags:caster}(20-30)% increased Spell Damage
+{variant:9}{tags:physical_damage}(20-30)% increased Global Physical Damage
+{variant:33}+(12-18)% to Damage over Time Multiplier
+{variant:6}{tags:elemental_damage}(20-30)% increased Fire Damage
+{variant:5}{tags:elemental_damage}(20-30)% increased Cold Damage
+{variant:7}{tags:elemental_damage}(20-30)% increased Lightning Damage
+{variant:3}{tags:chaos_damage}(19-31)% increased Chaos Damage
+{variant:14}{tags:critical}(40-50)% increased Global Critical Strike Chance
+{variant:19}{tags:critical}+(24-36)% to Global Critical Strike Multiplier
+{variant:18}{tags:resource}(8-12)% increased maximum Life
+{variant:10}{tags:resource}(20-30)% increased maximum Mana
+{variant:17}(6-10)% increased Quantity of Items found
+{variant:32}Projectiles Pierce 2 additional Targets
+{variant:15}(5-8)% increased Area of Effect
+{variant:24}{tags:resource}Regenerate 2% of Life per second
+{variant:16}{tags:attack,caster,speed}(6-10)% increased Attack and Cast Speed
+{variant:20}+1 to maximum number of Raised Zombies
+{variant:12}(4-6)% additional Physical Damage Reduction
+{variant:23}10% chance to gain an Endurance Charge on Kill
+{variant:21}10% chance to gain a Frenzy Charge on Kill
+{variant:22}10% chance to gain a Power Charge on Kill
+{variant:13}(4-6)% chance to Freeze, Shock and Ignite
+{variant:2}{tags:defences}(15-25)% increased Global Defences
+{variant:31}{tags:physical_damage,elemental_damage}Gain (6-12)% of Physical Damage as Extra Damage of a random Element
+{variant:27}50% of Fire Damage from Hits taken as Cold Damage
+{variant:28}50% of Fire Damage from Hits taken as Lightning Damage
+{variant:25}50% of Cold Damage from Hits taken as Fire Damage
+{variant:26}50% of Cold Damage from Hits taken as Lightning Damage
+{variant:30}50% of Lightning Damage from Hits taken as Fire Damage
+{variant:29}50% of Lightning Damage from Hits taken as Cold Damage
+(50-100)% increased Enchantment Modifier magnitudes
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring (Fire/Lightning)
+Item Level: 84
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Lightning Resistances
+{tags:frenzy_charge,unveiled_mod}{suffix}+1 to Minimum Frenzy Charges
+{tags:frenzy_charge,unveiled_mod}{suffix}4% chance to gain a Frenzy Charge on Kill
+{tags:attribute}{suffix}+49 to Intelligence
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 84
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++14% to Fire and Cold Resistances
+{tags:frenzy_charge,unveiled_mod}{suffix}+1 to Minimum Frenzy Charges
+{tags:frenzy_charge,unveiled_mod}{suffix}4% chance to gain a Frenzy Charge on Kill
+{tags:attribute}{suffix}+51 to Intelligence
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Vanguard Belt
+Item Level: 84
+LevelReq: 78
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 2
+{crafted}{enchant}Enemies Maimed by you take 8% increased Damage Over Time
++290 to Armour and Evasion Rating
+{tags:flask,chaos,resistance}{suffix}+50% to Chaos Resistance during any Flask Effect
+{tags:unveiled_mod,attribute}{suffix}{crafted}+21 to Strength and Intelligence
+{tags:attribute}{suffix}+49 to Strength
+</Item><Item id="11">Rarity: MAGIC
+Bismuth Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 1
+{crafted}{enchant}Used when you become Frozen
+56% increased Evasion Rating during Effect
+25% reduced Duration
+25% increased effect
+</Item><Item id="12">Rarity: UNIQUE
+Taste of Hate
+Sapphire Flask
+Variant: Pre 2.2.0
+Variant: Pre 3.0.0
+Variant: Pre 3.15.0
+Variant: Pre 3.25.0
+Variant: Current
+{variant:5}(20-30)% of Fire and Lightning Damage from Hits taken as Cold Damage during Effect
+{variant:1}30% of Physical Damage from Hits taken as Cold Damage during Effect
+{variant:2,3}20% of Physical Damage from Hits taken as Cold Damage during Effect
+{variant:4}(10-15)% of Physical Damage from Hits taken as Cold Damage during Effect
+{variant:1,2}Gain (20-30)% of Physical Damage as Extra Cold Damage during effect
+{variant:3}Gain (15-20)% of Physical Damage as Extra Cold Damage during effect
+{variant:4,5}Gain (10-15)% of Physical Damage as Extra Cold Damage during effect
+30% chance to Avoid being Chilled during Effect
+30% chance to Avoid being Frozen during Effect
+</Item><Item id="13">Rarity: MAGIC
+Ruby Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 1
+{crafted}{enchant}Reused at the end of this Flask's effect
+56% increased Evasion Rating during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="14">Rarity: MAGIC
+Topaz Flask
+Item Level: 84
+Quality: 20
+LevelReq: 67
+Implicits: 1
+{crafted}{enchant}Used when you lose a Guard Skill Buff
+56% increased Armour during Effect
+31% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="15">Rarity: UNIQUE
+Rumi's Concoction
+Granite Flask
+Variant: Pre 1.3.0
+Variant: Pre 2.5.0
+Variant: Pre 3.15.0
+Variant: Current
+LevelReq: 68
+{variant:1}+(30-40)% Chance to Block Attack Damage during Effect
+{variant:2}+(20-30)% Chance to Block Attack Damage during Effect
+{variant:3}+(14-20)% Chance to Block Attack Damage during Effect
+{variant:4}+(8-12)% Chance to Block Attack Damage during Effect
+{variant:1}+(15-20)% Chance to Block Spell Damage during Effect
+{variant:2}+(10-15)% Chance to Block Spell Damage during Effect
+{variant:3}+(6-10)% Chance to Block Spell Damage during Effect
+{variant:4}+(4-6)% Chance to Block Spell Damage during Effect
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 84
+LevelReq: 0
+Implicits: 0
+</Item><Item id="500">Rarity: NORMAL
+Large Cluster Jewel
+Cluster Jewel Skill: affliction_physical_damage
+Cluster Jewel Node Count: 8
+Item Level: 84
+LevelReq: 0
+Implicits: 3
+{crafted}Adds 8 Passive Skills
+{crafted}2 Added Passive Skills are Jewel Sockets
+{crafted}Added Small Passive Skills grant: 12% increased Physical Damage
+</Item><Item id="501">Rarity: NORMAL
+Small Cluster Jewel
+Cluster Jewel Skill: affliction_chance_to_block_attack_damage
+Cluster Jewel Node Count: 2
+Item Level: 84
+LevelReq: 0
+Implicits: 2
+{crafted}Adds 2 Passive Skills
+{crafted}Added Small Passive Skills grant: +2% Chance to Block Attack Damage
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="bandit" string="None"/><Input name="targetBrandedEnemy" boolean="true"/><Input name="prideEffect" string="Initial"/><Input name="multiplierWarcryPower" number="20"/><Input name="usePowerCharges" boolean="true"/><Input name="buffFortification" boolean="true"/><Input name="buffElusive" boolean="true"/><Input name="conditionSkillCritRecently" boolean="true"/><Input name="multiplierCritRecently" number="14"/><Input name="conditionHitRecentlyWithWeapon" boolean="true"/><Input name="conditionKilledRecently" boolean="true"/><Input name="conditionKilledLast3Seconds" boolean="true"/><Input name="conditionKilledAffectedByDoT" boolean="true"/><Input name="conditionShockedEnemyRecently" boolean="true"/><Input name="multiplierManaSpentRecently" number="598"/><Input name="conditionChampionIntimidate" boolean="true"/><Input name="conditionUsedSkillRecently" boolean="true"/><Input name="multiplierSkillUsedRecently" number="17"/><Input name="conditionAttackedRecently" boolean="true"/><Input name="conditionUsedTravelSkillRecently" boolean="true"/><Input name="conditionUsedMovementSkillRecently" boolean="true"/><Input name="conditionSacrificeMinion" boolean="true"/><Input name="conditionUsedWarcryRecently" boolean="true"/><Input name="conditionUsedWarcryInPast8Seconds" boolean="true"/><Input name="conditionCursedEnemyRecently" boolean="true"/><Input name="conditionImpaledRecently" boolean="true"/><Input name="conditionCausedBleedingRecently" boolean="true"/><Input name="meleeDistance" number="15"/><Input name="conditionAtCloseRange" boolean="true"/><Input name="conditionEnemyCursed" boolean="true"/><Input name="conditionEnemyMaimed" boolean="true"/><Input name="conditionEnemyShocked" boolean="true"/><Input name="conditionHaveEnergyShield" boolean="true"/><Input name="conditionGainedPowerChargeRecently" boolean="true"/><Input name="conditionEnemyBleeding" boolean="true"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

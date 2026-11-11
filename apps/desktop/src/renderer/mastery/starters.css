@@ -1,0 +1,13 @@
+.starter-chooser { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; padding: 28px clamp(16px, 4vw, 56px) 40px; max-width: 1280px; margin: 0 auto; box-sizing: border-box; height: 100%; overflow: auto; }
+.starter-head { display: flex; flex-direction: column; gap: 8px; }
+.starter-h { margin: 0; font: 600 clamp(30px, 4vw, 44px) / 1.1 'Cormorant Garamond', serif; color: var(--text-display); }
+.starter-p { margin: 0; color: var(--text-2); font-size: 14px; }
+.starter-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.starter-filters .input { flex: 1 1 220px; max-width: 360px; width: auto; }
+.starter-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.starter-card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .14); background: var(--surface-2); }
+.starter-title { margin: 0; font: 600 17px Geist, sans-serif; color: var(--text-strong); overflow-wrap: anywhere; }
+.starter-meta { margin: 0; font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+.starter-note { margin: 4px 0 0; font-size: 12px; color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.starter-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+.starter-foot { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }

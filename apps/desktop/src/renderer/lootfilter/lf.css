@@ -1,0 +1,31 @@
+/* Loot Filter, shared by Guided and Advanced. Colours come from design/tokens.css; item labels are game art and never themed. */
+
+.lf-root { position: absolute; inset: 40px 0 0 0; display: flex; flex-direction: column; overflow: hidden; background: var(--ambient, var(--surface-0)); font: 400 14px/1.45 Geist, sans-serif; color: var(--text-2); container-type: inline-size; container-name: area; }
+.lf-root * { box-sizing: border-box; }
+.lf-root button { font-family: inherit; }
+.lf-scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .2) transparent; }
+.lf-eyebrow { font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); white-space: nowrap; }
+.lf-faint { color: var(--text-faint); }
+.lf-muted { color: var(--text-muted); }
+.lf-h1 { margin: 0; font: 600 40px/1.05 'Cormorant Garamond', serif; color: var(--text-display); text-wrap: balance; }
+.lf-card {
+  border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .09);
+  background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .5), rgba(var(--glass-rgb), .86));
+  box-shadow: 0 14px 40px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+.lf-chip button { font-synthesis: none; text-rendering: geometricPrecision; -webkit-text-stroke: .35px currentColor; }
+.lf-chip:hover .lf-chip-menu, .lf-chip:focus-within .lf-chip-menu { opacity: 1 !important; }
+@keyframes lf-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes lf-spin { to { transform: rotate(360deg); } }
+.lf-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .25); border-top-color: currentColor; animation: lf-spin .8s linear infinite; flex: none; }
+@media (prefers-reduced-motion: reduce) { .lf-root * { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+/* The area could not load its state: a panel with the reason and a retry, not a bare red line. */
+.lf-startfail { position: absolute; inset: 40px 0 0 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--ambient, var(--surface-0)); font: 400 14px/1.45 Geist, sans-serif; color: var(--text-2); }
+.lf-startfail-card { width: min(520px, 100%); padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; border-left: 3px solid var(--negative); }
+.lf-startfail-card b { color: var(--text-strong); font-size: 16px; }
+.lf-startfail-row { display: flex; gap: 8px; margin-top: 6px; }
+
+/* LF-34: status text on its 12% tints meets 4.5:1 in light mode (the greys come from .text-aa in ui.css). */
+.lf-root:where([data-mode="light"] *), .lf-portal:where([data-mode="light"] *) { --positive-text: #10602e; --warning-text: #7c4200; --negative-text: #961a25; }
+/* Key hints on the dark-mode gold button: a light wash keeps the dark ink at 4.5:1 on the gradient's deep end. */
+.lf-root:where(:root:not([data-mode="light"]) *) .gd-primary:not(.quiet) .kbd.on-gold, .lf-root:where(:root:not([data-mode="light"]) *) .adv-sh-write .adv-sh-k.on-gold { background: rgba(255, 255, 255, .2); }

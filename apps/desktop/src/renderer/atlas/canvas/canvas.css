@@ -1,0 +1,73 @@
+.atlas-canvas-view { --atlas: var(--area-atlas-rgb, 96,170,255); display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; height: 100%; color: var(--text); font: 14px Geist, sans-serif; }
+.atlas-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.atlas-canvas-toolbar, .atlas-canvas-legend, .atlas-canvas-panel-header, .atlas-canvas-detail-actions, .atlas-node-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.atlas-canvas-view { position: relative; }
+/* Toolbar floats over the top of the canvas (board: Path of Mastery Atlas, Main). */
+.atlas-canvas-toolbar { flex-wrap: nowrap; position: absolute; top: 12px; left: 12px; right: 12px; z-index: 3; pointer-events: none; }
+.atlas-canvas-toolbar > * { pointer-events: auto; }
+.atlas-canvas-toolbar .atlas-canvas-search { flex: 0 1 520px; }
+.atlas-canvas-view .atlas-canvas-toolbar input.field { background: rgba(12,14,20,.85); color: #ece6da; border-color: rgba(255,255,255,.14); }
+.atlas-canvas-toolbar .atlas-canvas-count { background: rgba(7,8,12,.8); color: #ece6da; padding: 4px 8px; border-radius: 6px; }
+.atlas-canvas-toolbar .btn, .atlas-node-list .btn, .atlas-canvas-detail-actions .btn { min-height: 34px; }
+.atlas-canvas-search { display: flex; gap: 6px; align-items: center; flex: 1 1 260px; min-width: 0; }
+.atlas-canvas-search input { width: 100%; min-width: 100px; }
+.atlas-canvas-count { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+.atlas-canvas-tools { display: inline-flex; gap: 4px; margin-left: auto; padding: 3px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: rgba(12,14,20,.85); }
+.atlas-canvas-tools .btn { color: #ece6da; }
+.atlas-canvas-tools:is([data-mode='light'] *) .btn { color: #1f1c17; }
+.atlas-canvas-tools .btn { min-width: 34px; }
+/* The open side panel takes the right edge: the floating toolbar stays over the canvas, clear of the panel's Close. */
+.atlas-canvas-view:has(.atlas-canvas-panel) .atlas-canvas-toolbar { right: 344px; }
+.atlas-canvas-note { margin: 0; font-size: 12px; color: var(--text-3); }
+.atlas-canvas-source, .atlas-canvas-help { font-size: 12px; color: var(--text-3); margin: 0; }
+.atlas-canvas-body { display: flex; gap: 12px; flex: 1 1 auto; min-height: 360px; position: relative; min-width: 0; }
+.atlas-canvas-stage { --atlas-on-canvas: 110,180,255; position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; border: 1px solid rgba(var(--atlas), .28); border-radius: 12px; overflow: hidden;
+  background: radial-gradient(60% 55% at 50% 60%, rgba(var(--atlas), .10), transparent 70%), radial-gradient(40% 35% at 15% 20%, rgba(var(--accent-rgb, 233,190,110), .06), transparent 70%), var(--atlas-canvas-bg, #07080c);
+  box-shadow: inset 0 0 80px rgba(0,0,0,.45); }
+.atlas-canvas-stage canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.atlas-canvas-stage canvas[data-hover]:not([data-hover='']) { cursor: pointer; }
+.atlas-canvas-stage canvas[data-dragging='true'] { cursor: grabbing; }
+.atlas-canvas-stage canvas:focus-visible { outline: 2px solid rgb(var(--atlas)); outline-offset: -2px; }
+.atlas-node-row:focus-visible { outline: 2px solid rgb(var(--atlas)); outline-offset: 2px; }
+.atlas-points { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); padding: 6px 16px; border-radius: 999px; pointer-events: none; font-size: 14px; color: var(--text);
+  background: rgba(7,8,12,.8); color: #ece6da; border: 1px solid rgba(var(--atlas-on-canvas), .55); box-shadow: 0 0 18px -4px rgba(var(--atlas-on-canvas), .6); white-space: nowrap; }
+.atlas-points strong { color: rgb(var(--atlas-on-canvas)); font-size: 18px; font-variant-numeric: tabular-nums; }
+.atlas-points[data-over='true'] { border-color: var(--warning); box-shadow: 0 0 18px -4px var(--warning); }
+.atlas-points[data-over='true'] strong { color: var(--warning); }
+.atlas-canvas-stage .atlas-canvas-source { position: absolute; left: 12px; bottom: 10px; pointer-events: none; padding: 2px 8px; border-radius: 6px; background: rgba(7,8,12,.6); color: #a9b3c6; }
+.atlas-canvas-stage .atlas-canvas-legend { position: absolute; left: 12px; top: 104px; padding: 6px 10px; border-radius: 8px; background: rgba(7,8,12,.85); color: #ece6da; border: 1px solid rgba(255,255,255,.12); font-size: 12px; }
+.atlas-tip { position: absolute; z-index: 3; width: max-content; max-width: 340px; pointer-events: none; padding: 10px 12px; border-radius: 10px;
+  background: rgba(12,14,20,.96); color: #ece6da; border: 1px solid rgba(var(--atlas-on-canvas), .6); box-shadow: 0 10px 30px rgba(0,0,0,.55); font-size: 13px; line-height: 1.4; }
+.atlas-tip-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.atlas-tip-head span { display: flex; flex-direction: column; }
+.atlas-tip-head strong { font-family: var(--font-title, 'Cormorant Garamond', serif); font-size: 18px; color: #f3e4c0; }
+.atlas-tip-head small { color: #a9b3c6; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.atlas-tip p { margin: 2px 0; color: #9fc0ff; }
+.atlas-tip .atlas-tip-action { margin-top: 8px; color: #ece6da; font-weight: 600; }
+.atlas-tip .atlas-tip-remove { color: #ff9b8f; }
+.atlas-tip .atlas-tip-steps { color: #a9b3c6; font-size: 12px; }
+.atlas-canvas-panel { flex: 0 0 320px; width: 320px; min-width: 0; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-1); padding: 12px; overflow-y: auto; }
+.atlas-canvas-panel-header { justify-content: space-between; }
+.atlas-node-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1 1 140px; min-height: 110px; }
+.atlas-node-list li { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding: 6px 0; content-visibility: auto; contain-intrinsic-size: auto 72px; }
+.atlas-node-row { display: flex; align-items: center; gap: 8px; text-align: left; width: 100%; min-height: 36px; background: transparent; border: 0; color: var(--text); padding: 4px; cursor: pointer; font: inherit; }
+.atlas-node-row[aria-pressed="true"] { box-shadow: inset 2px 0 rgb(var(--atlas)); }
+.atlas-node-row span { min-width: 0; }
+.atlas-node-row strong, .atlas-node-title strong { font-family: Cormorant, serif; font-size: 18px; overflow-wrap: anywhere; }
+.atlas-node-row small { display: block; color: var(--text-3); font: 12px Geist, sans-serif; }
+.atlas-node-art { flex: 0 0 32px; display: inline-block; width: 32px; height: 32px; background-repeat: no-repeat; border-radius: 50%; box-shadow: 0 0 0 1px rgba(var(--atlas), .5); }
+.atlas-node-art-missing { border: 1px dashed var(--border); background: transparent; box-shadow: none; }
+.atlas-node-detail { border-top: 1px solid var(--border); padding-top: 8px; flex: 0 0 auto; max-height: 55%; overflow-y: auto; overflow-wrap: anywhere; }
+.atlas-node-detail p { margin: 8px 0; }
+.atlas-delta-added, .atlas-node-row small.atlas-delta-added { color: var(--tree-add); }
+.atlas-delta-removed, .atlas-node-row small.atlas-delta-removed { color: var(--tree-remove); }
+.atlas-canvas-warning { color: var(--warning); }
+/* Light mode: a pale map stage, dark node discs (the game art needs them), the light Atlas accent (board: Path of Mastery Atlas, Optimizer-light). */
+.atlas-canvas-stage:is([data-mode='light'] *), .atlas-canvas-stage:is([data-theme='ivory']:not([data-mode]) *), .atlas-canvas-stage:is([data-theme='porcelain']:not([data-mode]) *) {
+  --atlas-on-canvas: 30,96,176; --atlas-canvas-line: 40,52,80; --atlas-canvas-text: #1f1c17; --atlas-canvas-label-bg: rgba(255,255,255,.85); --atlas-canvas-add: #1f8a3a;
+  background: radial-gradient(60% 55% at 50% 60%, rgba(30,96,176,.08), transparent 70%), #e9edf4; box-shadow: inset 0 0 60px rgba(40,52,80,.12); }
+.atlas-points:is([data-mode='light'] *), .atlas-canvas-stage:is([data-mode='light'] *) .atlas-canvas-legend { background: rgba(255,255,255,.92); color: #1f1c17; }
+.atlas-canvas-stage:is([data-mode='light'] *) .atlas-canvas-source { background: rgba(255,255,255,.75); color: #4a4f5c; }
+.atlas-canvas-tools:is([data-mode='light'] *), .atlas-canvas-view:is([data-mode='light'] *) .atlas-canvas-toolbar input.field { background: rgba(255,255,255,.95); color: #1f1c17; border-color: rgba(30,96,176,.35); }
+@media (max-width: 1023px) { .atlas-canvas-panel { position: absolute; right: 8px; top: 8px; bottom: 8px; width: min(320px, calc(100% - 16px)); box-shadow: var(--elev-2); z-index: 4; } }
+@media (prefers-reduced-motion: reduce) { .atlas-canvas-view * { scroll-behavior: auto; transition: none; animation: none; } }

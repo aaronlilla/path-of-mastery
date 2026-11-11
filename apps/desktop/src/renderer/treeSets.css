@@ -1,0 +1,81 @@
+/* Tree sets: Manage Passive Trees, the tree select with its hover card, Import and Export Tree. Every rule starts with ts-. */
+.ts-form { display: flex; flex-direction: column; gap: 14px; }
+.ts-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ts-manage { display: flex; flex-direction: column; gap: 12px; }
+.ts-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.ts-tools .kbd { margin-left: 4px; }
+.ts-list {
+  display: flex; flex-direction: column; gap: 2px; min-height: 180px; max-height: 300px; overflow-y: auto; padding: 6px; border-radius: 12px; outline: none;
+  background: rgba(var(--shadow-rgb), calc(.25 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .08);
+}
+.ts-list:focus-visible { border-color: rgba(var(--accent-rgb), .5); }
+.ts-item { flex: none; display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px; border-radius: 8px; color: var(--text-2); cursor: default; user-select: none; }
+.ts-item:hover { background: rgba(var(--line-rgb), .06); }
+.ts-item.on { background: linear-gradient(180deg, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .08)); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .2); color: var(--text-strong); }
+.ts-item.drop { box-shadow: inset 0 2px 0 var(--gold-400); }
+.ts-item .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts-item .meta { flex: none; color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.ts-item .cur { flex: none; padding: 1px 8px; border-radius: 6px; font-size: 11px; color: var(--gold-text); background: rgba(var(--accent-rgb), .12); }
+.ts-hint { color: var(--text-muted); font-size: 12px; }
+
+/* The tree select's menu rows and its hover card */
+.ts-menu { max-height: none !important; overflow: visible !important; }
+.ts-opts { display: flex; flex-direction: column; gap: 1px; max-height: min(46vh, 420px); overflow-y: auto; }
+.ts-opt { min-height: 34px; }
+.ts-opt .pts { flex: none; margin-left: auto; font-size: 11px; color: var(--text-muted); }
+.ts-opt .ck { flex: none; width: 14px; display: flex; color: var(--gold-400); }
+.ts-manage-row { color: var(--gold-text); }
+.ts-tip {
+  position: fixed; z-index: 500; width: 300px; box-sizing: border-box; pointer-events: none; border-radius: 14px; overflow: hidden; white-space: normal;
+  font: 400 13px/1.4 Geist, sans-serif; color: var(--text-2);
+  background: linear-gradient(180deg, rgba(var(--glass-rgb), .97), rgba(var(--glass-rgb), .98)); border: 1px solid rgba(var(--line-rgb), .12);
+  box-shadow: 0 24px 60px rgba(var(--shadow-rgb), calc(.6 * var(--shadow-k)));
+}
+.ts-tip .a { padding: 12px 16px 10px; display: flex; flex-direction: column; gap: 3px; color: var(--text-muted); }
+.ts-tip .a b { color: var(--text-strong); font-weight: 500; }
+.ts-tip .cmp { margin: 0 10px; padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 3px; background: rgba(var(--shadow-rgb), calc(.28 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .06); }
+.ts-tip .cmp .cap { color: var(--text-muted); font-size: 12px; }
+.ts-tip .cmp .up { color: var(--positive-text); font-weight: 500; }
+.ts-tip .cmp .down { color: var(--negative-text); font-weight: 500; }
+.ts-tip .z { padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.ts-tip .z .gold { color: var(--gold-currency, var(--gold-text)); }
+.ts-tip .z .sub { color: var(--text-3); }
+.ts-tip .z .ver { color: var(--text-faint); }
+
+/* The header's class popover */
+.ts-hdrmenu { max-height: calc(100vh - 24px) !important; padding: 0 !important; }
+.ts-hdr { width: 300px; box-sizing: border-box; padding: 12px; display: grid; gap: 8px; white-space: nowrap; }
+.ts-hdr .ttl { padding: 2px 4px 4px; color: var(--text-strong); font: 600 14px Geist, sans-serif; }
+.ts-fld {
+  min-height: 40px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 10px; width: 100%; text-align: left; cursor: pointer;
+  background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+  color: var(--text-strong); font: 500 13px Geist, sans-serif;
+}
+.ts-fld:hover:not(:disabled) { border-color: rgba(var(--accent-rgb), .45); }
+.ts-fld:disabled { opacity: .55; cursor: default; }
+.ts-fld .col { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.ts-fld .cap { font-size: 10px; color: var(--text-muted); letter-spacing: .06em; }
+.ts-fld .val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts-fld .val .sep { color: var(--text-faint); }
+.ts-fld .dot { flex: none; width: 8px; height: 8px; border-radius: 4px; }
+.ts-fld pom-icon[name="chevron-down"] { flex: none; color: var(--text-muted); transition: transform var(--dur-quick) var(--ease); }
+.ts-fld[aria-expanded="true"] pom-icon[name="chevron-down"] { transform: rotate(180deg); }
+.ts-lvl { height: 40px; display: flex; justify-content: space-between; align-items: center; border-radius: 10px; background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); }
+.ts-lvl button { flex: none; width: 30px; height: 34px; border: 0; background: transparent; color: var(--text-3); cursor: pointer; }
+.ts-lvl button:first-child { border-radius: 9px 0 0 9px; } .ts-lvl button:last-child { border-radius: 0 9px 9px 0; }
+.ts-lvl button:hover { background: rgba(var(--line-rgb), .05); color: var(--text-strong); }
+.ts-lvl .mid { flex: none; display: flex; flex-direction: column; align-items: center; width: 44px; line-height: 1.05; }
+.ts-lvl .mid span { font-size: 10px; color: var(--text-muted); letter-spacing: .06em; }
+.ts-lvl .mid input { width: 40px; padding: 0; border: 0; background: transparent; text-align: center; font: 600 14px Geist, sans-serif; color: var(--text-strong); }
+.ts-list-in { display: flex; flex-direction: column; gap: 1px; padding: 4px; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.25 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .07); max-height: 260px; overflow-y: auto; }
+.ts-list-in .menu-item { min-height: 32px; }
+.ts-list-in .menu-item .dot { width: 8px; height: 8px; border-radius: 4px; flex: none; }
+.ts-list-in .menu-head { padding: 6px 10px 2px; }
+
+/* The plain class list beside the build popover: dot, name, a tick on the current class. */
+.ts-clsmenu { width: 240px; min-width: 240px !important; padding: 6px !important; border-radius: 14px; gap: 1px; }
+.ts-clsmenu .menu-item { height: 34px; padding: 0 10px; gap: 10px; border-radius: 8px; color: var(--text-2); }
+.ts-clsmenu .menu-item[aria-selected="true"] { color: var(--text-strong); }
+.ts-art { flex: none; display: inline-block; background-repeat: no-repeat; border-radius: 4px; }
+.ts-clsmenu .menu-item .ts-art { margin-left: -2px; }
+.ts-portrait { border-radius: 50%; object-fit: cover; }

@@ -1,0 +1,60 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-test",
+    "rootDir": ".",
+    "declaration": false,
+    "sourceMap": false,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ]
+  },
+  "include": [
+    "src/renderer/jsx-env.d.ts",
+    "src/main/**/*.ts",
+    "src/engine-host/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/renderer/tree/treeLayout.ts",
+    "src/renderer/lootfilter/advanced/raw/convert.ts",
+    "src/renderer/search/searchIndex.ts",
+    "src/renderer/search/shellDocs.ts",
+    "src/renderer/format.ts",
+    "src/renderer/tree/treeTypes.ts",
+    "src/renderer/tree/treeClick.ts",
+    "src/renderer/tree/viewClamp.ts",
+    "src/renderer/tree/powerRows.ts",
+    "src/renderer/tree/optimizePreview.ts",
+    "src/renderer/tree/treeSearch.ts",
+    "src/renderer/tree/tattoos.ts",
+    "src/renderer/displayStats*.ts",
+    "src/renderer/preview/pvResult.ts",
+    "src/renderer/buildSkills.ts",
+    "src/renderer/items/itemText.ts",
+    "src/renderer/items/rank.ts",
+    "src/renderer/items/variantGroups.ts",
+    "src/renderer/items/wiki.ts",
+    "src/renderer/items/affixMath.ts",
+    "src/renderer/items/statCompareCore.ts",
+    "src/renderer/items/tradeQuery.ts",
+    "src/renderer/wealth/loadSteps.ts",
+    "src/renderer/delayedFlag.ts",
+    "src/renderer/saveReason.ts",
+    "src/renderer/items/slots.ts",
+    "src/renderer/compare/itemArtPick.ts",
+    "src/renderer/items/deleteInfo.ts",
+    "src/renderer/items/craftGroups.ts",
+    "src/renderer/items/virtual.ts",
+    "src/renderer/items/trader/model.ts",
+    "src/renderer/items/trader/weights.ts",
+    "src/renderer/timeless/timelessData.ts",
+    "src/renderer/buildTabs.ts",
+    "src/renderer/timelines/closeBlock.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "test/atlas-ingestion.test.ts",
+    "test/starter-pack.test.ts"
+  ]
+}

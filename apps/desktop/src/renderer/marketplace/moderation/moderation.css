@@ -1,0 +1,21 @@
+.mod-root { display: flex; flex-direction: column; gap: 12px; padding: 12px; font: 400 14px/1.5 Geist, sans-serif; color: var(--text); min-width: 0; }
+.mod-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; } .mod-head h1 { font-size: 18px; margin: 0; }
+.mod-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mod-filters input, .mod-field textarea, .mod-field input { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font: inherit; box-sizing: border-box; width: 100%; }
+.mod-filters input { width: 240px; }
+.mod-main { display: grid; grid-template-columns: 1fr; gap: 12px; min-width: 0; } .mod-main.has-drawer { grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); }
+.mod-list { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mod-row { display: grid; grid-template-columns: 90px 1fr 1fr auto auto; gap: 12px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; overflow-wrap: anywhere; }
+.mod-row.on, .mod-row:focus-visible { outline: 2px solid var(--accent, #c8a85a); outline-offset: -2px; }
+.mod-drawer { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; max-height: calc(100vh - 160px); overflow-y: auto; min-width: 0; }
+.mod-drawer-head { display: flex; justify-content: space-between; align-items: center; } .mod-drawer h2 { font-size: 13px; margin: 0 0 4px; opacity: .8; }
+.mod-snap { max-height: 160px; overflow: auto; background: rgba(0, 0, 0, .2); padding: 8px; border-radius: 6px; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mod-text { overflow-wrap: anywhere; white-space: pre-wrap; }
+.mod-btns { display: flex; gap: 8px; flex-wrap: wrap; } .mod-field { display: flex; flex-direction: column; gap: 6px; }
+.mod-preview { border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 4px; } .mod-preview p { margin: 0; }
+.mod-check { display: flex; gap: 8px; align-items: flex-start; }
+.mod-muted, .mod-hint { opacity: .7; } .mod-err { color: var(--danger, #e5736b); } .mod-warn { color: var(--warn, #e0b252); margin: 0; }
+.mod-state { padding: 24px; text-align: center; opacity: .85; } .mod-skel { height: 160px; border-radius: 8px; background: var(--surface-2); animation: modpulse 1.2s ease-in-out infinite; }
+.mod-form { display: flex; flex-direction: column; gap: 12px; } .mod-audit { margin: 0; padding-left: 18px; }
+@keyframes modpulse { 50% { opacity: .5; } } @media (prefers-reduced-motion: reduce) { .mod-skel { animation: none; } }
+@media (max-width: 900px) { .mod-main.has-drawer { grid-template-columns: 1fr; } .mod-row { grid-template-columns: 80px 1fr; } }

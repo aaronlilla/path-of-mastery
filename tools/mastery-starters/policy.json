@@ -1,0 +1,6 @@
+{
+  "limits": { "maxBytes": 33554432, "maxDepth": 64, "maxNodes": 500000, "maxArrayLength": 50000, "maxStringLength": 1048576 },
+  "maxBlobBytes": 33554432,
+  "maxTotalBlobBytes": 134217728,
+  "maxEvidenceAgeMs": 86400000
+}

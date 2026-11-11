@@ -1,0 +1,48 @@
+{
+ "skill": "Righteous Fire",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Chieftain fire RF",
+    "ascendancy": "Chieftain",
+    "supports": [
+     "Burning Damage",
+     "Increased Duration",
+     "Concentrated Effect"
+    ],
+    "why": "Chieftain's fire nodes and Tukohama life regen carry RF's self-burn and scale fire damage"
+   },
+   {
+    "name": "Juggernaut RF tank",
+    "ascendancy": "Juggernaut",
+    "supports": [
+     "Burning Damage",
+     "Controlled Destruction",
+     "Increased Area of Effect"
+    ],
+    "why": "Armour and life regen carry the burn; Juggernaut survives the self damage"
+   },
+   {
+    "name": "Inquisitor fire",
+    "ascendancy": "Inquisitor",
+    "supports": [
+     "Burning Damage",
+     "Elemental Focus",
+     "Increased Area of Effect"
+    ],
+    "why": "Inquisitor crit and fire penetration scale the RF hit"
+   }
+  ]
+ }
+}

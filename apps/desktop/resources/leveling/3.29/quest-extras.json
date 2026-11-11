@@ -1,0 +1,99 @@
+{
+ "note": "Passive-point quests checked against the PoE wiki 'Passive skill' page (Passive skill points as quest rewards) on 2026-10-11: 23 quests, 24 points with the bandit point. Quest ids come from the route files.",
+ "verified": true,
+ "source": "https://www.poewiki.net/wiki/Passive_skill",
+ "quests": {
+  "a1q7": {
+   "passives": 1,
+   "note": "The Dweller of the Deep"
+  },
+  "a1q6": {
+   "passives": 1,
+   "note": "The Marooned Mariner"
+  },
+  "a1q9": {
+   "passives": 1,
+   "note": "The Way Forward"
+  },
+  "a2q5": {
+   "passives": 1,
+   "note": "Through Sacred Ground"
+  },
+  "a2q7": {
+   "passives": 1,
+   "note": "Deal with the Bandits: +1 passive point only when all three bandits are killed"
+  },
+  "a3q11": {
+   "passives": 1,
+   "note": "Victario's Secrets"
+  },
+  "a3q9": {
+   "passives": 1,
+   "note": "Piety's Pets"
+  },
+  "a4q6": {
+   "passives": 1,
+   "note": "An Indomitable Spirit"
+  },
+  "a5q3": {
+   "passives": 1,
+   "note": "In Service to Science"
+  },
+  "a5q7": {
+   "passives": 1,
+   "note": "Kitava's Torments"
+  },
+  "a6q3": {
+   "passives": 1,
+   "note": "The Father of War"
+  },
+  "a6q7": {
+   "passives": 1,
+   "note": "The Cloven One"
+  },
+  "a6q6": {
+   "passives": 1,
+   "note": "The Puppet Mistress"
+  },
+  "a7q1": {
+   "passives": 1,
+   "note": "The Master of a Million Faces"
+  },
+  "a7q9": {
+   "passives": 1,
+   "note": "Queen of Despair"
+  },
+  "a7q6": {
+   "passives": 1,
+   "note": "Kishara's Star"
+  },
+  "a8q6": {
+   "passives": 1,
+   "note": "Love is Dead"
+  },
+  "a8q4": {
+   "passives": 1,
+   "note": "Reflection of Terror"
+  },
+  "a8q7": {
+   "passives": 1,
+   "note": "The Gemling Legion"
+  },
+  "a9q5": {
+   "passives": 1,
+   "note": "Queen of the Sands"
+  },
+  "a9q2": {
+   "passives": 1,
+   "note": "The Ruler of Highgate"
+  },
+  "a10q6": {
+   "passives": 1,
+   "note": "Vilenta's Vengeance"
+  },
+  "a10q3": {
+   "passives": 2,
+   "note": "An End to Hunger: +2 passive points"
+  }
+ }
+}

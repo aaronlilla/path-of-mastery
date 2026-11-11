@@ -1,0 +1,22 @@
+[package]
+name = "pom-napi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pom-engine = { path = "../engine" }
+pom-calc = { path = "../calc" }
+pom-pipeline = { path = "../pipeline" }
+pom-sim = { path = "../sim" }
+pom-item = { path = "../item" }
+pom-skills = { path = "../skills" }
+serde_json = { version = "1", features = ["preserve_order"] }
+napi = { version = "2", default-features = false, features = ["napi4"] }
+napi-derive = "2"
+mimalloc = { version = "0.1", default-features = false }
+
+[build-dependencies]
+napi-build = "2"

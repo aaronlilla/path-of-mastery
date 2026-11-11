@@ -1,0 +1,17 @@
+{
+ "skill": "Flicker Strike",
+ "className": "Templar",
+ "level": 90,
+ "wealth": "mid-league",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "flasks": true,
+  "flaskUptime": "mapping",
+  "playMode": "mapping"
+ }
+}

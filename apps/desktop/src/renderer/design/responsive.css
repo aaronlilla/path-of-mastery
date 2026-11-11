@@ -1,0 +1,243 @@
+/* Path of Mastery — tab reflow (RESPONSIVE.md). Each tab root is a size container named "tab" (its content box).
+   Container queries style descendants only, so per-tab variables are re-declared on the panels, never on the root.
+   Hooks are data-r tokens in the tab markup; !important overrides the inline desktop layout. */
+
+/* Tab toolbars wrap to a second row instead of clipping. Body panels move down by one row (48px). */
+@container tab (max-width: 819px) {
+  [data-screen-label^="Items"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
+  [data-screen-label^="Items"] [data-r~="tab-body"] { top: 116px !important; }
+}
+@container tab (max-width: 1099px) {
+  [data-screen-label^="Calcs"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
+  [data-screen-label^="Calcs"] [data-r~="tab-body"] { top: 116px !important; }
+}
+@container tab (max-width: 1039px) {
+  [data-screen-label^="Configuration"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
+  [data-screen-label^="Configuration"] [data-r~="tab-body"] { top: 116px !important; }
+}
+@container tab (max-width: 999px) {
+  [data-screen-label^="Compare"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
+  [data-screen-label^="Compare"] [data-r~="tab-body"] { top: 116px !important; }
+}
+
+/* Skills: under 1180 the socket group list is a strip across the top and the gem editor sits below it. Both stay on screen:
+   the list of setups never folds away (New, choosing a group). */
+@container tab (max-width: 999px) {
+  [data-r~="sk-groups"] { right: 0 !important; width: auto !important; bottom: auto !important; height: clamp(190px, 30%, 320px) !important; }
+  [data-r~="sk-groups"] > div { overflow-y: auto !important; }
+  /* One scroll region in the strip: the group list and Gem Defaults scroll together instead of the list scrolling inside the strip. */
+  [data-r~="sk-groups"] .sk-list { flex: none; min-height: 0; overflow: visible; }
+  [data-r~="sk-editor"] .sk-label { flex-basis: 200px; }
+  [data-r~="sk-editor"] { left: 0 !important; top: calc(80px + clamp(190px, 30%, 320px)) !important; }
+}
+/* Skills three columns between 1000 and 1400: the group buttons drop their icons so the usage-tips key fits, and the docked
+   gem list's title gets its own line above the All / Supports / Skills switch. */
+@container tab (min-width: 1000px) and (max-width: 1399px) {
+  [data-r~="sk-groups"] .sk-hdr .acts .sk-btn > pom-icon { display: none; }
+  .sk-root .sk-dock .sk-dock-hd { flex-wrap: wrap; row-gap: 6px; }
+  .sk-root .sk-dock .sk-dock-hd .ttl { flex: 1 0 100%; }
+}
+/* Editors are their own containers. */
+[data-r~="sk-editor"] { container: ske / inline-size; }
+[data-r~="it-editor"] { container: ited / inline-size; }
+@container ited (max-width: 560px) {
+  [data-r~="modrow"] { grid-template-columns: 74px minmax(0, 1fr) !important; row-gap: 4px !important; }
+  [data-r~="modrow"] > :nth-child(3) { grid-column: 2; }
+}
+/* Gem table: Quality moves into the level hover, then Count goes. */
+@container ske (max-width: 559px) {
+  [data-r~="gemrow"] { grid-template-columns: 28px minmax(0,1fr) 64px 56px 64px !important; }
+  [data-r~="gemrow"] > :nth-child(4) { display: none !important; }
+}
+@container ske (max-width: 459px) {
+  [data-r~="gemrow"] { grid-template-columns: 28px minmax(0,1fr) 64px 56px !important; }
+  [data-r~="gemrow"] > :nth-child(6) { display: none !important; }
+}
+
+/* Items: three columns (slots | all items | editor) down to 1000, with narrower side columns under 1400; under 1000 the
+   editor opens as a sheet over the list. */
+@container tab (max-width: 1399px) {
+  /* Slots get the widest side column so equipped item names stay readable; the list is the narrow one. */
+  [data-r~="it-slots"] { width: 34% !important; }
+  [data-r~="it-list"] { left: calc(34% + 12px) !important; width: 26.5% !important; }
+  [data-r~="it-editor"] { left: calc(60.5% + 24px) !important; }
+  [data-r~="it-slots"] .it-row { grid-template-columns: 84px minmax(0, 1fr) 28px; }
+}
+@container tab (max-width: 999px) {
+  [data-r~="it-slots"], [data-r~="it-list"], [data-r~="it-editor"] { --it-c: clamp(280px, 42%, 420px); }
+  [data-r~="it-slots"] { bottom: 0 !important; width: var(--it-c) !important; }
+  [data-r~="it-list"] { left: calc(var(--it-c) + 12px) !important; right: 0 !important; width: auto !important; top: 68px !important; }
+  [data-r~="it-editor"][data-open="0"] { display: none !important; }
+  [data-r~="it-close"] { display: flex !important; }
+  [data-r~="it-editor"] { left: calc(var(--it-c) + 12px) !important; right: 0 !important; width: auto !important; z-index: 6; box-shadow: -30px 0 80px rgba(var(--shadow-rgb), calc(.7 * var(--shadow-k))), 0 0 0 1px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))) !important; }
+}
+@container tab (max-width: 819px) {
+  [data-r~="it-slots"], [data-r~="it-editor"] { top: 116px !important; }
+  [data-r~="it-list"] { top: 116px !important; }
+}
+
+/* Calcs: section columns auto-fill; the breakdown popover pins inside the tab. */
+@container tab (max-width: 1399px) {
+  [data-r~="calc-grid"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  [data-r~="calc-pop"] { left: auto !important; right: 12px !important; max-width: calc(100% - 24px) !important; }
+}
+
+@container tab (max-width: 759px) {
+  [data-r~="calc-grid"] { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* Configuration: one column, max 960px, centred. */
+
+/* Import/Export, Party: two columns become one under 1100. */
+@container tab (max-width: 1099px) {
+  [data-r~="imp-grid"], [data-r~="party-grid"] { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important; grid-auto-rows: max-content !important; align-content: start !important; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: thin; }
+  [data-r~="imp-grid"] > *, [data-r~="party-grid"] > * { grid-column: 1 !important; }
+}
+@container tab (max-width: 759px) {
+  [data-r~="imp-2"] { grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important; }
+}
+
+@container tab (max-width: 759px) {
+  [data-screen-label^="Configuration"] [data-r~="tab-body"] { top: 150px !important; }
+}
+
+/* Build library */
+@container bl (max-width: 760px) { [data-r~="bl-meta"] { display: none !important; } }
+@container bl (max-width: 1180px) { [data-r~="bl-arc"] { zoom: .78; } }
+@container bl (max-width: 900px) { [data-r~="bl-arc"] { zoom: .6; } }
+@container bl (max-height: 940px) { [data-r~="bl-arc"] { zoom: .74; } [data-r~="bl-first"] { gap: 18px !important; top: 48px !important; bottom: 48px !important; } [data-r~="bl-first-h"] { font-size: 50px !important; } }
+@container bl (max-height: 700px) { [data-r~="bl-arc"] { zoom: .6; } }
+
+/* Configuration: section index + two-column masonry; under 1100 the index hides and cards stack in one column. */
+@container tab (max-width: 1099px) {
+  [data-r~="cfg-grid"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [data-r~="cfg-nav"] { display: none !important; }
+}
+
+/* Notes: editor left, help right; under 900 the help moves above the editor. */
+@container tab (max-width: 899px) {
+  /* Help on top at its own height; the editor takes the rest (at least 420px), so no empty band opens between them. */
+  [data-r~="notes-grid"] { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(420px, 1fr) !important; grid-auto-rows: auto !important; }
+  [data-r~="notes-grid"] > aside { order: 0 !important; position: static !important; }
+  [data-r~="notes-grid"] > .notes-edbox { min-height: 420px !important; }
+}
+
+/* Build library, narrow windows (768 and 360) */
+@container bl (max-width: 900px) {
+  [data-r~="bl-head"] { flex-wrap: wrap !important; }
+  [data-r~="bl-head"] > div:first-child { flex: 1 0 100% !important; }
+}
+@container bl (max-width: 760px) {
+  [data-r~="bl-head"] > div:first-child { flex: 1 0 100% !important; }
+  [data-r~="bl-h1"] { font-size: 46px !important; }
+  [data-r~="bl-tools"] { flex-wrap: wrap !important; }
+  [data-r~="bl-search"] { flex: 1 0 100% !important; }
+  [data-r~="bl-sort"] { flex: 1 1 auto !important; width: auto !important; }
+}
+@container bl (max-width: 480px) {
+  [data-r~="bl-main"] { width: calc(100% - 24px) !important; }
+  [data-r~="bl-h1"] { font-size: 38px !important; }
+  [data-r~="bl-btn"] { font-size: 0 !important; gap: 0 !important; padding: 0 11px !important; }
+  [data-r~="bl-btn"] > span { display: none !important; }
+  [data-r~="bl-head"] > button:last-child { flex: 1 1 auto !important; justify-content: center; }
+  [data-r~="bl-date"] { display: none !important; }
+}
+@container bl (max-width: 560px) {
+  [data-r~="bl-cap"] { white-space: normal !important; text-align: center; max-width: 100%; }
+  [data-r~="bl-foot"] { left: 12px !important; right: 12px !important; bottom: 10px !important; flex-wrap: wrap !important; justify-content: center; row-gap: 6px !important; gap: 14px !important; }
+  [data-r~="bl-foot"] > span:nth-child(4) { display: none !important; }
+  [data-r~="bl-first"] { bottom: 70px !important; width: calc(100% - 24px) !important; }
+}
+
+/* Phone widths: tab content is about 280px. Toolbar and header buttons go icon-only (their text stays as the accessible name). */
+@container tab (max-width: 480px) {
+  [data-r~="tab-tb"] button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)), [data-r~="sk-hdr"] button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)) { font-size: 0 !important; gap: 0 !important; padding: 0 9px !important; }
+  [data-r~="tab-tb"] button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)) > span, [data-r~="sk-hdr"] button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)) > span { display: none !important; }
+  [data-r~="tab-tb"] > span:not(:has(*)) { display: none !important; }
+  [data-r~="tab-tb"] { gap: 6px !important; }
+  [data-r~="imp-hint"] { flex-wrap: wrap !important; }
+  [data-r~="imp-hint"] > span:first-of-type { flex: 1 0 calc(100% - 30px) !important; }
+  [data-r~="calc-mlbl"] { display: none !important; }
+  [data-r~="calc-mode"] { flex: 1 1 100% !important; height: auto !important; flex-wrap: wrap !important; }
+}
+@container tab (max-width: 760px) {
+  [data-r~="it-gear"] { grid-template-columns: minmax(0, 1fr) 28px !important; row-gap: 3px !important; }
+  [data-r~="it-gear"] > span:first-child { grid-column: 1 / -1; text-align: left !important; font-size: 11.5px; color: var(--text-muted) !important; }
+  div:has(> [data-r~="it-trade"]) { flex-wrap: wrap !important; row-gap: 6px !important; }
+}
+@container tab (max-width: 480px) {
+  [data-screen-label^="Compare"] [data-r~="tab-body"] { top: 164px !important; }
+}
+@container tab (max-width: 480px) {
+  [data-ck] > span:first-child { white-space: normal !important; text-overflow: clip !important; line-height: 1.35; padding: 6px 0; }
+  [data-ck]:has(pom-icon[name="chevron-down"]), [data-ck]:has(input:not([type="checkbox"])), [data-ck]:has([role="radiogroup"]) { grid-template-columns: minmax(0, 1fr) !important; row-gap: 2px !important; padding-bottom: 8px !important; }
+  [data-ck]:has(pom-icon[name="chevron-down"]) > span:last-child, [data-ck]:has(input:not([type="checkbox"])) > span:last-child, [data-ck]:has([role="radiogroup"]) > span:last-child { justify-content: flex-start !important; }
+  [data-ck] > span:first-child { padding-bottom: 0; }
+}
+
+/* ── Wealth and Loot Filter (container "area" on each root). Layout grids are tagged by type:
+   lay = equal fr columns · lay-side = a fixed side column next to the content · lay-form = label | control rows · tbl = data table rows. */
+@container area (max-width: 1000px) {
+  [data-r~="lay"] { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)) !important; }
+  [data-r~="lay"] > * { grid-column: auto !important; grid-row: auto !important; }
+}
+@container area (max-width: 900px) {
+  [data-r~="lay-side"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [data-r~="lay-side"] > * { grid-column: auto !important; grid-row: auto !important; }
+}
+@container area (max-width: 760px) {
+  [data-r~="tbl"] { min-width: 680px; }
+  :has(> [data-r~="tbl"]) { overflow-x: auto !important; scrollbar-width: thin; }
+}
+@container area (max-width: 560px) {
+  [data-r~="lay-form"] { grid-template-columns: minmax(0, 1fr) !important; row-gap: 4px !important; }
+  [data-r~="lay-form"] > * { grid-column: auto !important; justify-self: stretch; text-align: left !important; }
+}
+/* Phone widths in Wealth and Loot Filter: any row may wrap, and the growing text in a row keeps at least 160px so it drops to its own line instead of turning into a column of words. */
+/* The window cannot be narrower than 800px, so this never applies in the app. It sits behind a media query so the browser leaves these
+   rules out altogether: because they match on the style attribute of a parent, every inline style write anywhere (the glass pointer light
+   writes several per frame) made the browser restyle that element's whole contents, 3.7 ms per write on the stat sidebar. */
+@media (max-width: 560px) {
+@container area (max-width: 520px) {
+  [style*="display: flex"]:not([style*="flex-direction: column"]):not([role="tablist"]):not([role="radiogroup"]):not([style^="height:"]):not([style*="; height:"]) { flex-wrap: wrap !important; row-gap: 8px; }
+  /* Fixed-height bars (headers, tab strips) keep one row: their buttons go icon-only and the bar scrolls inside itself as a last resort. */
+  [style*="display: flex"]:is([style^="height:"],[style*="; height:"]):not([style*="flex-direction: column"]) { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  [style*="display: flex"]:is([style^="height:"],[style*="; height:"]) > button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)) { font-size: 0 !important; gap: 0 !important; padding: 0 9px !important; }
+  [style*="display: flex"]:is([style^="height:"],[style*="; height:"]) > button:has(pom-icon):not([aria-haspopup]):not(:has(> span > span)) > span { display: none !important; }
+  [style*="display: flex"]:not([style*="flex-direction: column"]) > [style*="flex: 1"]:not(:empty) { min-width: min(160px, 100%) !important; }
+  [style*="display: grid"]:not([data-r]) { max-width: 100%; }
+}
+}
+@container area (max-width: 760px) {
+  [data-r~="lay12"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [data-r~="lay12"] > * { grid-column: 1 / -1 !important; }
+}
+/* Wealth header bar: the nav gives way first (labels go under 1280, the search under 1100, the session text under 760); the right cluster never shrinks below its content. */
+@container area (max-width: 1279px) {
+  [data-r~="w-navlbl"] { display: none !important; }
+  [data-r~="w-nav"] button { padding: 0 10px !important; }
+}
+@container area (max-width: 1099px) { [data-r~="w-search"] { display: none !important; } }
+@container area (max-width: 759px) { [data-r~="w-sess"] { display: none !important; } }
+@container area (max-width: 520px) { [data-r~="w-bar"] { overflow: hidden !important; } [data-r~="w-right"] { margin-left: 4px !important; } }
+@container area (min-width: 761px) and (max-width: 1100px) {
+  [data-r~="lay12"] > * { grid-column: span 6 !important; }
+  [data-r~="lay12"] > :first-child { grid-column: 1 / -1 !important; }
+}
+@container area (max-width: 760px) {
+  [data-r~="lay12"] > * > [data-lg="panel"] > div { flex-wrap: wrap !important; row-gap: 8px; flex-shrink: 0 !important; }
+  [data-r~="lay12"] > * > [data-lg="panel"] > div > span[style*="margin-left: auto"] { flex: 1 0 100%; margin-left: 0 !important; }
+}
+/* Loot Filter Simple change rows: number | icon | text | chip | actions. When the card is narrow the chip and actions move to a second line under the text, so the text column never collapses. */
+:has(> [data-r~="lf-row"]) { container: lfrows / inline-size; }
+@container lfrows (max-width: 640px) {
+  [data-r~="lf-row"] { grid-template-columns: 22px 36px minmax(0, 1fr) !important; row-gap: 6px !important; }
+  [data-r~="lf-row"] > :nth-child(n+4) { grid-column: 3 / -1 !important; justify-self: start; }
+}
+/* Loot Filter Simple draws its own app bar: collapse it at the same steps as Title Bar. Window controls never shrink. */
+[data-r~="lfs-bar"] > :last-child { flex: none !important; }
+@container area (max-width: 1100px) { [data-r~="lfs-bar"] [data-r~="lfs-lbl"] { display: none !important; } [data-r~="lfs-bar"] nav a, [data-r~="lfs-bar"] nav span[aria-current] { padding: 0 7px !important; } }
+@container area (max-width: 760px) { [data-r~="lfs-search"] { flex: 0 0 34px !important; min-width: 34px !important; } [data-r~="lfs-search"] input { padding-left: 30px !important; color: transparent !important; } [data-r~="lfs-search"] input::placeholder { color: transparent; } [data-r~="lfs-search"] > span { display: none !important; } [data-r~="lfs-acct"] { display: none !important; } }
+@container area (max-width: 520px) { [data-r~="lfs-bar"] { gap: 4px !important; padding-left: 8px !important; } [data-r~="lfs-bar"] > :last-child > span { width: 32px !important; } [data-r~="lfs-bar"] nav a, [data-r~="lfs-bar"] nav span[aria-current] { padding: 0 5px !important; } [data-r~="lfs-bar"] > span[title^="Signed in"] { padding: 0 2px !important; margin-right: 0 !important; } }
+@container area (max-width: 900px) { [data-r~="lfs-search"] { flex: 0 0 34px !important; min-width: 34px !important; } [data-r~="lfs-search"] input { padding-left: 30px !important; color: transparent !important; } [data-r~="lfs-search"] input::placeholder { color: transparent; } [data-r~="lfs-search"] > span { display: none !important; } [data-r~="lfs-bar"] > div:has([aria-haspopup="menu"]) { min-width: 0 !important; flex: 0 1 auto !important; } }
+@container area (max-width: 520px) { [data-r~="lfs-bar"] > div:has([aria-haspopup="menu"]), [data-r~="lfs-bar"] > span[title="Account synced"] { display: none !important; } }

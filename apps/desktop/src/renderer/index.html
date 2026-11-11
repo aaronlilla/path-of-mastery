@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-theme="obsidian" data-mode="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cdn.discordapp.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com; font-src 'self'; connect-src 'self'; frame-src https://pathofmastery.gg https://challenges.cloudflare.com"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Path of Mastery</title>
+    <link rel="icon" href="./design/assets/icon/favicon-32.png" />
+    <!-- The design system's own scripts: theme first so the page never flashes the wrong colours. -->
+    <script src="/ds/theme.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="/ds/icons.js"></script>
+    <script src="/ds/liquid-glass.js"></script>
+    <script src="/ds/motion.js"></script>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

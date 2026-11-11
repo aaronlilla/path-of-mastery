@@ -1,0 +1,51 @@
+{
+ "skill": "Poisonous Concoction",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Pathfinder flask poison",
+    "ascendancy": "Pathfinder",
+    "supports": [
+     "Unbound Ailments",
+     "Void Manipulation",
+     "Deadly Ailments"
+    ],
+    "why": "Flask charges and uptime feed Concoction; Master Alchemist/Nature's Reprisal scale poison and chaos"
+   },
+   {
+    "name": "Assassin crit poison",
+    "ascendancy": "Assassin",
+    "supports": [
+     "Unbound Ailments",
+     "Critical Strike Affliction",
+     "Void Manipulation"
+    ],
+    "why": "Toxic Delivery and crit poison chance; poison stacks fast"
+   },
+   {
+    "name": "Trickster DoT tank",
+    "ascendancy": "Trickster",
+    "supports": [
+     "Unbound Ailments",
+     "Void Manipulation",
+     "Deadly Ailments"
+    ],
+    "keystones": [
+     "Ghost Dance"
+    ],
+    "why": "Patient Reaper/Polymath damage over time plus evasion and ES for EHP"
+   }
+  ]
+ }
+}

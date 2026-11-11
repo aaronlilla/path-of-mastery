@@ -1,0 +1,52 @@
+{
+  "name": "@pom/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed contract between the Path of Mastery renderer/main process and the calc engine host",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./remoteConfig": {
+      "types": "./dist/remoteConfig.d.ts",
+      "default": "./dist/remoteConfig.js"
+    },
+    "./flagRegistry": {
+      "types": "./dist/flagRegistry.d.ts",
+      "default": "./dist/flagRegistry.js"
+    },
+    "./telemetry": {
+      "types": "./dist/telemetry.d.ts",
+      "default": "./dist/telemetry.js"
+    },
+    "./updatePolicy": {
+      "types": "./dist/updatePolicy.d.ts",
+      "default": "./dist/updatePolicy.js"
+    },
+    "./sha256": {
+      "types": "./dist/sha256.d.ts",
+      "default": "./dist/sha256.js"
+    },
+    "./semver": {
+      "types": "./dist/semver.d.ts",
+      "default": "./dist/semver.js"
+    },
+    "./limits": {
+      "types": "./dist/limits.d.ts",
+      "default": "./dist/limits.js"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/gen-lists.mjs && tsc -p tsconfig.json",
+    "pretest": "node scripts/gen-lists.mjs && tsc -p tsconfig.test.json",
+    "test": "node --test dist-test/test/*.test.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.10.2"
+  }
+}

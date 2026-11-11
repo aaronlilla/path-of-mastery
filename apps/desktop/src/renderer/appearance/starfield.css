@@ -1,0 +1,22 @@
+.mastery-starfield {
+  --space-base: #07111e;
+  --space-mid: #10243a;
+  --space-star: #b5c9e6;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+  background: radial-gradient(ellipse at 74% 26%, #10243a99 0%, transparent 58%),
+    radial-gradient(ellipse at 22% 88%, #10243a66 0%, transparent 52%), var(--space-base);
+}
+.mastery-starfield__layer { position: absolute; inset: -10px; width: calc(100% + 20px); height: calc(100% + 20px); opacity: .72; }
+.mastery-starfield[data-animated="true"] .mastery-starfield__layer { will-change: transform, opacity; }
+.mastery-starfield__particle { position: absolute; left: 0; top: 0; width: 2px; height: 2px; border-radius: 50%; background: var(--space-star); }
+.mastery-starfield[data-animated="true"] .mastery-starfield__particle { will-change: transform; }
+.mastery-starfield[data-animated="false"] .mastery-starfield__particle { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mastery-starfield .mastery-starfield__particle { display: none; }
+  .mastery-starfield .mastery-starfield__layer { transform: none !important; opacity: .72 !important; will-change: auto !important; }
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T21:19:18.000Z",
+  "leagues": {
+    "evidenceId": "official-leagues",
+    "entries": [
+      {
+        "leagueId": "Allflame",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Hardcore Allflame",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Ruthless Allflame",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "HC Ruthless Allflame",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Standard",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Hardcore",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Ruthless",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Hardcore Ruthless",
+        "realm": "pc"
+      },
+      {
+        "leagueId": "Allflame",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Hardcore Allflame",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Ruthless Allflame",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "HC Ruthless Allflame",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Standard",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Hardcore",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Ruthless",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Hardcore Ruthless",
+        "realm": "xbox"
+      },
+      {
+        "leagueId": "Allflame",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Hardcore Allflame",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Ruthless Allflame",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "HC Ruthless Allflame",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Standard",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Hardcore",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Ruthless",
+        "realm": "sony"
+      },
+      {
+        "leagueId": "Hardcore Ruthless",
+        "realm": "sony"
+      }
+    ]
+  },
+  "patchVersion": {
+    "status": "known",
+    "value": "3.29.3b",
+    "evidenceId": "official-patch-thread"
+  }
+}

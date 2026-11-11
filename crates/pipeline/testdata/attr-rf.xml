@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Marauder" ascendClassName="Chieftain" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Righteous Fire" skillId="RighteousFire" gemId="Metadata/Items/Gems/SkillGemRighteousFire" variantId="RighteousFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Burning Damage" skillId="SupportBurningDamage" gemId="Metadata/Items/Gems/SupportGemIncreasedBurningDamage" variantId="SupportBurningDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Concentrated Effect" skillId="SupportConcentratedEffect" gemId="Metadata/Items/Gems/SupportGemConcentratedEffect" variantId="SupportConcentratedEffect" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Elemental Focus" skillId="SupportElementalFocus" gemId="Metadata/Items/Gems/SupportGemElementalFocus" variantId="SupportElementalFocus" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Efficacy" skillId="SupportEfficacy" gemId="Metadata/Items/Gems/SupportGemEfficacy" variantId="SupportEfficacy" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Inspiration" skillId="SupportInspiration" gemId="Metadata/Items/Gems/SupportGemReducedMana" variantId="SupportInspiration" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Purity of Fire" skillId="PurityOfFire" gemId="Metadata/Items/Gems/SkillGemFireResistAura" variantId="PurityOfFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Vitality" skillId="Vitality" gemId="Metadata/Items/Gems/SkillGemVitality" variantId="Vitality" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Flammability" skillId="Flammability" gemId="Metadata/Items/Gems/SkillGemFlammability" variantId="Flammability" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Summon Chaos Golem" skillId="SummonChaosGolem" gemId="Metadata/Items/Gems/SkillGemSummonChaosGolem" variantId="SummonChaosGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Flame Dash" skillId="FlameDash" gemId="Metadata/Items/Gems/SkillGemFlameDash" variantId="FlameDash" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="1" ascendClassId="3" masteryEffects="{48267,36313},{4139,47642},{2828,11521}" nodes="47175,24704,32249,42659,48480,5643,50692,14996,61355,10238,22627,50904,61198,5152,24383,63048,36047,15868,20551,59861,6718,53118,44429,55649,6446,26523,58449,2550,54396,10221,48267,65108,3533,11088,7374,44967,50422,31931,15631,4139,1550,36949,10031,15064,6712,12536,33435,13164,8198,55993,29061,60472,23027,29049,5916,4713,7444,64210,26270,25970,34423,48118,55332,42760,36678,2828,58218,5743,41472,9386,14057,24324,37163,885,40366,52742,51804,30370,46340,44799,21330,17821,39648,60398,49254,1203,61471,4177,38989,15046,29106,25332,19103,35260,26866,30380,21958,14936,44184,63447,39841,11924,31462,13559,61804,18715,14040,33755,10893,60501,52412,43716,34144,34506,24872,15167,19501,4367,34661,44983,12852,1031,61217" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+The Grey Spire
+Judgement Staff
+Variant: Pre 3.11.0
+Variant: Pre 3.25.0
+Variant: Pre 3.29.0
+Variant: Current
+Requires Level 68, 113 Str, 113 Int
+Implicits: 3
+{variant:1}+18% Chance to Block Attack Damage
+{variant:3,4}+25% Chance to Block Attack Damage
+{variant:2}+20% Chance to Block Spell Damage
+Has no Sockets
+{variant:1,2,3}(250-300)% increased Global Damage
+{variant:4}(300-400)% increased Global Damage
+(20-30)% increased Attack Speed
+{variant:1,2,3}+(1-4)% to all maximum Resistances
+{variant:4}+(1-5)% to all maximum Resistances
+{variant:4}Implicit Modifier magnitudes are doubled
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B R R R
+Implicits: 1
+{crafted}{enchant}40% increased Righteous Fire Damage
++130 to maximum Life
++45% to Cold Resistance
++41% to Fire Resistance
+{crafted}+17% to Cold and Lightning Resistances
++18 to maximum Energy Shield
++29 to maximum Life
++65 to Armour
++29 to maximum Life</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Sacred Chainmail
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B-R-B-B-B-R
+Implicits: 1
+{crafted}{enchant}40% reduced Attribute Requirements
+{crafted}Regenerate 150 Energy Shield per second while a Rare or Unique Enemy is Nearby
+Regenerate 72.0 Life per second
++145 to maximum Life
+68% increased Armour and Energy Shield
++18 to maximum Energy Shield
++29 to maximum Life
++33 to Strength</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Warlock Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R B B B
+Implicits: 0
+41% increased Energy Shield</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: R B R R
+Implicits: 1
+{crafted}{enchant}10% increased Movement Speed if you haven't been Hit Recently
+Drops Burning Ground while moving, dealing 2500 Fire Damage per second for 4 seconds
+25% increased Movement Speed
+{crafted}18% increased Movement Speed
+{crafted}8% increased Movement Speed if you haven't been Hit Recently
++38 to Intelligence
++36% to Lightning Resistance
++85 to maximum Life</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Agate Amulet
+Item Level: 75
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Intelligence
+{tags:chaos,resistance}{suffix}+21% to Chaos Resistance
+{tags:unveiled_mod,elemental,cold,chaos,resistance}{suffix}{crafted}+13% to Cold and Chaos Resistances
+{tags:dot_multi,damage}{suffix}+11% to Damage over Time Multiplier
+{tags:resource,life}{prefix}+70 to maximum Life
+{tags:defences,energy_shield}{prefix}18% increased maximum Energy Shield
+{tags:defences,energy_shield}{prefix}+32 to maximum Energy Shield
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Ruby Ring
+Item Level: 75
+LevelReq: 60
+Implicits: 1
++25% to Fire Resistance
+{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Ruby Ring
+Item Level: 75
+LevelReq: 60
+Implicits: 1
++25% to Fire Resistance
+{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 64
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:resource,life}{prefix}+85 to maximum Life
+{tags:unveiled_mod,damage}{prefix}{crafted}15% increased Damage
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+</Item><Item id="12">Rarity: MAGIC
+Eternal Mana Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+</Item><Item id="13">Rarity: MAGIC
+Amethyst Flask
+Item Level: 75
+Quality: 20
+LevelReq: 18
+Implicits: 0
+</Item><Item id="14">Rarity: MAGIC
+Aquamarine Flask
+Item Level: 75
+Quality: 20
+LevelReq: 27
+Implicits: 1
+Creates Chilled Ground on Use
+</Item><Item id="15">Rarity: MAGIC
+Basalt Flask
+Item Level: 75
+Quality: 20
+LevelReq: 57
+Implicits: 1
+Taunts nearby Enemies on use
+37% less Duration
+Immunity to Freeze and Chill during Effect
+</Item><Item id="16">Rarity: NORMAL
+Cobalt Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="bandit" string="None"/><Input name="multiplierNearbyRareOrUniqueEnemies" number="1"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/></Config>
+</PathOfBuilding>

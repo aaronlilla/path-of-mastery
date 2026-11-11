@@ -1,0 +1,59 @@
+{
+ "files": [
+  {
+   "name": "GloriousVanity",
+   "raw": 51651890,
+   "packed": 19330346
+  },
+  {
+   "name": "LethalPride",
+   "raw": 3632454,
+   "packed": 2071990
+  },
+  {
+   "name": "BrutalRestraint",
+   "raw": 3405454,
+   "packed": 1942799
+  },
+  {
+   "name": "MilitantFaith",
+   "raw": 3632454,
+   "packed": 785162
+  },
+  {
+   "name": "ElegantHubris",
+   "raw": 3587054,
+   "packed": 2436761
+  },
+  {
+   "name": "HeroicTragedy",
+   "raw": 3587054,
+   "packed": 1962599
+  },
+  {
+   "name": "AbyssTecrod",
+   "raw": 74295265,
+   "packed": 23435899
+  },
+  {
+   "name": "AbyssUlaman",
+   "raw": 73153181,
+   "packed": 23136393
+  },
+  {
+   "name": "AbyssKurgal",
+   "raw": 73751789,
+   "packed": 23147580
+  },
+  {
+   "name": "AbyssAmanamu",
+   "raw": 72995595,
+   "packed": 22500250
+  },
+  {
+   "name": "AbyssZorath",
+   "raw": 102669141,
+   "packed": 20934011
+  }
+ ]
+}

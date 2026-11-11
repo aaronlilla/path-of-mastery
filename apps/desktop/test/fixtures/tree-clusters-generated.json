@@ -1,0 +1,725 @@
+{
+ "note": "Generated cluster-jewel nodes from the engine tree state of a corpus build (3 large and 6 medium cluster jewels), used by treeLayout.test.ts",
+ "generated": [
+  {
+   "id": 66844,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65772,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65834,
+   "kind": "Notable",
+   "name": "Blanketed Snow",
+   "stats": [
+    "Damage Penetrates 10% Cold Resistance against Chilled Enemies"
+   ],
+   "orbit": 3,
+   "orbitIndex": 9,
+   "linked": [
+    33753,
+    65824
+   ]
+  },
+  {
+   "id": 66652,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65642,
+   "kind": "Notable",
+   "name": "Blanketed Snow",
+   "stats": [
+    "Damage Penetrates 10% Cold Resistance against Chilled Enemies"
+   ],
+   "orbit": 3,
+   "orbitIndex": 12,
+   "linked": [
+    46393,
+    65632
+   ]
+  },
+  {
+   "id": 65831,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 5,
+   "linked": [
+    65830,
+    33753
+   ]
+  },
+  {
+   "id": 66649,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 13,
+   "linked": [
+    3109,
+    66640
+   ]
+  },
+  {
+   "id": 65766,
+   "kind": "Notable",
+   "name": "Widespread Destruction",
+   "stats": [
+    "6% increased Area of Effect",
+    "20% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 9,
+   "linked": [
+    65765,
+    65767
+   ]
+  },
+  {
+   "id": 65639,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 8,
+   "linked": [
+    65638,
+    46393
+   ]
+  },
+  {
+   "id": 66832,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Strength",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 15,
+   "linked": [
+    66834,
+    66842,
+    33753
+   ]
+  },
+  {
+   "id": 66643,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 5,
+   "linked": [
+    66640,
+    3109
+   ]
+  },
+  {
+   "id": 65760,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+8 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 1,
+   "linked": [
+    65762,
+    65770,
+    2491
+   ]
+  },
+  {
+   "id": 66640,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Intelligence",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 1,
+   "linked": [
+    66643,
+    66649,
+    46393
+   ]
+  },
+  {
+   "id": 65754,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 12,
+   "linked": [
+    65752,
+    65744
+   ]
+  },
+  {
+   "id": 65816,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Intelligence",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 4,
+   "linked": [
+    18436,
+    65818
+   ]
+  },
+  {
+   "id": 65810,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 12,
+   "linked": [
+    65808,
+    18436
+   ]
+  },
+  {
+   "id": 65836,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65644,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 66840,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Strength",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 9,
+   "linked": [
+    22748,
+    66842
+   ]
+  },
+  {
+   "id": 65830,
+   "kind": "Notable",
+   "name": "Widespread Destruction",
+   "stats": [
+    "6% increased Area of Effect",
+    "20% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 4,
+   "linked": [
+    65829,
+    65831
+   ]
+  },
+  {
+   "id": 65765,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+8 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 8,
+   "linked": [
+    10532,
+    65766
+   ]
+  },
+  {
+   "id": 65638,
+   "kind": "Notable",
+   "name": "Widespread Destruction",
+   "stats": [
+    "6% increased Area of Effect",
+    "20% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 7,
+   "linked": [
+    65637,
+    65639
+   ]
+  },
+  {
+   "id": 66834,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 1,
+   "linked": [
+    66832,
+    22748
+   ]
+  },
+  {
+   "id": 65762,
+   "kind": "Notable",
+   "name": "Prismatic Heart",
+   "stats": [
+    "+10% to all Elemental Resistances",
+    "30% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 4,
+   "linked": [
+    65760,
+    10532
+   ]
+  },
+  {
+   "id": 65824,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 12,
+   "linked": [
+    65826,
+    65834,
+    32763
+   ]
+  },
+  {
+   "id": 65632,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 15,
+   "linked": [
+    65634,
+    65642,
+    46882
+   ]
+  },
+  {
+   "id": 65756,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65818,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 7,
+   "linked": [
+    65816,
+    65808
+   ]
+  },
+  {
+   "id": 65744,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+7% to Lightning Resistance",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 15,
+   "linked": [
+    65746,
+    65754,
+    10532
+   ]
+  },
+  {
+   "id": 66780,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 66842,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 12,
+   "linked": [
+    66840,
+    66832
+   ]
+  },
+  {
+   "id": 65770,
+   "kind": "Notable",
+   "name": "Blanketed Snow",
+   "stats": [
+    "Damage Penetrates 10% Cold Resistance against Chilled Enemies"
+   ],
+   "orbit": 3,
+   "orbitIndex": 15,
+   "linked": [
+    46519,
+    65760
+   ]
+  },
+  {
+   "id": 66777,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 0,
+   "linked": [
+    61666,
+    66768
+   ]
+  },
+  {
+   "id": 65767,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+8 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 11,
+   "linked": [
+    65766,
+    46519
+   ]
+  },
+  {
+   "id": 65829,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 3,
+   "linked": [
+    6910,
+    65830
+   ]
+  },
+  {
+   "id": 65826,
+   "kind": "Notable",
+   "name": "Prismatic Heart",
+   "stats": [
+    "+10% to all Elemental Resistances",
+    "30% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 15,
+   "linked": [
+    65824,
+    6910
+   ]
+  },
+  {
+   "id": 66771,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 8,
+   "linked": [
+    66768,
+    61666
+   ]
+  },
+  {
+   "id": 65637,
+   "kind": "Normal",
+   "name": "Cold Damage",
+   "stats": [
+    "12% increased Cold Damage",
+    "+5 to Intelligence"
+   ],
+   "orbit": 3,
+   "orbitIndex": 5,
+   "linked": [
+    22994,
+    65638
+   ]
+  },
+  {
+   "id": 65634,
+   "kind": "Notable",
+   "name": "Prismatic Heart",
+   "stats": [
+    "+10% to all Elemental Resistances",
+    "30% increased Elemental Damage"
+   ],
+   "orbit": 3,
+   "orbitIndex": 1,
+   "linked": [
+    65632,
+    22994
+   ]
+  },
+  {
+   "id": 66768,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Intelligence",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 4,
+   "linked": [
+    66771,
+    66777,
+    46519
+   ]
+  },
+  {
+   "id": 65820,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65628,
+   "kind": "Mastery",
+   "name": "Nothingness",
+   "stats": [],
+   "orbit": 0,
+   "orbitIndex": 0,
+   "linked": []
+  },
+  {
+   "id": 65752,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+7% to Lightning Resistance",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 9,
+   "linked": [
+    23984,
+    65754
+   ]
+  },
+  {
+   "id": 65625,
+   "kind": "Notable",
+   "name": "Surprise Sabotage",
+   "stats": [
+    "+8% to Critical Strike Multiplier with Traps",
+    "+8% to Critical Strike Multiplier with Mines",
+    "Trap Damage Penetrates 4% Elemental Resistances",
+    "Mine Damage Penetrates 4% Elemental Resistances"
+   ],
+   "orbit": 2,
+   "orbitIndex": 8,
+   "linked": [
+    61305,
+    65616
+   ]
+  },
+  {
+   "id": 65746,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 1,
+   "linked": [
+    65744,
+    23984
+   ]
+  },
+  {
+   "id": 65808,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Intelligence",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 9,
+   "linked": [
+    65810,
+    65818,
+    6910
+   ]
+  },
+  {
+   "id": 65619,
+   "kind": "Notable",
+   "name": "Guerilla Tactics",
+   "stats": [
+    "20% increased Trap Damage",
+    "20% increased Mine Damage",
+    "10% increased Trap Throwing Speed",
+    "10% increased Mine Throwing Speed",
+    "5% increased Movement Speed if you've thrown a Trap or Mine Recently"
+   ],
+   "orbit": 2,
+   "orbitIndex": 0,
+   "linked": [
+    65616,
+    61305
+   ]
+  },
+  {
+   "id": 65616,
+   "kind": "Normal",
+   "name": "Trap and Mine Damage",
+   "stats": [
+    "12% increased Trap Damage",
+    "12% increased Mine Damage",
+    "+8 to Strength",
+    "3% increased Trap and Mine Throwing Speed"
+   ],
+   "orbit": 2,
+   "orbitIndex": 12,
+   "linked": [
+    65619,
+    65625,
+    22994
+   ]
+  }
+ ]
+}

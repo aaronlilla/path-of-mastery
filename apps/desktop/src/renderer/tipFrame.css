@@ -1,0 +1,37 @@
+/* The in-game look every hover tooltip shares: a frame edged in --tt-rc, a header band tinted by it, Fontin names and
+   dividers in the same colour. A frame sets --tt-px / --tt-py (its padding) so the band reaches its edges. */
+.tt-band {
+  box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center;
+  min-height: 40px; padding: 7px 14px;
+  margin: calc(-1 * var(--tt-py, 10px)) calc(-1 * var(--tt-px, 14px)) 8px;
+  border-radius: 9px 9px 0 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tt-rc) 26%, rgb(var(--glass-rgb))), color-mix(in srgb, var(--tt-rc) 9%, rgb(var(--glass-rgb))));
+  border-bottom: 1px solid color-mix(in srgb, var(--tt-rc) 60%, transparent);
+  color: var(--tt-rc);
+  font-family: 'Fontin SmallCaps', 'Cormorant Garamond', serif; font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0;
+}
+.tt-band.col { flex-direction: column; gap: 1px; }
+.tt-alt { margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(var(--line-rgb), .1); text-align: center; font-size: 11.5px; line-height: 1.2; color: var(--text-3); }
+
+/* Passive node tooltip */
+.tt-tip.tt-tip { --tt-px: 12px; --tt-py: 12px; --tt-rc: var(--rarity-normal); border-color: var(--tt-rc); }
+.tt-tip .head.tt-band { margin-bottom: 0; border-radius: 13px 13px 0 0; }
+.tt-tip .head.tt-band .nm { font: 400 21px/1.15 'Fontin SmallCaps', 'Cormorant Garamond', serif; font-variant-ligatures: none; color: var(--tt-rc); }
+.tt-tip .foot .tt-alt { margin: 0 0 0 auto; padding: 0; border: 0; font-weight: 400; }
+
+/* Stat tooltip (sidebar) and the short Calcs card */
+.sb-explain.sb-explain, .calc-bd.calc-short { --tt-px: 0px; --tt-py: 0px; --tt-rc: var(--gold-400); border-color: color-mix(in srgb, var(--tt-rc) 70%, transparent); }
+.sb-explain .hd.tt-band, .calc-short .tt-band { margin-bottom: 8px; border-radius: 13px 13px 0 0; }
+.sb-explain .hd.tt-band { flex-direction: column; gap: 2px; padding: 8px 14px; }
+.sb-explain .hd.tt-band .t { flex: none; font: 400 20px/1.1 'Fontin SmallCaps', 'Cormorant Garamond', serif; font-variant-ligatures: none; color: var(--tt-rc); }
+.sb-explain .hd.tt-band .v { color: var(--text-strong); }
+.sb-explain .mean { text-align: center; }
+.sb-explain .ft { justify-content: center; border-top: 0; background: none; padding: 0 14px 8px; }
+.sb-explain .ft .tt-alt, .calc-short .tt-alt { margin: 0; padding: 0; border: 0; }
+.calc-short { pointer-events: none !important; text-align: center; overflow: hidden; padding-bottom: 8px; }
+.calc-short .tt-band .ttl { font: 400 19px/1.15 'Fontin SmallCaps', 'Cormorant Garamond', serif; font-variant-ligatures: none; color: var(--tt-rc); }
+.calc-short .short-v { padding: 2px 14px 8px; font: 600 15px Geist, sans-serif; color: var(--text-strong); font-variant-numeric: tabular-nums; }
+
+/* Skills tab hint box */
+.sk-tt-alt { min-width: 0 !important; padding: 5px 14px !important; }
+.sk-tt-alt .tt-alt { margin: 0; padding: 0; border: 0; }

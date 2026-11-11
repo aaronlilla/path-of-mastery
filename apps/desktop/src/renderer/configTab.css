@@ -1,0 +1,206 @@
+/* Configuration tab. Ported from "Tab - Configuration.dc.html"; tokens only. */
+.cfg-root { font-family: Geist, sans-serif; font-size: 13.5px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; box-sizing: border-box; }
+.cfg-root *, .cfg-root *::before, .cfg-root *::after { box-sizing: border-box; }
+.cfg-note { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 32px; white-space: normal; color: var(--text-muted); font-size: 14px; line-height: 1.55; pointer-events: auto; border-radius: 16px; border: 1px dashed rgba(var(--line-rgb), .16); }
+.cfg-note b { color: var(--text-2); font-weight: 500; }
+
+/* toolbar */
+.cfg-tb {
+  max-width: 1440px; margin: 0 auto; position: absolute !important; left: 0; right: 0; top: 0; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 10px; overflow: visible; min-width: 0;
+  border-radius: 16px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .56), rgba(var(--glass-rgb), .6)); border: 1px solid rgba(var(--line-rgb), .09);
+  box-shadow: 0 18px 50px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .06); pointer-events: auto; z-index: 5;
+}
+.cfg-tb .sp { flex: 1; }
+.cfg-setwrap { position: relative; flex: 0 1 220px; min-width: 110px; }
+.cfg-set {
+  width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+.cfg-set:hover, .cfg-set[aria-expanded="true"] { border-color: rgba(var(--accent-rgb), .45); }
+.cfg-set .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.cfg-set .k { font-size: 10px; color: var(--text-muted); letter-spacing: .06em; }
+.cfg-set .v { color: var(--text-strong); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cfg-set > pom-icon { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
+.cfg-set[aria-expanded="true"] > pom-icon { transform: rotate(180deg); }
+.cfg-btn {
+  flex: none; height: 36px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 10px; font: 500 13.5px Geist, sans-serif; white-space: nowrap; cursor: pointer;
+  background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .5), rgba(var(--glass-rgb), .42)); border: 1px solid rgba(var(--line-rgb), .1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 6px rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); color: var(--text);
+}
+.cfg-btn:hover { border-color: rgba(var(--accent-rgb), .5); color: var(--text-strong); }
+.cfg-btn:disabled { opacity: .5; cursor: not-allowed; }
+.cfg-btn[aria-pressed="true"] { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .12); color: var(--text-strong); }
+.cfg-btn.sm { height: 30px; padding: 0 10px; border-radius: 8px; font-size: 12.5px; gap: 6px; box-shadow: none; }
+.cfg-ico { flex: none; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 7px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cfg-ico:hover { color: var(--text-strong); background: rgba(var(--line-rgb), .07); }
+.cfg-ico.del:hover { color: var(--negative-text); }
+.cfg-ico:disabled { opacity: .35; cursor: default; }
+.cfg-ico:disabled:hover { color: var(--text-muted); background: transparent; }
+.cfg-vr { width: 1px; height: 24px; background: rgba(var(--line-rgb), .1); margin: 0 6px; flex: none; }
+.cfg-search {
+  flex: 0 1 320px; min-width: 110px; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 6px 0 12px; border-radius: 10px;
+  background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k)));
+}
+.cfg-search > pom-icon { flex: none; color: var(--text-muted); }
+.cfg-search input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: var(--text-strong); font: inherit; outline: none; }
+.cfg-search button { flex: none; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cfg-search button:hover { color: var(--text-strong); }
+.cfg-search:focus-within { border-color: rgba(var(--accent-rgb), .55); }
+.cfg-oc { flex: none; display: inline-flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px 0 8px; border-radius: 16px; border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-strong); font: 500 12.5px Geist, sans-serif; white-space: nowrap; cursor: pointer; }
+.cfg-oc .trk { position: relative; width: 28px; height: 16px; border-radius: 8px; background: rgba(var(--line-rgb), .22); }
+.cfg-oc .knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-strong); transition: left var(--dur-quick, 160ms) var(--ease, ease); }
+.cfg-oc.on { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .12); }
+.cfg-oc.on .trk { background: var(--gold-400); }
+.cfg-oc.on .knob { left: 14px; }
+
+/* popovers */
+.cfg-pop { position: absolute !important; z-index: 60; display: flex; flex-direction: column; border-radius: 12px; background: rgba(var(--glass-rgb), .97); border: 1px solid rgba(var(--line-rgb), .1); box-shadow: var(--elev-3); pointer-events: auto; white-space: nowrap; }
+.cfg-setmenu { left: 0; top: calc(100% + 6px); width: max(100%, 240px); padding: 4px; gap: 1px; border-radius: 10px; }
+.cfg-mi { min-height: 32px; display: flex; align-items: center; gap: 9px; padding: 4px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--text-strong); font: 500 13px Geist, sans-serif; text-align: left; cursor: pointer; }
+.cfg-mi:hover { background: rgba(var(--line-rgb), .07); }
+.cfg-mi[aria-selected="true"] { background: rgba(var(--accent-rgb), .12); }
+.cfg-mi > pom-icon { flex: none; color: var(--text-muted); }
+.cfg-mi .tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cfg-mi .r { flex: none; font-size: 11.5px; font-weight: 400; color: var(--text-faint); }
+.cfg-mi .ck { flex: none; width: 14px; display: flex; color: var(--gold-400); }
+.cfg-setmenu .sep { flex: none; height: 1px; margin: 3px 6px; background: rgba(var(--line-rgb), .08); }
+.cfg-manage { top: 62px; width: 340px; max-width: calc(100% - 16px); }
+.cfg-manage .hd { display: flex; align-items: center; gap: 8px; padding: 10px 8px 8px 14px; border-bottom: 1px solid rgba(var(--line-rgb), .06); }
+.cfg-manage .hd span { flex: 1; font-weight: 600; color: var(--text-strong); }
+.cfg-manage .rows { display: flex; flex-direction: column; gap: 1px; padding: 4px; max-height: 260px; overflow-y: auto; }
+.cfg-manage .r { min-height: 36px; display: flex; align-items: center; gap: 6px; padding: 2px 4px 2px 10px; border-radius: 8px; }
+.cfg-manage .r.cur { background: rgba(var(--accent-rgb), .08); }
+.cfg-manage .r:hover { background: rgba(var(--line-rgb), .05); }
+.cfg-manage .r.cur:hover { background: rgba(var(--accent-rgb), .1); }
+.cfg-manage .nm { flex: 1; min-width: 0; height: 32px; display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--text-strong); font: 500 13px Geist, sans-serif; text-align: left; cursor: pointer; }
+.cfg-manage .nm .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cfg-manage .nm .cu { flex: none; color: var(--text-muted); font-weight: 400; }
+.cfg-manage .nm .n { flex: none; margin-left: auto; font-size: 11.5px; color: var(--text-faint); font-weight: 400; }
+.cfg-manage input { flex: 1; min-width: 0; height: 28px; padding: 0 8px; border-radius: 7px; border: 1px solid rgba(var(--accent-rgb), .45); background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); color: var(--text-strong); font: 500 13px Geist, sans-serif; outline: none; }
+.cfg-manage .ft { padding: 8px; border-top: 1px solid rgba(var(--line-rgb), .06); }
+.cfg-manage .ft .cfg-btn { width: 100%; height: 32px; border-radius: 8px; font-size: 13px; }
+
+/* body */
+.cfg-body {
+  position: absolute; left: 0; right: 0; top: 68px; bottom: 0; max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-content: start; align-items: start;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; pointer-events: auto;
+}
+.cfg-nav {
+  position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(var(--glass-rgb), .6), rgba(var(--glass-rgb), .66)); border: 1px solid rgba(var(--line-rgb), .08);
+}
+.cfg-nav .h { padding: 6px 10px 4px; font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); }
+.cfg-nav button { height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 9px; border: 0; border-radius: 8px; background: transparent; color: var(--text-2); font: 500 13px Geist, sans-serif; text-align: left; cursor: pointer; white-space: nowrap; }
+.cfg-nav button:hover { background: rgba(var(--line-rgb), .06); color: var(--text-strong); }
+.cfg-nav button > pom-icon { color: var(--text-muted); }
+.cfg-nav .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* Two columns once each can be --col-min wide; ConfigTab sets data-cols and the height that balances them (see useBalancedColumns). */
+.cfg-cols { --col-min: 420; padding-bottom: 14px; min-width: 0; }
+.cfg-cols[data-cols="2"] { display: flex; flex-direction: column; flex-wrap: wrap; align-content: flex-start; column-gap: 14px; }
+.cfg-cols[data-cols="2"] > * { flex: none; width: calc((100% - 14px) / 2); }
+.cfg-card {
+  break-inside: avoid; margin-bottom: 14px; border-radius: 14px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .74), rgba(var(--glass-rgb), .78)); border: 1px solid rgba(var(--line-rgb), .08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); padding: 10px 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.cfg-card .ttl { display: flex; align-items: center; gap: 9px; padding: 2px 10px 8px; font: 600 21px/1 'Cormorant Garamond', serif; color: var(--text-display); }
+.cfg-card .ttl { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.cfg-card .ttl > pom-icon:first-child { color: var(--gold-label); }
+.cfg-card .ttl .ttl-t { flex: 1; min-width: 0; }
+.cfg-card .ttl > pom-icon:last-child { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
+.cfg-card .ttl[aria-expanded='false'] > pom-icon:last-child { transform: rotate(-90deg); }
+.cfg-card .ttl:hover > pom-icon:last-child { color: var(--text-strong); }
+/* The prototype's cards show no chevron: it appears on hover, on keyboard focus, and while a card is collapsed. */
+.cfg-card .ttl > pom-icon:last-child { opacity: 0; }
+.cfg-card .ttl:hover > pom-icon:last-child, .cfg-card .ttl:focus-visible > pom-icon:last-child, .cfg-card .ttl[aria-expanded='false'] > pom-icon:last-child { opacity: 1; }
+.cfg-hint { padding: 18px 16px; color: var(--text-muted); }
+.cfg-empty { padding: 18px 16px; flex-direction: row; align-items: center; gap: 10px; color: var(--text-2); white-space: normal; }
+.cfg-empty > pom-icon { flex: none; color: var(--text-muted); }
+.cfg-empty .tx { flex: 1; min-width: 0; }
+.cfg-empty button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: rgba(var(--accent-rgb), .14); color: var(--gold-text); font: 600 12.5px Geist, sans-serif; cursor: pointer; }
+.cfg-empty button:hover { background: rgba(var(--accent-rgb), .22); }
+
+/* rows */
+.cfg-sub { padding: 8px 12px 2px; display: flex; align-items: center; gap: 7px; font-weight: 600; color: var(--rarity-gem-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cfg-sub img { flex: none; width: 20px; height: 20px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
+.cfg-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; transition: background .2s, box-shadow .2s; }
+.cfg-row .l { color: var(--text-3); overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cfg-row .c { display: flex; justify-content: flex-end; min-width: 0; }
+.cfg-row.on { background: rgba(var(--accent-rgb), .06); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .12); }
+.cfg-row.on .l { color: var(--text-strong); }
+.cfg-row.dim { opacity: .75; }
+.cfg-row.bad { background: rgba(239, 70, 86, .07); box-shadow: inset 0 0 0 1px rgba(239, 70, 86, .22); }
+.cfg-row.bad .l { color: var(--negative-text); }
+.cfg-row .switch { flex: none; }
+.cfg-dd { position: relative; flex: 0 1 auto; min-width: 110px; }
+.cfg-select {
+  width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 8px; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+.cfg-select:hover, .cfg-select[aria-expanded="true"] { border-color: rgba(var(--accent-rgb), .45); }
+.cfg-select .v { flex: 1; min-width: 0; color: var(--text-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cfg-select > pom-icon { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
+.cfg-select[aria-expanded="true"] > pom-icon { transform: rotate(180deg); }
+.cfg-num { flex: 0 1 96px; min-width: 96px; width: 96px; height: 30px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); }
+.cfg-num:focus-within { border-color: rgba(var(--accent-rgb), .55); }
+/* The number box is a plain field, not a glass tile: the tile style blanks the border, so an empty box vanished. */
+.cfg-root .cfg-num { background: linear-gradient(rgba(var(--line-rgb), .045), rgba(var(--line-rgb), .045)), rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border-color: rgba(var(--line-rgb), .26); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))) !important; }
+.cfg-root .cfg-num:hover { border-color: rgba(var(--line-rgb), .38); }
+.cfg-root .cfg-num:focus-within { border-color: rgba(var(--accent-rgb), .55); }
+.cfg-num input { flex: 1; min-width: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: right; color: var(--text-strong); font: inherit; outline: none; }
+.cfg-num input::placeholder { color: var(--text-faint); }
+.cfg-seg { height: 30px; }
+.cfg-seg > button { height: 22px; padding: 0 11px; font-size: 13.5px; }
+.cfg-text { width: 100%; min-height: 80px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k))); color: var(--text-strong); font: 500 12.5px/1.5 'Geist Mono', monospace; }
+
+/* dropdown menu */
+.cfg-dd-search { display: flex; align-items: center; gap: 8px; height: 34px; margin: 0 2px 4px; padding: 0 10px; border-radius: 8px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .12); }
+.cfg-dd-search > pom-icon { flex: none; color: var(--text-muted); }
+.cfg-dd-search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text-strong); font: 400 13.5px Geist, sans-serif; outline: none; }
+.cfg-dd-search .n { flex: none; font-size: 11.5px; color: var(--text-faint); }
+.cfg-dd-list { display: flex; flex-direction: column; gap: 1px; max-height: 300px; overflow-y: auto; outline: none; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .2) transparent; }
+.cfg-opt { min-height: 32px; flex: none; color: var(--text-strong); font-weight: 500; font-size: 13px; }
+.cfg-opt[aria-selected="true"] { background: rgba(var(--accent-rgb), .12); }
+.cfg-dd-none { padding: 14px 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--text-muted); font-size: 13px; }
+.cfg-dd-none button { border: 0; background: transparent; color: var(--gold-text); font: 600 12.5px Geist, sans-serif; cursor: pointer; }
+.cfg-dd-foot { padding: 6px 10px 2px; font-size: 11px; color: var(--text-faint); border-top: 1px solid rgba(var(--line-rgb), .06); margin-top: 4px; }
+
+/* custom modifiers */
+.cfg-mod { margin: 2px 6px 6px; padding: 8px; border-radius: 10px; background: rgba(var(--line-rgb), .03); border: 1px solid rgba(var(--line-rgb), .07); display: flex; flex-direction: column; gap: 8px; transition: background .2s; }
+.cfg-mod.live { background: rgba(var(--accent-rgb), .06); border-color: rgba(var(--accent-rgb), .16); }
+.cfg-mod .top { display: flex; align-items: center; gap: 8px; }
+.cfg-mod .t { flex: 1; min-width: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .16); background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); color: var(--text-strong); font: 500 13px Geist, sans-serif; outline: none; }
+.cfg-mod .t:focus { border-color: rgba(var(--accent-rgb), .55); }
+.cfg-mod .del { width: 30px; height: 30px; }
+.cfg-mod .edit { position: relative; }
+.cfg-mod .hl, .cfg-mod textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .12); font: 500 12.5px/1.5 'Geist Mono', monospace; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+.cfg-mod .hl { position: absolute; inset: 0; overflow: hidden; pointer-events: none; background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k))); color: var(--text-strong); }
+.cfg-mod .hl .ok { color: var(--rarity-magic); }
+.cfg-mod .hl .bad { color: var(--negative-text); }
+.cfg-mod textarea { position: relative; display: block; min-height: 56px; resize: vertical; background: transparent; color: transparent; caret-color: var(--text-strong); outline: none; }
+.cfg-mod textarea::placeholder { color: var(--text-faint); }
+.cfg-mod textarea:focus { border-color: rgba(var(--accent-rgb), .55); }
+.cfg-addgroup { padding: 4px 12px 6px; }
+.cfg-addgroup .cfg-btn { height: 30px; padding: 0 12px; font-size: 13px; }
+
+/* tooltip */
+.cfg-tip { position: fixed !important; z-index: 500; max-width: 380px; padding: 10px 12px; border-radius: 10px; background: rgba(var(--glass-rgb), .97); border: 1px solid rgba(var(--line-rgb), .12); box-shadow: var(--elev-3); font-size: 13px; line-height: 1.5; color: var(--text-2); white-space: normal; pointer-events: none; text-wrap: pretty; }
+.cfg-tip .body { white-space: pre-line; tab-size: 4; }
+.cfg-tip .cmp { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(var(--line-rgb), .1); display: flex; flex-direction: column; gap: 1px; }
+.cfg-tip .cmp:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.cfg-tip .hd { color: var(--text-muted); margin-bottom: 2px; }
+.cfg-tip .pos { color: var(--positive-text); }
+.cfg-tip .neg { color: var(--negative-text); }
+
+/* narrow: one column, no section nav (responsive.css also does this under 1200) */
+@container tab (max-width: 1199px) { .cfg-body { grid-template-columns: minmax(0, 1fr); } .cfg-nav { display: none; } .cfg-cols { --col-min: 290; } }
+@container tab (max-width: 640px) { .cfg-row { gap: 8px; } .cfg-search { flex-basis: 100%; } }
+.cfg-root input:focus-visible, .cfg-root textarea:focus-visible { outline: none; box-shadow: none; }
+
+/* Manage: rows can be dragged into a new order. */
+.cfg-manage .r[draggable="true"] { cursor: grab; }
+.cfg-manage .r.over { box-shadow: inset 0 2px 0 rgba(var(--accent-rgb), .8); }
+.cfg-manage .cfg-grip { flex: none; width: 14px; margin-left: -6px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
+
+/* Keyboard focus: a gold ring on the box that holds the text field (the field itself draws none). */
+.cfg-root .cfg-search:focus-within, .cfg-root .cfg-num:focus-within, .cfg-root .cfg-dd-search:focus-within { outline: 2px solid var(--gold-400); outline-offset: 0; border-color: rgba(var(--accent-rgb), .6); }
+.cfg-root .cfg-mod .t:focus-visible, .cfg-root .cfg-mod textarea:focus-visible, .cfg-root .cfg-manage input:focus-visible { outline: 2px solid var(--gold-400); outline-offset: 0; border-color: rgba(var(--accent-rgb), .6); }

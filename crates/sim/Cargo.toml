@@ -1,0 +1,13 @@
+[package]
+name = "pom-sim"
+version = "0.1.0"
+edition = "2021"
+
+# Boss fight simulator: steps a fight against one boss and asks the engine (pom-pipeline) for the numbers at each
+# distinct condition state. Calls the engine; never changes it.
+[dependencies]
+pom-engine = { path = "../engine" }
+pom-calc = { path = "../calc" }
+pom-offence = { path = "../offence" }
+pom-pipeline = { path = "../pipeline" }
+serde_json = { version = "1", features = ["preserve_order"] }

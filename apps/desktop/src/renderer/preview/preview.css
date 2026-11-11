@@ -1,0 +1,51 @@
+/* Next-league preview (look A): the blue of changed tree nodes marks everything that comes from the patch notes. */
+.pv-tag { flex: none; display: inline-flex; align-items: center; height: 17px; padding: 0 8px; margin-left: 8px; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--tree-changed) 70%, transparent); background: color-mix(in oklab, var(--tree-changed) 16%, transparent); color: color-mix(in oklab, var(--tree-changed) 55%, var(--text-strong)); font: 600 10px/1 Geist, sans-serif; letter-spacing: .08em; vertical-align: 1px; }
+
+.pv-switch { flex: none; align-self: center; display: inline-flex; align-items: center; gap: 8px; margin-right: 10px; }
+.pv-switch .cap { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.pv-switch .seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: 8px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .1); }
+.pv-switch .seg button { height: 24px; padding: 0 9px; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); font: 500 12px Geist, sans-serif; white-space: nowrap; cursor: pointer; }
+.pv-switch .seg button[aria-pressed="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); color: var(--text-strong); }
+.pv-switch .seg button:last-child[aria-pressed="true"] { background: color-mix(in oklab, var(--tree-changed) 34%, var(--surface-4)); color: #fff; }
+
+.pv-pop { padding: 0; max-width: 320px; }
+.pv-pop-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
+.pv-pop-body b { font: 600 13.5px Geist, sans-serif; color: var(--text-strong); }
+.pv-pop-body p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--text-2); white-space: normal; }
+.pv-pop-body .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.pv-pop-body .when { font-size: 11.5px; color: var(--text-muted); }
+
+/* Sidebar: the live number and the change under each preview number. */
+.sb-row .pv-live { grid-column: 1; justify-self: end; font-size: 10.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.sb-row .pv-chg { grid-column: 2; font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.sb-row .pv-same { font-size: 10.5px; color: var(--text-faint); font-weight: 400; }
+.pv-chg.up, .pv-tile .up { color: var(--positive-text); }
+.pv-chg.down, .pv-tile .down { color: var(--negative-text); }
+.pv-tile { display: block; margin-top: 2px; font-size: 11px; font-weight: 600; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-tile .from { font-weight: 400; }
+
+/* Calcs: the live value under a changed cell. */
+.calc-row .pv-cell { display: block; font-size: 10px; line-height: 1.15; color: var(--text-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.calc-row .pv-cell .up { color: var(--positive-text); font-weight: 600; }
+.calc-row .pv-cell .down { color: var(--negative-text); font-weight: 600; }
+.calc-sub .extra .pv-cell { display: inline; margin-left: 10px; font-size: 11px; color: var(--text-faint); }
+.calc-sub .extra .pv-cell .up { color: var(--positive-text); font-weight: 600; }
+.calc-sub .extra .pv-cell .down { color: var(--negative-text); font-weight: 600; }
+
+/* Tree: dashed blue rings on the nodes the notes change, a legend card, and the note block in the node tooltip. */
+.pv-rings { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
+.pv-ring { position: absolute; left: 0; top: 0; border-radius: 50%; border: 2px dashed var(--tree-changed); box-shadow: 0 0 10px color-mix(in oklab, var(--tree-changed) 60%, transparent); }
+.pv-legend { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .14); background: rgba(var(--shadow-rgb), calc(.7 * var(--shadow-k))); font-size: 12.5px; color: var(--text); pointer-events: none; }
+.pv-legend .k { display: flex; align-items: center; gap: 7px; }
+.pv-legend .k i { width: 11px; height: 11px; border-radius: 50%; border: 2px dashed var(--tree-changed); }
+.pv-legend .hint { padding-left: 18px; font-size: 11px; color: var(--text-faint); }
+.tt-tip .pv-note, .pv-note { display: flex; flex-direction: column; gap: 6px; padding: 10px 0 2px; margin-top: 6px; border-top: 1px solid rgba(var(--line-rgb), .12); }
+.pv-note .tag { align-self: flex-start; padding: 2px 7px; border-radius: 5px; border: 1px solid color-mix(in oklab, var(--tree-changed) 70%, transparent); background: color-mix(in oklab, var(--tree-changed) 18%, transparent); color: color-mix(in oklab, var(--tree-changed) 55%, var(--text-strong)); font: 600 10.5px Geist, sans-serif; }
+.pv-note .ln { font-size: 12.5px; line-height: 1.45; color: var(--text); white-space: normal; }
+.pv-note .eff { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--text-faint); }
+.pv-note .eff b { font-weight: 600; }
+.pv-note .eff .up { color: var(--positive-text); }
+.pv-note .eff .down { color: var(--negative-text); }
+
+/* Gems and items the notes change. */
+[data-pv-changed] { box-shadow: 0 0 0 1.5px var(--tree-changed), 0 0 12px -2px color-mix(in oklab, var(--tree-changed) 70%, transparent) !important; border-radius: 8px; }

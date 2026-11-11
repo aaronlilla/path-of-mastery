@@ -1,0 +1,14 @@
+{
+ "skill": "Summon Raging Spirit",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ }
+}

@@ -1,0 +1,12 @@
+[package]
+name = "pom-breakdown"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+# `float_roundtrip`: without it, serde_json's float parser can be off by 1 ULP on some literals
+# (confirmed against a real corpus value, "10504.234999999999", which it otherwise silently
+# parses as the *next* representable double, 10504.235000000000582... -- exactly the kind of
+# hairline case that flips a round-to-2-decimals boundary and produces a wrong rendered digit).
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }

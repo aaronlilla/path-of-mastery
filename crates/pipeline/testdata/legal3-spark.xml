@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="100" targetVersion="3_0" bandit="None" className="Templar" ascendClassName="Guardian" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="None" pantheonMinorGod="None">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Spark of the Nova" skillId="SparkAltX" gemId="Metadata/Items/Gems/SkillGemSpark" variantId="SparkAltX" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Greater Spell Echo" skillId="SupportGreaterSpellEcho" gemId="Metadata/Items/Gems/SupportGemGreaterSpellEcho" variantId="SupportGreaterSpellEcho" level="3" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Invert the Rules" skillId="SupportInvertTheRules" gemId="Metadata/Items/Gems/SupportGemInvertTheRules" variantId="SupportInvertTheRules" level="3" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Controlled Destruction" skillId="SupportControlledDestruction" gemId="Metadata/Items/Gems/SupportGemControlledDestruction" variantId="SupportControlledDestruction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Elemental Focus" skillId="SupportElementalFocus" gemId="Metadata/Items/Gems/SupportGemElementalFocus" variantId="SupportElementalFocus" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Arcane Surge" skillId="SupportArcaneSurge" gemId="Metadata/Items/Gems/SupportGemArcaneSurge" variantId="SupportArcaneSurge" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Skitterbots" skillId="SummonSkitterbots" gemId="Metadata/Items/Gems/SkillGemSummonSkitterbots" variantId="SummonSkitterbots" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Defiance Banner" skillId="DefianceBanner" gemId="Metadata/Items/Gems/SkillGemDefianceBanner" variantId="DefianceBanner" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Enfeeble" skillId="Enfeeble" gemId="Metadata/Items/Gems/SkillGemEnfeeble" variantId="Enfeeble" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Arcane Cloak" skillId="ArcaneCloak" gemId="Metadata/Items/Gems/SkillGemArcaneCloak" variantId="ArcaneCloak" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Summon Lightning Golem" skillId="SummonLightningGolem" gemId="Metadata/Items/Gems/SkillGemSummonLightningGolem" variantId="SummonLightningGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Flame Dash" skillId="FlameDash" gemId="Metadata/Items/Gems/SkillGemFlameDash" variantId="FlameDash" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Smite" skillId="Smite" gemId="Metadata/Items/Gems/SkillGemSmite" variantId="Smite" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Zealotry" skillId="Zealotry" gemId="Metadata/Items/Gems/SkillGemSpellDamageAura" variantId="Zealotry" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Ancestral Cry" skillId="AncestralCry" gemId="Metadata/Items/Gems/SkillGemAncestralCry" variantId="AncestralCry" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Icicle Mine" skillId="IcicleMine" gemId="Metadata/Items/Gems/SkillGemFreezeMine" variantId="IcicleMine" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1"><Gem nameSpec="Wither" skillId="Wither" gemId="Metadata/Items/Gems/SkillGemWither" variantId="Wither" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Spell Totem" skillId="SupportSpellTotem" gemId="Metadata/Items/Gems/SupportGemSpellTotem" variantId="SupportSpellTotem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="5" ascendClassId="3" masteryEffects="{6968,28589},{38921,4500},{39332,50863},{5726,17942}" nodes="61525,409,4494,40010,19641,16745,42264,37419,17352,20228,39631,29005,26866,17251,41472,34098,60398,13009,17735,49254,1203,6967,55743,19919,6764,58402,38516,31819,58218,5743,9386,14057,62767,36859,41599,15631,31931,44908,6968,49698,55926,38921,63138,48298,18767,38701,12250,42760,40366,65273,5462,39841,39332,7347,26585,50029,23659,33864,63447,24362,29781,44184,18174,50826,19635,1031,60388,22088,55332,10115,43000,11551,6237,15599,7555,44183,12379,14021,63965,33435,44799,54694,9432,54657,34157,7938,11420,30225,4184,7918,42485,40075,56716,55647,57362,36121,32431,4367,739,18866,1957,44529,57264,33296,35724,60085,47504,12032,49651,38176,27203,48362,12913,18239,21934,17579,36774,49534,63558,2292,32455,7153,58763,5726,58604,12536,20050,64768,12852,21262,33923,58453,59005" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: RARE
+Solver Staff
+Battery Staff
+Item Level: 100
+Quality: 20
+LevelReq: 70
+Implicits: 4
+{crafted}{enchant}Quality does not increase Physical Damage
+{crafted}{enchant}Grants 1% increased Elemental Damage per 2% Quality
+90% increased Spell Damage
+28% increased Cast Speed
+200% increased Spell Damage
++4 to Level of all Lightning Spell Skill Gems
+200% increased Lightning Damage
+49% increased Cast Speed
+14% chance to deal Double Damage
+{crafted}+24 to Dexterity and Intelligence
+{crafted}16% increased Attack Speed
+Corrupted
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Elder Item
+Shaper Item
+Implicits: 3
+{crafted}{enchant}40% increased Spark Damage
++2% to maximum Lightning Resistance
+6% increased maximum Life
+15% increased maximum Mana
+Transfiguration of Mind
+Nearby Enemies take 9% increased Elemental Damage
+Adds 7 to 93 Lightning Damage to Spells
+Adds 8 to 121 Lightning Damage to Spells
++60 to Intelligence
+10% increased Mana Reservation Efficiency of Skills
+Corrupted
+</Item><Item id="4">Rarity: UNIQUE
+Servant of Decay
+Torturer Garb
+Source: Drops from unique{Incarnation of Fear} in normal{Moment of Trauma}
+Requires Level 78, 151 Dex, 151 Int
+Trigger Level 20 Summon Void Spawn every 4 seconds
+(150-200)% increased Energy Shield
++(23-37)% to Chaos Resistance
+(4-6)% of Damage from Hits is taken from Void Spawns' Life before you per Void Spawn
+Gain (4-6)% of Non-Chaos Damage as Extra Chaos Damage per Summoned Void Spawn
+</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Paladin Gloves
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Warlord Item
+Shaper Item
+Implicits: 2
+10% increased Cast Speed
++2% to maximum Cold Resistance
++35 to Strength and Intelligence
++55 to Intelligence
+Culling Strike
+25% increased Area of Effect if you've dealt a Culling Strike Recently
+38% increased Spell Damage
++77 to maximum Mana
+Socketed Gems are Supported by Level 25 Slower Projectiles
+25% increased Projectile Damage
+Corrupted
+</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 100
+Quality: 20
+LevelReq: 84
+Warlord Item
+Redeemer Item
+Implicits: 4
+{crafted}{enchant}+8% chance to Suppress Spell Damage if you've
+{crafted}{enchant}taken Spell Damage Recently
++29% to Chaos Resistance
+6% increased maximum Life
+20% increased Armour
+4% additional Physical Damage Reduction
+100% increased Armour and Energy Shield
+15% chance to avoid Projectiles if you've taken Projectile Damage Recently
+12% chance to avoid Projectiles
++77 to maximum Mana
++129 to maximum Life
++35% to Chaos Resistance
+Corrupted
+</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Pearlescent Amulet
+Item Level: 100
+LevelReq: 68
+Crusader Item
+Redeemer Item
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 4
+{crafted}Allocates Disciple of the Slaughter
+{tags:block}5% Chance to Block Attack Damage
+{tags:attribute}6% increased Dexterity
+{tags:attribute}6% increased Intelligence
+{tags:resource,influence_mod,mana,aura}{suffix}Zealotry has 50% increased Mana Reservation Efficiency
+{tags:resource,influence_mod,mana}{suffix}14% increased Mana Reservation Efficiency of Skills
+{tags:resource,influence_mod,mana}{suffix}14% increased Mana Reservation Efficiency of Skills
+{tags:gem}{prefix}+1 to Level of all Skill Gems
+{tags:elemental_damage,influence_mod,damage,elemental,lightning}{prefix}Damage Penetrates 10% Lightning Resistance
+{tags:elemental,lightning,gem}{prefix}+1 to Level of all Lightning Skill Gems
+Corrupted
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 100
+LevelReq: 68
+Catalyst: Fertile
+CatalystQuality: 20
+Implicits: 2
+{tags:resource,mana,aura}Zealotry has 30% increased Mana Reservation Efficiency
+{tags:caster,speed}10% increased Cast Speed
+{crafted}Can have up to 3 Crafted Modifiers
+{tags:unveiled_mod,attribute}{suffix}+35 to Dexterity and Intelligence
+{tags:resource,mana}{prefix}+78 to maximum Mana
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}Regenerate 25 Life per second
+{tags:resource,unveiled_mod,life,mana}{prefix}{crafted}+45 to maximum Mana
+{tags:resource,unveiled_mod,mana}{prefix}{crafted}+40 to maximum Mana
+{tags:resource,unveiled_mod,mana}{prefix}{crafted}Regenerate 4 Mana per second
+Corrupted
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Two-Stone Ring
+Item Level: 100
+LevelReq: 68
+Catalyst: Intrinsic
+CatalystQuality: 20
+Implicits: 3
+{tags:attribute}5% increased Attributes
+{tags:attribute}6% increased Dexterity
+{tags:attribute}6% increased Intelligence
+{tags:attribute}{suffix}+58 to Intelligence
+{tags:unveiled_mod,attribute}{suffix}+35 to Dexterity and Intelligence
+{tags:endurance_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Endurance Charges
+{tags:resource,life}{prefix}+114 to maximum Life
+{tags:defences,evasion}{prefix}+170 to Evasion Rating
+{tags:resource,mana}{prefix}+78 to maximum Mana
+Corrupted
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Stygian Vise
+Item Level: 100
+LevelReq: 68
+Implicits: 1
+Has 1 Abyssal Socket
++144 to maximum Life
++68 to maximum Mana
+Flasks applied to you have 12% increased Effect
++35% to Chaos Resistance
++60 to Strength
+</Item><Item id="11">Rarity: MAGIC
+Bismuth Flask
+Item Level: 100
+Quality: 20
+LevelReq: 67
+Implicits: 0
+60% increased Evasion Rating during Effect
+27% reduced Duration
+25% increased effect
+</Item><Item id="12">Rarity: MAGIC
+Ruby Flask
+Item Level: 100
+Quality: 20
+LevelReq: 67
+Implicits: 0
+60% increased Armour during Effect
+27% reduced Duration
+25% increased effect
+</Item><Item id="13">Rarity: MAGIC
+Sapphire Flask
+Item Level: 100
+Quality: 20
+LevelReq: 65
+Implicits: 0
+27% reduced Duration
+25% increased effect
+55% increased Critical Strike Chance during Effect
+</Item><Item id="14">Rarity: MAGIC
+Topaz Flask
+Item Level: 100
+Quality: 20
+LevelReq: 65
+Implicits: 0
+27% reduced Duration
+25% increased effect
+55% increased Critical Strike Chance during Effect
+</Item><Item id="15">Rarity: UNIQUE
+Rumi's Concoction
+Granite Flask
+Variant: Pre 1.3.0
+Variant: Pre 2.5.0
+Variant: Pre 3.15.0
+Variant: Current
+LevelReq: 68
+{variant:1}+(30-40)% Chance to Block Attack Damage during Effect
+{variant:2}+(20-30)% Chance to Block Attack Damage during Effect
+{variant:3}+(14-20)% Chance to Block Attack Damage during Effect
+{variant:4}+(8-12)% Chance to Block Attack Damage during Effect
+{variant:1}+(15-20)% Chance to Block Spell Damage during Effect
+{variant:2}+(10-15)% Chance to Block Spell Damage during Effect
+{variant:3}+(6-10)% Chance to Block Spell Damage during Effect
+{variant:4}+(4-6)% Chance to Block Spell Damage during Effect
+</Item><Item id="16">Rarity: RARE
+Solver Jewel
+Cobalt Jewel
+Item Level: 100
+LevelReq: 0
+Implicits: 2
+Damage Penetrates 1% Elemental Resistances
+Damage Penetrates 1% Lightning Resistance
+5% increased Cast Speed while wielding a Staff
+5% increased Cast Speed with Lightning Skills
+4% increased Attack and Cast Speed
+4% increased Cast Speed
+Corrupted
+</Item><Item id="25">Rarity: RARE
+Solver Jewel
+Ghastly Eye Jewel
+Item Level: 100
+LevelReq: 40
+Implicits: 2
+Damage Penetrates 1% Elemental Resistances
+Damage Penetrates 1% Lightning Resistance
++12% to Fire and Cold Resistances
+4% increased Cast Speed
+Damage Penetrates 1% Elemental Resistances
+Damage Penetrates 1% Lightning Resistance
+Corrupted
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11" active="true"/><Slot name="Flask 2" itemId="12" active="true"/><Slot name="Flask 3" itemId="13" active="true"/><Slot name="Flask 4" itemId="14" active="true"/><Slot name="Flask 5" itemId="15" active="true"/><Slot name="Belt Abyssal Socket 1" itemId="25"/></ItemSet></Items>
+	<Config ><Input name="bandit" string="None"/><Input name="multiplierWitheredStackCount" number="15"/></Config>
+</PathOfBuilding>

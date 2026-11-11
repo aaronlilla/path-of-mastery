@@ -1,0 +1,22 @@
+[package]
+name = "pom-pipeline"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pom-engine = { path = "../engine" }
+pom-item = { path = "../item" }
+pom-passives = { path = "../passives" }
+pom-config = { path = "../config" }
+pom-calc = { path = "../calc" }
+pom-defence = { path = "../defence" }
+pom-skills = { path = "../skills" }
+pom-offence = { path = "../offence" }
+pom-breakdown = { path = "../breakdown" }
+pom-triggers = { path = "../triggers" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+roxmltree = "0.20"
+indexmap = "2"
+regex = "1"
+sha2 = "0.10"

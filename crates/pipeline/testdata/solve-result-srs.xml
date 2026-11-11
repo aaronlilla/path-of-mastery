@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Witch" ascendClassName="Occultist" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Summon Raging Spirit" skillId="SummonRagingSpirit" gemId="Metadata/Items/Gems/SkillGemSummonRagingSpirit" variantId="SummonRagingSpirit" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Less Duration" skillId="SupportLessDuration" gemId="Metadata/Items/Gems/SupportGemReducedDuration" variantId="SupportLessDuration" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Minion Damage" skillId="SupportMinionDamage" gemId="Metadata/Items/Gems/SupportGemMinionDamage" variantId="SupportMinionDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Minion Speed" skillId="SupportMinionSpeed" gemId="Metadata/Items/Gems/SupportGemMinionSpeed" variantId="SupportMinionSpeed" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Elemental Army" skillId="SupportElementalArmy" gemId="Metadata/Items/Gems/SupportGemSummonElementalResistance" variantId="SupportElementalArmy" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Feeding Frenzy" skillId="SupportFeedingFrenzy" gemId="Metadata/Items/Gems/SupportGemFeedingFrenzy" variantId="SupportFeedingFrenzy" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Clarity" skillId="Clarity" gemId="Metadata/Items/Gems/SkillGemClarity" variantId="Clarity" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Elemental Weakness" skillId="ElementalWeakness" gemId="Metadata/Items/Gems/SkillGemElementalWeakness" variantId="ElementalWeakness" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Summon Carrion Golem" skillId="SummonCarrionGolem" gemId="Metadata/Items/Gems/SkillGemSummonCarrionGolem" variantId="SummonCarrionGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Flame Dash" skillId="FlameDash" gemId="Metadata/Items/Gems/SkillGemFlameDash" variantId="FlameDash" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="3" ascendClassId="1" masteryEffects="{34552,9876},{41415,47642}" nodes="54447,18378,25309,31316,27096,32417,37127,31984,47630,43242,57226,9650,59650,2292,27929,40637,25222,27611,32024,60554,21958,33755,1031,19635,14936,7688,15081,22062,31875,4397,7938,34552,41472,1203,49254,17735,13009,60398,21330,17821,39648,61471,33435,44799,36949,10031,15064,12536,6712,41415,58218,5743,64210,26270,60472,23027,9386,35958,46897,32932,9392,5935,15046,29106,25332,29049,5916,4713,7444,64426,15631,31931,38989,19103,26481,41190,35260,27308,43133,23185,54267,2913,44908,420,9294,43689,42668,10904,34880,53677,9505,48713,27195,50422,50862,19501,4367,44184,9370,5296,44360,12143,28859,55571,60440,49605,33310,6685,34506,24872,15167,4568,35685,7898,1722,53652,40126,6109,27415,32710,35791,24824,30767" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+Sign of the Sin Eater
+Tyrant's Sekhem
+League: Legion
+Requires Level 58, 99 Str, 99 Int
+Sockets: R R R
+Implicits: 1
+26% increased Elemental Damage
+Grants Level 30 Smite Skill
++(10-30) to Strength and Intelligence
+Enemies inflict Elemental Ailments on you instead of nearby Allies</Item><Item id="2">Rarity: RARE
+Solver Shield
+Archon Kite Shield
+Item Level: 75
+Quality: 20
+LevelReq: 68
+Sockets: R R R
+Implicits: 1
++12% to all Elemental Resistances
++14% to all Elemental Resistances
+{crafted}+17% to Cold and Lightning Resistances
++36% to Lightning Resistance
++115 to maximum Life</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B R R R
+Implicits: 1
+{crafted}{enchant}Summoned Raging Spirits deal 40% increased Damage
++2 to Level of all Minion Skill Gems
+Minions deal 28% increased Damage
++44 to Strength
++130 to maximum Life</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Sacred Chainmail
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B-R-B-B-B-B
+Implicits: 0
++100 to maximum Life</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Warlock Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B B B B
+Implicits: 0
+Minions deal 28% increased Damage</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B B R R
+Implicits: 1
+{crafted}{enchant}10% increased Movement Speed if you haven't been Hit Recently
+32% increased Movement Speed</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Agate Amulet
+Item Level: 75
+LevelReq: 60
+Catalyst: Sinistral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Intelligence
+{tags:gem}{prefix}+1 to Level of all Skill Gems
+{tags:elemental,fire,gem}{prefix}+1 to Level of all Fire Skill Gems
+{tags:physical,gem}{prefix}+1 to Level of all Physical Skill Gems
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Bone Ring
+Item Level: 75
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+Minions have +13% to all Elemental Resistances
+{tags:resource,mana}{suffix}68% increased Mana Regeneration Rate
+{tags:damage,minion}{prefix}Minions deal 13% increased Damage
+{tags:attribute}{suffix}+33 to Strength
+{tags:unveiled_mod,attribute}{suffix}{crafted}+21 to Strength and Intelligence
+{tags:resource,life}{prefix}+55 to maximum Life
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Bone Ring
+Item Level: 75
+LevelReq: 48
+Catalyst: Abrasive
+CatalystQuality: 20
+Implicits: 1
+Minions have +13% to all Elemental Resistances
+{tags:attack,caster,speed,minion}{suffix}Minions have 14% increased Attack and Cast Speed
+{tags:damage,minion}{prefix}Minions deal 29% increased Damage
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 50
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:flask,speed}{suffix}10% increased Movement Speed during any Flask Effect
+{tags:flask}{prefix}Flasks applied to you have 5% increased Effect
+{tags:flask}{suffix}23% increased Flask Charges gained
+{tags:flask}{suffix}16% increased Flask Effect Duration
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+</Item><Item id="12">Rarity: MAGIC
+Eternal Mana Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+</Item><Item id="13">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 0
+9% increased Movement Speed during Effect
+30% reduced Duration
+25% increased effect
+</Item><Item id="14">Rarity: MAGIC
+Silver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 40
+Implicits: 0
+30% reduced Duration
+25% increased effect
+</Item><Item id="15">Rarity: MAGIC
+Amethyst Flask
+Item Level: 75
+Quality: 20
+LevelReq: 18
+Implicits: 0
+</Item><Item id="16">Rarity: NORMAL
+Cobalt Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="bandit" string="None"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="feedingFrenzyFeedingFrenzyActive" boolean="true"/></Config>
+</PathOfBuilding>

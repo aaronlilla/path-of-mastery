@@ -1,0 +1,37 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+# Optimized, no LTO: fast to compile, for answer-key test runs.
+[profile.golden]
+inherits = "release"
+lto = false
+codegen-units = 16
+incremental = true
+
+# Unoptimized, for fast iteration on the mod parser tables.
+[profile.parsedev]
+inherits = "dev"
+opt-level = 0
+incremental = true
+
+# The engine's generated mod tables make LLVM optimisation very slow, and the answer-key runs do not need it.
+[profile.golden.package.pom-engine]
+opt-level = 0
+codegen-units = 256
+
+# Optimized build of the whole engine for full-corpus runs, without LTO.
+[profile.fastrun]
+inherits = "release"
+lto = false
+codegen-units = 16
+
+# fastrun plus line tables, for profiling.
+[profile.fastrun-prof]
+inherits = "fastrun"
+debug = "line-tables-only"

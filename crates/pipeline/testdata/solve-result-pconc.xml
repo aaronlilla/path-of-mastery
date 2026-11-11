@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Shadow" ascendClassName="Assassin" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem skillPart="2" nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SupportGemUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Mana Leech" skillId="SupportManaLeech" gemId="Metadata/Items/Gems/SupportGemManaLeech" variantId="SupportManaLeech" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Greater Volley" skillId="SupportGreaterVolley" gemId="Metadata/Items/Gems/SupportGemGreaterVolley" variantId="SupportGreaterVolley" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Greater Multiple Projectiles" skillId="SupportGreaterMultipleProjectiles" gemId="Metadata/Items/Gems/SupportGemGreaterMultipleProjectiles" variantId="SupportGreaterMultipleProjectiles" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Cruelty" skillId="SupportCruelty" gemId="Metadata/Items/Gems/SupportGemCruelty" variantId="SupportCruelty" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Precision" skillId="Precision" gemId="Metadata/Items/Gems/SkillGemPrecision" variantId="Precision" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Despair" skillId="Despair" gemId="Metadata/Items/Gems/SkillGemVulnerability" variantId="Despair" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Summon Ice Golem" skillId="SummonIceGolem" gemId="Metadata/Items/Gems/SkillGemSummonIceGolem" variantId="SummonIceGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="6" ascendClassId="1" masteryEffects="{292,34242},{60834,34420},{27371,6462},{20736,40906},{21801,59574},{41016,29214}" nodes="44683,58229,21192,47531,19598,23024,29844,51402,46676,6064,45272,25058,9877,5823,4011,21835,27788,40362,13885,292,25260,12801,8938,49978,9355,65210,48099,50338,38662,6538,32117,47362,15842,30894,54142,37504,18670,9206,41866,24133,64235,35894,37663,58968,10511,52095,57746,21301,20546,46408,50690,42133,17788,8135,11659,27929,8948,27659,37671,11128,49900,46277,11420,38129,9015,23439,39524,60834,63639,20953,65427,45202,36287,28754,35283,41689,51212,46289,36221,27276,51220,62831,27371,31585,3676,17790,1461,21264,19858,27203,48362,44988,1648,31359,11811,20736,13375,60592,21801,41016,7263,64769,12412,23886,36849,32227,3863,64509,16236,25766,32802,64709,60942,38344,30338,37785,20127,48477,23507,10763,24050,10017,65033,465" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="2">Rarity: RARE
+Solver Shield
+Archon Kite Shield
+Item Level: 75
+Quality: 20
+LevelReq: 68
+Sockets: R R R
+Implicits: 1
++12% to all Elemental Resistances
++51 to Dexterity
++145 to maximum Life
++18 to maximum Energy Shield
++29 to maximum Life
++65 to Armour
++29 to maximum Life
+{crafted}10% increased Attack Speed</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Torturer's Mask
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B G G G
+Implicits: 1
+{crafted}{enchant}40% increased Poisonous Concoction Damage
++108 to Accuracy Rating
+{crafted}+21 to Dexterity and Intelligence
++85 to maximum Life
++9 to maximum Energy Shield
++21 to maximum Life
++17 to Evasion Rating
++21 to maximum Life
+16% increased Global Accuracy Rating
+15% increased Light Radius</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Necrotic Armour
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G-B-G-G-G-R
+Implicits: 1
+{crafted}{enchant}40% reduced Attribute Requirements</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Phantom Mitts
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G G G G
+Implicits: 0
+{crafted}24% increased Damage during any Flask Effect
+11% increased Attack Speed</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B G R R
+Implicits: 1
+{crafted}{enchant}Adds 1 to 160 Lightning Damage if you haven't Killed Recently
++45% to Cold Resistance
++30% to Fire Resistance
++30% to Lightning Resistance
++70 to maximum Life
+20% increased Movement Speed
+{crafted}18% increased Movement Speed
+{crafted}8% increased Movement Speed if you haven't been Hit Recently</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 75
+LevelReq: 60
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:dot_multi,damage}{suffix}+9% to Damage over Time Multiplier
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:critical}{suffix}20% increased Global Critical Strike Chance
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Abrasive
+CatalystQuality: 20
+Implicits: 1
+20% increased Chaos Damage
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:elemental_damage,damage,elemental,lightning,attack}{prefix}Adds 2 to 31 Lightning Damage to Attacks
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Iolite Ring
+Item Level: 75
+LevelReq: 80
+Implicits: 1
+20% increased Chaos Damage
+{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="10">Rarity: UNIQUE
+The Magnate
+Studded Belt
+Variant: Pre 2.6.0
+Variant: Pre 3.19.0
+Variant: Current
+LevelReq: 16
+Implicits: 1
+(20-30)% increased Stun Duration on Enemies
+{tags:attribute}+(40-50) to Strength
+{variant:1,2}{tags:physical_damage}(25-40)% increased Global Physical Damage
+{variant:3}{tags:resistance}+(20-25)% to all Elemental Resistances
+50% increased Flask Charges gained
+{variant:2}{tags:resistance}+(20-25)% to all Elemental Resistances while you have at least 200 Strength
+{variant:3}10% chance to deal Double Damage while you have at least 200 Strength
+{variant:3}5% chance to deal Triple Damage while you have at least 400 Strength
+</Item><Item id="11">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 2
+{crafted}{enchant}70% increased Charge Recovery
+{crafted}{enchant}Gains no Charges during Effect
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+59% increased Amount Recovered
+33% reduced Recovery rate
+</Item><Item id="12">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 2
+{crafted}{enchant}65% increased effect
+{crafted}{enchant}Gains no Charges during Effect
+36% increased Charge Recovery
+9% increased Movement Speed during Effect
+</Item><Item id="13">Rarity: MAGIC
+Silver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 49
+Implicits: 2
+{crafted}{enchant}65% increased effect
+{crafted}{enchant}Gains no Charges during Effect
+26% chance to gain a Flask Charge when you deal a Critical Strike
+</Item><Item id="14">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 2
+{crafted}{enchant}70% increased Charge Recovery
+{crafted}{enchant}Gains no Charges during Effect
+36% increased Charge Recovery
+{crafted}50% Chance to Avoid being Stunned during Effect
+</Item><Item id="15">Rarity: MAGIC
+Divine Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 60
+Implicits: 2
+{crafted}{enchant}70% increased Charge Recovery
+{crafted}{enchant}Gains no Charges during Effect
+36% increased Charge Recovery
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="buffPhasing" boolean="true"/><Input name="multiplierPoisonAppliedRecently" number="12"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="multiplierWitheredStackCount" number="1.1652975701781567"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

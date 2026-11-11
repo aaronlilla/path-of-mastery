@@ -1,0 +1,32 @@
+import type { ClipOption, FrozenSource, RevisionRef, Timeline, TimelineBundle } from '@pom/mastery-contracts';
+import type { ItemCardModel, LifecycleAction } from '../documents/model.js';
+import type { PreflightContext, PreflightResult } from '../../shared/timelines/editor/preflight.js';
+export type TimelineSourceRow = { id: string; source: FrozenSource; ownership: 'own' | 'saved'; revisionLabel: string;
+  stages: number; art?: string; archived?: boolean; cached: boolean; guideAvailable?: boolean };
+export type TimelineLibraryRow = { id: string; timeline: Timeline; card: ItemCardModel; createdAt: string; lastUsed: number;
+  activeLeague: boolean; saved?: boolean; resume?: boolean; resumeAt?: string; runVersion?: string; editedVersion?: string };
+export type TimelineEditorProps = {
+  timeline: Timeline; sources: TimelineSourceRow[]; limits: PreflightContext['limits']; revision?: RevisionRef;
+  onPersist(timeline: Timeline, label: string): Promise<void>;
+  onRun(result: Extract<PreflightResult, { ready: true }>, replaceCurrent: boolean): Promise<void>;
+  runContext?: Omit<PreflightContext, 'limits'>;
+  onUndo?(): Promise<Timeline>; onRedo?(): Promise<Timeline>;
+  onBack(): void; onOpenSource?(source: FrozenSource, returnState: { clipId: string; previewLevel: number; inspector: boolean; scrollLeft: number }): void;
+  onBrowse?(kind: string): void; onShare?(timeline: Timeline): void; onPublish?(timeline: Timeline): void;
+  onCopy?(timeline: Timeline): void; onSave?(): Promise<void>;
+  latestOptions?: Record<string, ClipOption>;
+  timelineSources?: TimelineInsertion[];
+  initialView?: { clipId?: string; previewLevel?: number; inspector?: boolean; scrollLeft?: number };
+  onKeepRevision?(clipId: string, revisionId: string): void;
+  keptRevisions?: Record<string, string>;
+  verifiedZones?: { id: string; label: string; evidenceId: string }[];
+  landmarks?: import('../../shared/timelines/editor/model.js').Landmark[];
+  offline?: boolean;
+  /** Open straight into the Resolve Run setup (the library Run hit a blocker). */
+  runOnOpen?: boolean;
+};
+export type TimelineLibraryProps = { rows: TimelineLibraryRow[]; state?: 'loading' | 'error' | 'offline' | 'signed_out';
+  onOpen(row: TimelineLibraryRow): void; onRun(row: TimelineLibraryRow): void; onNew(): void; onImport(): void;
+  onAction(row: TimelineLibraryRow, action: LifecycleAction): void; onArchive(): void; onStarter(): void; onTrash(): void; onRetry(): void;
+  starterDismissed?: boolean; onDismissStarter?(): void };
+export type TimelineInsertion = { bundle: TimelineBundle; revision: RevisionRef };

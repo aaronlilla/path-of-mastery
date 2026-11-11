@@ -1,0 +1,247 @@
+/* App frame, title bar, account menu and search. */
+
+.app { position: absolute; inset: 0; background: var(--surface-0); overflow: hidden; }
+.stage { position: absolute; inset: 0; overflow: hidden; background: var(--surface-0); }
+
+.titlebar {
+  position: absolute; left: 0; top: 0; right: 0; height: 40px; width: 100%; display: flex; align-items: center; box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .32), rgba(var(--glass-rgb), .5));
+  border-bottom: 1px solid rgba(var(--line-rgb), .07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 1px 0 rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k)));
+  backdrop-filter: blur(24px) saturate(1.3);
+  font-size: 13px; white-space: nowrap; user-select: none; z-index: 130; container-type: inline-size; container-name: tb;
+  -webkit-app-region: drag;
+}
+.titlebar button, .titlebar a, .titlebar input, .titlebar [role="button"], .titlebar .tb-nodrag { -webkit-app-region: no-drag; }
+.tb-left { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 12px; padding-left: 16px; overflow: hidden; }
+.tb-crest { flex: none; width: 28px; height: 28px; object-fit: contain; display: block; cursor: pointer; -webkit-app-region: no-drag; }
+.area-switch {
+  flex: none; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px;
+  background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); box-shadow: inset 0 0 0 1px rgba(var(--line-rgb), .06);
+}
+.area-switch button {
+  height: 26px; padding: 0 11px 0 9px; display: flex; align-items: center; gap: 7px; border: 0; border-radius: 7px; cursor: pointer;
+  font: 500 13px Geist, sans-serif; white-space: nowrap; color: var(--text-2); background: transparent;
+  transition: background 120ms, color 120ms, box-shadow 120ms;
+}
+.area-switch button pom-icon { flex: none; }
+.area-switch button[data-area="build"] pom-icon { color: var(--area-build); }
+.area-switch button[data-area="wealth"] pom-icon { color: var(--area-wealth); }
+.area-switch button[data-area="filter"] pom-icon { color: var(--area-filter); }
+.area-switch button[aria-current="page"] { font-weight: 600; color: var(--text-strong); }
+.area-switch button[aria-current="page"] pom-icon[data-area="build"] { filter: drop-shadow(0 0 6px rgba(var(--area-build-rgb), .7)); }
+/* Every area button carries its own colour: Atlas is azure like the other three are ember, teal and
+   violet. --a is the area's rgb triple; selected = pill + inset ring + 2 px underline, hover = faint tint, keyboard focus =
+   2 px inset ring, all in that colour. */
+.area-switch button[data-area="build"] { --a: var(--area-build-rgb); }
+.area-switch button[data-area="atlas"] { --a: var(--area-atlas-rgb); }
+.area-switch button[data-area="wealth"] { --a: var(--area-wealth-rgb); }
+.area-switch button[data-area="filter"] { --a: var(--area-filter-rgb); }
+.area-switch button[data-area="atlas"] pom-icon { color: rgb(var(--area-atlas-rgb)); }
+.area-switch button:hover { color: var(--text-strong); background: rgba(var(--a), .14); }
+.area-switch button[aria-current="page"] {
+  background: linear-gradient(180deg, rgba(var(--a), .26), rgba(var(--a), .12));
+  box-shadow: inset 0 -2px 0 rgb(var(--a)), inset 0 0 0 1px rgba(var(--a), .5), 0 0 14px -4px rgba(var(--a), .6);
+}
+.area-switch button:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgb(var(--a)); }
+.area-switch button[aria-current="page"]:focus-visible { box-shadow: inset 0 0 0 2px rgb(var(--a)), inset 0 -2px 0 rgb(var(--a)); }
+/* The crest is the Home button (Builds root). */
+.tb-crest-btn { flex: none; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; cursor: pointer; -webkit-app-region: no-drag; }
+.tb-crest-btn:hover { background: rgba(var(--line-rgb), .07); }
+.tb-crest-btn:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--area-build-rgb), .8); }
+.tb-crest-btn .tb-crest { cursor: inherit; }
+/* Settings gear, left of the account button. */
+.tb-gear { flex: none; width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--text-3); cursor: pointer; }
+.tb-gear:hover { color: var(--text-strong); background: rgba(var(--line-rgb), .08); }
+.tb-gear:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--accent-rgb), .7); }
+/* The account menu's compact Light / Dark / System row and its link to the rest of Appearance in Settings. */
+.acct-menu .modes-row { display: flex; align-items: center; gap: 10px; padding: 4px 10px; }
+.acct-menu .modes-row > span { flex: none; color: var(--text-3); font-size: 13px; }
+.acct-menu .modes { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 11px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .06); }
+.acct-menu .modes button { height: 28px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; border: 0; background: transparent; color: var(--text-muted); font: 400 12.5px Geist, sans-serif; cursor: pointer; }
+.acct-menu .modes button[aria-pressed="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); color: var(--text-strong); }
+.acct-menu .more-looks { align-self: flex-start; margin: 2px 10px 6px; padding: 0; border: 0; background: none; color: var(--gold-text); font: 400 12.5px Geist, sans-serif; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tb-title { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); font-weight: 500; }
+.tb-dot { width: 3px; height: 3px; border-radius: 2px; background: var(--surface-5); flex: none; }
+.tb-sub { flex: 0 100 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-faint); }
+
+.search-pill {
+  flex: 0 40 440px; min-width: 190px; height: 28px; display: flex; align-items: center; gap: 9px; padding: 0 6px 0 11px; box-sizing: border-box;
+  border-radius: 9px; cursor: text; border: 1px solid rgba(var(--line-rgb), .09); background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k)));
+  box-shadow: inset 0 1px 2px rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); transition: border-color .15s, background .15s;
+  color: var(--text-faint); font: 400 13px Geist, sans-serif; text-align: left;
+}
+.search-pill:hover { border-color: rgba(var(--accent-rgb), .4); }
+.search-pill > pom-icon { flex: none; color: var(--text-muted); }
+.search-pill > .txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+.tb-right { flex: 0 0 auto; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 0 8px 0 12px; }
+.sync-pill {
+  position: relative; flex: none; display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border: 1px solid transparent; border-radius: 13px;
+  background: transparent; color: var(--text-muted); font: 500 12px Geist, sans-serif; cursor: pointer;
+}
+.sync-pill:hover { background: rgba(var(--line-rgb), .07); }
+.sync-pop { position: absolute !important; top: 34px; right: 0; z-index: 80; width: 320px; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .1); box-shadow: var(--elev-3); display: flex; flex-direction: column; overflow: hidden; white-space: normal; text-align: left; }
+.acct {
+  flex: none; height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 8px 0 3px; border-radius: 16px; cursor: pointer;
+  border: 0; background: transparent; color: var(--text-2); font: 500 13px Geist, sans-serif;
+  transition: background .15s, box-shadow .15s;
+}
+.acct:hover { background: rgba(var(--line-rgb), .07); }
+.acct[aria-expanded="true"] { background: rgba(var(--accent-rgb), .12); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .28); }
+.acct .av {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--glass-hi-rgb), .6); box-shadow: inset 0 0 0 1px rgba(var(--line-rgb), .14); color: var(--text-3);
+}
+.acct > pom-icon:last-child { transition: transform .18s; color: var(--text-muted); }
+.acct[aria-expanded="true"] > pom-icon:last-child { transform: rotate(180deg); }
+:where(.titlebar) .wc { flex: none; align-self: stretch; display: flex; border-left: 1px solid rgba(var(--line-rgb), .06); }
+:where(.titlebar) .wc button { width: 46px; display: flex; align-items: center; justify-content: center; color: var(--text-3); cursor: default; border: 0; background: transparent; padding: 0; transition: background .12s, color .12s; }
+:where(.titlebar) .wc button:hover { background: rgba(var(--line-rgb), .08); color: var(--text-strong); }
+:where(.titlebar) .wc button.close:hover { background: #c42b1c; color: #fff; }
+
+@container tb (max-width: 999px) {
+  .area-switch button { padding: 0 7px; }
+  .area-switch button .lbl, .sync-pill .lbl { display: none; }
+  .tb-sub { display: none; }
+}
+@container tb (max-width: 639px) {
+  .search-pill { flex: 0 0 auto; min-width: 30px; padding: 0 7px; }
+  .search-pill .txt, .search-pill .kbd { display: none; }
+  .acct .lbl { display: none; }
+  :where(.titlebar) .wc button { width: 36px; }
+  .tb-left { padding-left: 10px; }
+}
+@container tb (max-width: 479px) { .tb-title { display: none; } .sync-pill { display: none; } }
+
+.acct-menu {
+  position: absolute !important; right: 0; top: 38px; z-index: 95; width: 360px; max-width: calc(100vw - 16px); max-height: calc(100vh - 60px); overflow-y: auto;
+  border-radius: 16px; border: 1px solid rgba(var(--line-rgb), .1); white-space: normal; cursor: default; text-align: left;
+  background: linear-gradient(180deg, rgb(var(--glass-hi-rgb)), rgb(var(--glass-rgb)));
+  box-shadow: 0 30px 80px rgba(var(--shadow-rgb), calc(.65 * var(--shadow-k))), 0 0 0 1px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+.acct-menu .sec { padding: 6px; display: flex; flex-direction: column; gap: 1px; }
+.acct-menu .rule { height: 1px; margin: 0 12px; background: rgba(var(--line-rgb), .07); }
+.acct-menu .mi {
+  height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 8px; border: 0; background: transparent; width: 100%;
+  color: var(--text-2); cursor: pointer; font: 400 13.5px Geist, sans-serif; text-align: left; box-sizing: border-box;
+}
+.acct-menu .mi:hover, .acct-menu .mi:focus-visible { background: rgba(var(--line-rgb), .06); color: var(--text-strong); }
+.acct-menu .mi > pom-icon { flex: none; color: var(--text-muted); }
+.acct-menu .mi .meta { margin-left: auto; font: 500 11px 'Geist Mono', monospace; color: var(--text-faint); }
+.acct-menu .mi.danger { color: var(--negative-text); }
+.acct-card { padding: 18px 16px 14px; display: flex; flex-direction: column; gap: 10px; background: radial-gradient(120% 140% at 0% 0%, rgba(var(--accent-rgb), .12), transparent 60%); }
+.acct-card .h { font: 600 22px/1.05 'Cormorant Garamond', serif; color: var(--text-display); }
+.acct-card .p { color: var(--text-muted); font-size: 12.5px; line-height: 1.5; }
+:where(.titlebar) .look { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+:where(.titlebar) .look .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 12px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .06); }
+:where(.titlebar) .look .modes button { height: 30px; display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: 9px; border: 0; background: transparent; color: var(--text-muted); font: 400 12.5px Geist, sans-serif; cursor: pointer; }
+:where(.titlebar) .look .modes button[aria-pressed="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); color: var(--text-strong); }
+:where(.titlebar) .look .themes { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.theme-sw { position: relative; aspect-ratio: 1; border-radius: 12px; cursor: pointer; border: 0; padding: 0; overflow: hidden; transition: box-shadow .18s, transform .18s; }
+.theme-sw:hover { transform: translateY(-1px); }
+.theme-sw i { position: absolute; display: block; }
+.theme-sw .chk { inset: 0; display: flex; align-items: center; justify-content: center; }
+:where(.titlebar) .look .row { display: flex; align-items: center; gap: 10px; }
+:where(.titlebar) .look .row > span { color: var(--text-3); font-size: 12.5px; }
+:where(.titlebar) .look .row .seg { margin-left: auto; }
+:where(.titlebar) .look .row .seg > button { height: 24px; font-size: 12.5px; }
+:where(.titlebar) .look .hint { font-size: 11.5px; color: var(--text-faint); }
+:where(.titlebar) .look .hint b { font: 400 11.5px 'Geist Mono', monospace; }
+
+/* Search overlay */
+.search-scrim { position: absolute; left: 0; right: 0; top: 40px; bottom: 0; background: rgba(var(--void-rgb), .45); backdrop-filter: blur(3px); z-index: 1; }
+.search-box {
+  position: absolute !important; left: 50%; top: 46px; width: min(720px, calc(100% - 32px)); transform: translateX(-50%); z-index: 2; border-radius: 18px; overflow: hidden;
+  background: linear-gradient(180deg, rgb(var(--glass-hi-rgb)), rgb(var(--glass-rgb))); border: 1px solid rgba(var(--line-rgb), .11);
+  box-shadow: 0 40px 100px rgba(var(--shadow-rgb), calc(.7 * var(--shadow-k))), 0 0 0 1px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .07);
+  white-space: normal; cursor: default; -webkit-app-region: no-drag;
+}
+.search-head { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px 0 18px; border-bottom: 1px solid rgba(var(--line-rgb), .07); }
+.search-head input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text-strong); font: 400 18px Geist, sans-serif; padding: 0; }
+.search-list { max-height: 600px; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--surface-5) transparent; padding: 10px; }
+.search-group { padding: 8px 8px 4px; font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--text-faint); }
+.search-row { height: 38px; display: flex; align-items: center; gap: 12px; padding: 0 10px; border-radius: 9px; cursor: pointer; }
+.search-row[data-on="true"] { background: rgba(var(--accent-rgb), .1); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .3); }
+.search-row .ic { flex: none; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(var(--line-rgb), .06); color: var(--text-2); }
+.search-row .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+.search-row .t b { color: var(--gold-text); font-weight: 600; }
+.search-row .m { flex: none; color: var(--text-muted); font-size: 12.5px; }
+.search-row .enter { flex: none; width: 14px; font: 500 11px 'Geist Mono', monospace; color: var(--text-faint); opacity: 0; }
+.search-row[data-on="true"] .enter { opacity: 1; }
+.search-foot { display: flex; align-items: center; gap: 16px; height: 36px; padding: 0 16px; white-space: nowrap; border-top: 1px solid rgba(var(--line-rgb), .07); background: rgba(var(--shadow-rgb), calc(.2 * var(--shadow-k))); font-size: 12px; color: var(--text-faint); }
+.search-foot b { font: 400 12px 'Geist Mono', monospace; }
+.search-foot .mode { display: inline-flex; align-items: center; gap: 7px; }
+.search-foot .mode i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-disabled); }
+.search-foot .mode i[data-on="true"] { background: var(--gold-400); }
+.search-ask { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 8px; border-radius: 12px; background: linear-gradient(180deg, rgba(var(--accent-rgb), .08), rgba(var(--accent-rgb), .03)); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .22); }
+.search-ask.locked { background: transparent; box-shadow: none; border: 1px dashed rgba(var(--accent-rgb), .35); }
+.search-ask .ic { flex: none; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(var(--line-rgb), .06); color: var(--gold-text); }
+.search-ask .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.search-ask .h { color: var(--text-strong); font-weight: 600; font-size: 13.5px; }
+.search-ask .h b { color: var(--gold-text); }
+.search-ask .p { color: var(--text-muted); font-size: 12.5px; line-height: 1.45; }
+.search-ask .btn { flex: none; }
+.search-answer { margin-bottom: 10px; border-radius: 14px; padding: 16px 16px 12px; cursor: pointer; background: radial-gradient(120% 140% at 0% 0%, rgba(var(--accent-rgb), .13), transparent 55%), rgba(var(--shadow-rgb), calc(.25 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .08); transition: border-color .15s, box-shadow .15s; }
+.search-answer[data-on="true"] { border-color: rgba(var(--accent-rgb), .4); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .1); }
+.search-answer .top { display: flex; align-items: baseline; gap: 10px; }
+.search-answer .eyebrow { font: 600 10px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); }
+.search-answer .where { margin-left: auto; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.search-answer .ttl { margin-top: 6px; font: 600 26px/1.1 'Cormorant Garamond', serif; color: var(--text-display); }
+.search-answer .sum { margin-top: 6px; color: var(--text-2); line-height: 1.5; text-wrap: pretty; }
+.search-answer .rows { margin-top: 12px; display: flex; flex-direction: column; gap: 2px; }
+.search-answer .r { display: grid; grid-template-columns: minmax(120px, 170px) 96px 84px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 32px; padding: 0 10px; border-radius: 8px; background: rgba(var(--line-rgb), .025); color: var(--text-2); }
+.search-answer .r[data-focus="true"] { background: rgba(var(--accent-rgb), .1); color: var(--text-strong); font-weight: 600; }
+.search-answer .r .v { text-align: right; color: var(--text-strong); font-weight: 400; font-variant-numeric: tabular-nums; }
+.search-answer .r .s { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 12.5px; font-weight: 400; }
+.search-answer .chip { justify-self: start; display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 10px; font: 400 11px Geist, sans-serif; color: var(--c); border: 1px solid var(--c); }
+.search-answer .chip i { width: 5px; height: 5px; border-radius: 3px; background: var(--c); }
+.search-answer .chip[data-tone="ok"] { --c: var(--positive-text); }
+.search-answer .chip[data-tone="part"] { --c: var(--warning-text); }
+.search-answer .chip[data-tone="low"] { --c: var(--warning-text); }
+.search-answer .chip[data-tone="none"] { --c: var(--negative-text); }
+.search-answer .open { margin-top: 10px; display: flex; align-items: center; gap: 6px; color: var(--gold-text); font-size: 12.5px; }
+.search-answer .open .enter { margin-left: auto; font: 500 11px 'Geist Mono', monospace; color: var(--text-faint); }
+.search-try { display: flex; flex-direction: column; gap: 10px; padding: 8px 8px 4px; }
+.search-try .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.search-try .chips button { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .1); background: rgba(var(--line-rgb), .03); color: var(--text-2); font: 500 12.5px Geist, sans-serif; cursor: pointer; }
+.search-try .chips button:hover { border-color: rgba(var(--accent-rgb), .45); color: var(--text-strong); }
+.search-try .note { color: var(--text-muted); font-size: 12.5px; line-height: 1.5; }
+.search-row.ask { margin-top: 6px; background: rgba(var(--line-rgb), .03); box-shadow: inset 0 0 0 1px rgba(var(--line-rgb), .06); }
+.search-row.ask[data-on="true"] { background: rgba(var(--accent-rgb), .1); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .3); }
+.search-row.ask .ic { color: var(--gold-text); }
+
+/* moved from wealth/wealth.css */
+.titlebar .wsearch { cursor: text; }
+.titlebar .wsearch input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--text); font: 400 13px Geist, sans-serif; }
+.titlebar .wsearch input::placeholder { color: var(--text-faint); }
+.titlebar:has(.wsearch) .tb-title { display: none; }
+.titlebar .wsearch { flex: 1 6 360px; min-width: 120px; }
+
+/* Loot Filter area: its context button and search live in the title bar through these two slots. */
+.tb-lfslot, .tb-lfsearch { display: contents; }
+.tb-ctx { min-width: 0; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; color: var(--text-2); font: 500 13px Geist, sans-serif; }
+.tb-ctx:hover, .tb-ctx[aria-expanded="true"] { background: rgba(var(--line-rgb), .07); }
+.tb-ctx .lg { flex: none; color: var(--text-faint); font-weight: 400; }
+.tb-ctx .dot { flex: none; width: 3px; height: 3px; border-radius: 2px; background: var(--text-faint); }
+.tb-ctx .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tb-ctx .pend { flex: none; width: 6px; height: 6px; border-radius: 3px; background: var(--gold-400); }
+.tb-ctx-rename { width: 240px; height: 28px; box-sizing: border-box; padding: 0 10px; border: 1px solid rgba(var(--accent-rgb), .6); border-radius: 8px; background: var(--surface-2); color: var(--text-strong); font: 600 14px Geist, sans-serif; }
+.tb-find { position: relative; flex: 0 6 440px; min-width: 160px; display: flex; align-items: center; }
+.tb-find > pom-icon { position: absolute; left: 11px; pointer-events: none; color: var(--text-faint); }
+.tb-find input { width: 100%; height: 28px; box-sizing: border-box; padding: 0 60px 0 35px; border: 1px solid rgba(var(--line-rgb), .09); border-radius: 9px; background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k))); box-shadow: inset 0 1px 2px rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); color: var(--text-strong); font: 400 13px Geist, sans-serif; outline: 0; }
+.tb-find input:focus { border-color: rgba(var(--accent-rgb), .45); background: rgba(var(--accent-rgb), .08); }
+.tb-find input::placeholder { color: var(--text-faint); }
+.tb-find .kbd { position: absolute; right: 6px; padding: 1px 6px; border-radius: 5px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--line-rgb), .04); font: 500 10.5px 'Geist Mono', monospace; color: var(--text-muted); pointer-events: none; }
+
+/* From 640 px up the crumb side keeps its full width while it can: the search pill starts at its 190 px floor and grows to 440 px into spare room, and only when even the floor does not fit does the crumb shrink and ellipsize, so the account and window buttons never leave the window. */
+@container tb (min-width: 640px) { .tb-left { flex: 0 1 auto; } .search-pill { flex: 1 0 200px; min-width: max-content; max-width: 440px; margin-left: auto; } .tb-right { margin-left: 0; } .tb-find { margin-left: auto; } .tb-lfsearch:empty + .tb-right { margin-left: auto; } }
+@container tb (max-width: 1199px) { .tb-sub, .tb-dot { display: none; } }
+
+/* Title-bar Back (Alt+Left, mouse back): one step back through the areas visited. */
+.tb-back { flex: none; width: 26px; height: 26px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--text-2); cursor: pointer; -webkit-app-region: no-drag; }
+.tb-back:hover:not(:disabled) { color: var(--text-strong); background: rgba(var(--line-rgb), .08); }
+.tb-back:disabled { opacity: .35; cursor: default; }
+
+/* The starfield shows through the areas that draw no full-bleed background of their own. */
+.stage[data-sky] { background: transparent; }

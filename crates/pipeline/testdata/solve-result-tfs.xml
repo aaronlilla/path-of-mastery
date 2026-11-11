@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Templar" ascendClassName="Inquisitor" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Flicker Strike" skillId="FlickerStrike" gemId="Metadata/Items/Gems/SkillGemFlickerStrike" variantId="FlickerStrike" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Elemental Damage with Attacks" skillId="SupportElementalDamageWithAttacks" gemId="Metadata/Items/Gems/SupportGemWeaponElementalDamage" variantId="SupportElementalDamageWithAttacks" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Mana Leech" skillId="SupportManaLeech" gemId="Metadata/Items/Gems/SupportGemManaLeech" variantId="SupportManaLeech" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Ruthless" skillId="SupportRuthless" gemId="Metadata/Items/Gems/SupportGemRuthless" variantId="SupportRuthless" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Immolate" skillId="SupportImmolate" gemId="Metadata/Items/Gems/SupportGemImmolate" variantId="SupportImmolate" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Fortify" skillId="SupportFortify" gemId="Metadata/Items/Gems/SupportGemFortify" variantId="SupportFortify" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Precision" skillId="Precision" gemId="Metadata/Items/Gems/SkillGemPrecision" variantId="Precision" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Flammability" skillId="Flammability" gemId="Metadata/Items/Gems/SkillGemFlammability" variantId="Flammability" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Defiance Banner" skillId="DefianceBanner" gemId="Metadata/Items/Gems/SkillGemDefianceBanner" variantId="DefianceBanner" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="5" ascendClassId="1" masteryEffects="{38320,6216},{35118,35582},{10245,11938},{26697,50922},{25934,1626}" nodes="61525,61871,6741,14056,487,42800,40653,53793,22285,55649,6446,26523,44606,50862,2913,44908,35556,39916,20228,13851,27055,19417,43193,40059,60769,53884,662,6289,48287,64587,5197,61198,20551,58449,33287,62017,53118,44429,41472,61471,26866,33435,44799,30439,8879,14419,34750,3644,14930,38320,63422,28311,62108,30693,12536,49254,1203,6237,15599,12795,39768,44529,25367,55166,49415,7082,5233,2225,59494,16380,22703,49318,1909,56381,8533,24914,34400,35118,37647,56460,38664,57839,43514,35053,61050,64024,34130,55002,35192,45646,55913,10245,58831,15678,37501,63282,59928,63723,39023,56355,40907,43374,63965,18025,14606,60169,35724,26697,35436,28728,15438,49412,25934,43689,42668,10904,34880,17735,61190,10311,45503,61262,24824" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+Oro's Sacrifice
+Infernal Sword
+Variant: Pre 1.3.0
+Variant: Pre 3.11.0
+Variant: Current
+Sockets: R R R R R R
+Implicits: 2
+{variant:1,2}30% increased Global Accuracy Rating
+{variant:3}30% increased Elemental Damage with Attack Skills
+No Physical Damage
+Adds (425-475) to (550-600) Fire Damage
+(10-15)% increased Attack Speed
+20% chance to Ignite
+{variant:1}20% increased Physical Damage taken
+{variant:2,3}10% increased Physical Damage taken
+{variant:1}20% increased Fire Damage taken
+{variant:2,3}10% increased Fire Damage taken
+Culling Strike against Burning Enemies
+Gain a Frenzy Charge if an Attack Ignites an Enemy</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Haunted Bascinet
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Sockets: B G B R
+Implicits: 3
+{crafted}{enchant}Flicker Strike has 30% increased Cooldown Recovery Rate
+{eater}21% increased Attack Damage
+{exarch}12% increased Flammability Curse Effect
++33 to Strength and Dexterity
++51 to Dexterity
++49 to Strength
++130 to maximum Life
+{crafted}+1 to Level of Socketed AoE Gems
+{crafted}9% increased Area of Effect
++65 to Armour
++29 to maximum Life</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Conquest Lamellar
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Sockets: G-R-G-R-B-R
+Implicits: 3
+{crafted}{enchant}40% reduced Attribute Requirements
+{exarch}22% increased Fire Damage
+{eater}+10% to all Elemental Resistances
++33 to Dexterity and Intelligence
++51 to Dexterity
++45% to Fire Resistance
++160 to maximum Life
+{crafted}7% increased maximum Life
+{crafted}7% increased maximum Mana
++97 to Armour
++34 to maximum Life</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Paladin Gloves
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Searing Exarch Item
+Eater of Worlds Item
+Sockets: R R R R
+Implicits: 2
+{eater}Inflict Fire Exposure on Hit, applying -13% to Fire Resistance
+{exarch}+12% to Fire Damage over Time Multiplier
++31% to Chaos Resistance
+{crafted}+17% to Fire and Lightning Resistances
++115 to maximum Life</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 84
+Quality: 20
+LevelReq: 84
+Sockets: R R R R
+Implicits: 0
+{crafted}+17% to Fire and Cold Resistances
++31% to Chaos Resistance
++115 to maximum Life
+32% increased Movement Speed</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Citrine Amulet
+Item Level: 84
+LevelReq: 67
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Dexterity
+{tags:elemental_damage,damage,elemental,attack}{prefix}37% increased Elemental Damage with Attack Skills
+{tags:elemental_damage,damage,elemental,fire}{suffix}31% increased Fire Damage
+{tags:elemental,cold,resistance}{suffix}+45% to Cold Resistance
+{tags:elemental,lightning,resistance}{suffix}+45% to Lightning Resistance
+{tags:gem}{prefix}+1 to Level of all Skill Gems
+{tags:resource,life}{prefix}+115 to maximum Life
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Opal Ring
+Item Level: 84
+LevelReq: 80
+Elder Item
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+20% increased Elemental Damage
+{tags:elemental_damage,damage,elemental,attack}{prefix}37% increased Elemental Damage with Attack Skills
+{tags:attribute}{suffix}+49 to Intelligence
+{tags:elemental,resistance}{suffix}+14% to all Elemental Resistances
+{tags:elemental_damage,damage,elemental,fire}{suffix}31% increased Fire Damage
+{tags:elemental_damage,influence_mod,damage,elemental,fire,ailment}{prefix}Adds 25 to 46 Fire Damage against Ignited Enemies
+{tags:resource,life}{prefix}+100 to maximum Life
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Opal Ring
+Item Level: 84
+LevelReq: 80
+Catalyst: Turbulent
+CatalystQuality: 20
+Implicits: 1
+20% increased Elemental Damage
+{tags:elemental_damage,damage,elemental,attack}{prefix}37% increased Elemental Damage with Attack Skills
+{tags:elemental_damage,damage,elemental,fire}{suffix}31% increased Fire Damage
+{tags:resource,life}{prefix}+100 to maximum Life
+{tags:elemental_damage,damage,elemental,fire,attack}{prefix}Adds 21 to 39 Fire Damage to Attacks
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 84
+LevelReq: 64
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:flask,speed}{suffix}10% increased Movement Speed during any Flask Effect
+{tags:chaos,resistance}{suffix}+31% to Chaos Resistance
+{tags:elemental_damage,damage,elemental,attack}{prefix}37% increased Elemental Damage with Attack Skills
+{tags:resource,life}{prefix}+130 to maximum Life
+{tags:unveiled_mod}{suffix}{crafted}9% increased Cooldown Recovery Rate
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 84
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 15 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 15 seconds if used while affected by Corrupted Blood
+65% increased Amount Recovered
+33% reduced Recovery rate
+</Item><Item id="12">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 84
+Quality: 20
+LevelReq: 65
+Implicits: 0
+9% increased Movement Speed during Effect
+26% reduced Charges per use
+</Item><Item id="13">Rarity: MAGIC
+Silver Flask
+Item Level: 84
+Quality: 20
+LevelReq: 65
+Implicits: 0
+26% reduced Charges per use
+</Item><Item id="14">Rarity: MAGIC
+Amethyst Flask
+Item Level: 84
+Quality: 20
+LevelReq: 18
+Implicits: 0
+</Item><Item id="15">Rarity: MAGIC
+Aquamarine Flask
+Item Level: 84
+Quality: 20
+LevelReq: 27
+Implicits: 1
+Creates Chilled Ground on Use
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 84
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyIgnited" boolean="true"/><Input name="bandit" string="None"/><Input name="bannerPlanted" boolean="true"/><Input name="bannerValour" number="50"/><Input name="useFrenzyCharges" boolean="true"/><Input name="overrideFrenzyCharges" number="1"/><Input name="buffFortification" boolean="true"/><Input name="multiplierNearbyEnemies" number="1"/><Input name="conditionAtCloseRange" boolean="true"/><Input name="conditionEnemyMaimed" boolean="true"/><Input name="FlickerStrikeBypassCD" boolean="true"/><Input name="conditionGainedFrenzyChargeRecently" boolean="true"/><Input name="conditionEnemyIgnited" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Shadow" ascendClassName="Assassin" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Poisonous Concoction" skillId="PoisonousConcoction" gemId="Metadata/Items/Gems/SkillGemPoisonousConcoction" variantId="PoisonousConcoction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Unbound Ailments" skillId="SupportUnboundAilments" gemId="Metadata/Items/Gems/SupportGemUnboundAilments" variantId="SupportUnboundAilments" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Critical Strike Affliction" skillId="SupportCriticalStrikeAffliction" gemId="Metadata/Items/Gems/SupportGemPoison" variantId="SupportCriticalStrikeAffliction" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Void Manipulation" skillId="SupportVoidManipulation" gemId="Metadata/Items/Gems/SupportGemVoidManipulation" variantId="SupportVoidManipulation" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Added Chaos Damage" skillId="SupportAddedChaosDamage" gemId="Metadata/Items/Gems/SupportGemAddedChaosDamage" variantId="SupportAddedChaosDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Pierce" skillId="SupportPierce" gemId="Metadata/Items/Gems/SupportGemPierce" variantId="SupportPierce" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Clarity" skillId="Clarity" gemId="Metadata/Items/Gems/SkillGemClarity" variantId="Clarity" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Purity of Lightning" skillId="PurityOfLightning" gemId="Metadata/Items/Gems/SkillGemLightningResistAura" variantId="PurityOfLightning" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Summon Flame Golem" skillId="SummonFlameGolem" gemId="Metadata/Items/Gems/SkillGemSummonFlameGolem" variantId="SummonFlameGolem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Weapon 1"><Gem nameSpec="Wither" skillId="Wither" gemId="Metadata/Items/Gems/SkillGemWither" variantId="Wither" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Spell Totem" skillId="SupportSpellTotem" gemId="Metadata/Items/Gems/SupportGemSpellTotem" variantId="SupportSpellTotem" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="6" ascendClassId="1" masteryEffects="{292,34242},{44316,47642},{19750,62285},{37795,35302}" nodes="44683,58229,1461,1648,4011,11811,28012,31359,45272,49900,59606,19598,23024,48239,55686,4242,12850,25058,9877,5823,60180,35894,21835,27788,40362,13885,25260,53114,45593,12801,8938,25067,24050,3656,20546,1822,4502,33783,19858,9206,36221,12412,20807,36287,15842,18670,37504,41866,65210,32117,54142,30894,3469,64709,60942,29379,43787,56589,23471,19144,16167,10829,238,11497,5408,35503,33508,36881,4269,46277,38129,17934,29359,7263,64769,10661,8544,29937,6363,5237,17566,24083,16544,6064,51402,41689,57080,37887,63639,23886,36849,292,21435,52230,1325,31471,29933,44316,19750,8001,8012,32681,55880,46408,12878,36761,1159,49343,49109,23449,15027,38190,37795,27276,51220,62831,42104,49621,28754,10763,48614,16079,59220" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="2">Rarity: UNIQUE
+Replica Mistwall
+Lacquered Buckler
+League: Heist
+Source: Steal from a unique{Curio Display} during a Grand Heist
+Sockets: G G G
+Implicits: 1
+6% increased Movement Speed
+(120-150)% increased Evasion Rating
+10% increased Movement Speed
++(10-20)% to Fire and Cold Resistances
++(8-15)% chance to Avoid Physical Damage from Hits while Phasing
+You have Phasing if you have Blocked Recently
+You are at Maximum Chance to Block Spell Damage if you have not Blocked Recently</Item><Item id="3">Rarity: UNIQUE
+The Broken Crown
+Prophet Crown
+Sockets: B B R G
+Variant: Pre 2.6.0
+Variant: Pre 3.0.0
+Variant: Current
+Requires Level 63, 85 Str, 62 Int
+Socketed Gems are supported by Level 20 Cast on Death
++(10-15) to all Attributes
+20% increased Damage when on Low Life
+(60-100)% increased Armour and Energy Shield
+{variant:1}+(20-30) to maximum Energy Shield
+{variant:2}+(70-90) to maximum Energy Shield
+{variant:3}+(50-70) to maximum Energy Shield
+20% reduced Mana Regeneration Rate
++(43-61)% to Chaos Resistance</Item><Item id="5">Rarity: UNIQUE
+Ceaseless Feast
+Spiked Gloves
+Source: Drops from unique{The Infinite Hunger}
+Requires Level 70, 95 Str
+Sockets: R R R R
+Implicits: 1
+(16-20)% increased Melee Damage
+Adds (2-3) to (22-26) Physical Damage to Attacks
+(100-150)% increased Armour
+(20-30)% chance to inflict Corrosion on Hit with Attacks
+(20-30)% chance to gain an Endurance Charge on Hitting an Enemy with no Armour
+(20-30)% chance to gain a Frenzy Charge on Hitting an Enemy with no Evasion Rating</Item><Item id="6">Rarity: UNIQUE
+Atziri's Step
+Slink Boots
+Sockets: G G G G
+Source: Drops from unique{Atziri, Queen of the Vaal} in normal{The Apex of Sacrifice}
+Variant: Pre 3.16.0
+Variant: Current
+Requires Level 69, 120 Dex
+{variant:1}+(21-24)% chance to Suppress Spell Damage
+{variant:2}+(20-26)% chance to Suppress Spell Damage
+180% increased Evasion Rating
++(55-75) to maximum Life
+30% increased Movement Speed</Item><Item id="7">Rarity: UNIQUE
+Hinekora's Sight
+Onyx Amulet
+Requires Level 20
+Variant: Pre 3.16.0
+Variant: Pre 3.37.0
+Variant: Current
+Implicits: 1
+{tags:attribute}+(10-16) to all Attributes
+{variant:2}Prevent +3% of Suppressed Spell Damage
+{variant:3}Prevent +(4-6)% of Suppressed Spell Damage
+{variant:1}+(6-10)% chance to Suppress Spell Damage
+{variant:1}+(6-10)% chance to Suppress Spell Damage
+{variant:1}{tags:attack}+1000 to Accuracy Rating
+{variant:2,3}{tags:attack}+(600-1000) to Accuracy Rating
+{variant:2,3}{tags:defences}+(600-1000) to Evasion Rating
+Cannot be Blinded
+</Item><Item id="8">Rarity: UNIQUE
+Prospero's Protection
+Iron Ring
+Requires Level 32
+Implicits: 1
+{tags:physical_damage,attack}Adds 1 to 4 Physical Damage to Attacks
+(4-6)% Chance to Block Attack Damage
+{tags:attribute}+(15-35) to Strength
+{tags:resource}+(45-60) to maximum Life
+{tags:defences}Armour from Equipped Shield is doubled
+{tags:defences}Gain no Armour from Equipped Body Armour
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Ruby Ring
+Item Level: 75
+LevelReq: 40
+Catalyst: Prismatic
+CatalystQuality: 20
+Implicits: 1
++25% to Fire Resistance
+{tags:elemental,fire,cold,resistance}{suffix}{crafted}+13% to Fire and Cold Resistances
+{tags:elemental,resistance}{suffix}+6% to all Elemental Resistances
+</Item><Item id="10">Rarity: UNIQUE
+Perseverance
+Vanguard Belt
+Variant: Pre 3.16.0
+Variant: Current
+Implicits: 1
+{tags:defences}+(260-320) to Armour and Evasion Rating
+{tags:resource}(4-8)% increased maximum Life
+{tags:resistance}+(20-40)% to Cold Resistance
+{tags:attack}1% increased Attack Damage per 200 of the lowest of Armour and Evasion Rating
+{variant:1}Melee Hits which Stun have (14-20)% chance to Fortify
+{variant:2}Melee Hits which Stun Fortify
+You have Onslaught while Fortified
+</Item><Item id="16">Rarity: NORMAL
+Viridian Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 2" itemId="2"/><Slot name="Helmet" itemId="3"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="bandit" string="None"/><Input name="usePowerCharges" boolean="true"/><Input name="multiplierPoisonAppliedRecently" number="11"/><Input name="conditionGainedPowerChargeRecently" boolean="true"/><Input name="conditionEnemyPoisoned" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/><Input name="multiplierWitheredStackCount" number="0"/><Input name="conditionCritRecently" boolean="true"/></Config>
+</PathOfBuilding>

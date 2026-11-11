@@ -1,0 +1,93 @@
+.opt-area { container-type: inline-size; margin-top: 12px; min-width: 0; color: var(--text, #e2dccd); font: 14px/1.5 var(--font-ui, 'Geist', sans-serif); }
+.opt-area *, .opt-area *::before, .opt-area *::after { box-sizing: border-box; }
+.opt-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 12px; align-items: start; }
+.opt-main:has(.opt-wizard) { grid-template-columns: minmax(0, 1fr); }
+.opt-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.opt-panel, .opt-result, .opt-rail { min-width: 0; padding: 12px; border: 1px solid var(--border, #ffffff1c); border-radius: var(--radius, 8px); background: var(--surface-1, #131924); }
+.opt-panel h2, .opt-rail h2 { font-family: var(--font-title, 'Cormorant Garamond', serif); font-size: 22px; margin: 0; flex: 1; }
+.opt-panel h3 { font-size: 13px; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .06em; }
+.opt-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.opt-list { max-height: 220px; overflow-y: auto; margin: 8px 0; scrollbar-gutter: stable; }
+.opt-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border, #ffffff1c); flex-wrap: wrap; min-width: 0; }
+.opt-row[data-drag] { opacity: .5; }
+.opt-check { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 200px; }
+.opt-meta, .opt-note, .opt-area small { font-size: 12px; color: var(--text-muted, #a9a392); }
+.opt-note { margin: 6px 0; }
+.opt-priority { list-style: none; margin: 0; padding: 0; }
+.opt-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opt-rank { min-width: 20px; text-align: center; color: var(--gold-400, #d6ba78); font-variant-numeric: tabular-nums; }
+.opt-handle { cursor: grab; padding: 0 6px; border-radius: 4px; color: var(--text-muted, #a9a392); }
+.opt-handle:focus-visible { outline: 2px solid var(--gold-400, #d6ba78); }
+.opt-field { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.opt-num { width: 72px; text-align: center; }
+.opt-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border, #ffffff33); font-size: 12px; white-space: nowrap; }
+.opt-chip[data-tone='reached'], .opt-chip[data-mark='want'] { color: #9fd9a6; border-color: #9fd9a688; }
+.opt-chip[data-tone='short'] { color: var(--text-muted, #a9a392); }
+.opt-chip[data-tone='tentative'], .opt-chip.warn { color: var(--gold-400, #d6ba78); border-color: #d6ba7888; border-style: dashed; }
+.opt-chip[data-tone='unavailable'] { color: var(--text-muted, #a9a392); border-style: dotted; }
+.opt-chip.cold, .opt-chip[data-mark='avoid'] { color: #8fc1ee; border-color: #8fc1ee88; }
+.opt-banner { margin: 0 0 8px; padding: 6px 10px; border: 1px dashed var(--gold-400, #d6ba78); border-radius: var(--radius, 8px); color: var(--gold-400, #d6ba78); }
+.opt-side { min-width: 0; }
+.opt-points { margin: 0 0 4px; font-size: 16px; }
+.opt-results { list-style: none; margin: 8px 0; padding: 0; }
+.opt-results li { padding: 4px 0; border-bottom: 1px solid var(--border, #ffffff1c); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.opt-results li[data-tone='short'], .opt-results li[data-tone='unavailable'] { color: var(--text-muted, #a9a392); }
+.opt-tabs { display: flex; gap: 4px; margin-top: 8px; }
+.opt-tabs [aria-selected='true'] { border-color: var(--gold-400, #d6ba78); color: var(--gold-400, #d6ba78); }
+.opt-tabbody { max-height: 160px; overflow-y: auto; font-size: 13px; overflow-wrap: anywhere; }
+.opt-rail h2 { font-size: 20px; }
+.opt-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.opt-chip-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px; border: 1px solid var(--border, #ffffff1c); border-radius: var(--radius, 8px); }
+.opt-chip-body { flex: 1 1 100%; text-align: left; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; overflow-wrap: anywhere; }
+.opt-chip-body:not(.info):hover { color: var(--gold-400, #d6ba78); }
+.opt-chip-body.info { cursor: default; }
+.opt-chip-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt-tag { font-size: 11px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--border, #ffffff33); }
+.opt-tag[data-origin='AI'] { color: var(--gold-400, #d6ba78); border-color: var(--gold-400, #d6ba78); }
+.opt-reason { flex-basis: 100%; }
+.opt-rail-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 12px; }
+.opt-warning { margin: 0 0 8px; padding: 6px 10px; border: 1px solid #d6ba7866; border-radius: var(--radius, 8px); background: #d6ba7814; }
+.opt-warning[data-tone='error'] { border-color: #e08a8a88; background: #e08a8a14; }
+.opt-toast { display: flex; gap: 8px; align-items: center; }
+/* The Applied banner floats over the canvas bottom (above the undo/redo note), so it stays in view whatever the side
+   column's scroll position is, and showing or hiding it never moves the layout. */
+.atlas-editor-area .opt-toast { position: fixed; left: 50%; bottom: 112px; transform: translateX(-50%); z-index: 61; margin: 0; padding: 6px 8px 6px 14px;
+  border: 1px solid rgba(var(--atlas), .55); border-radius: var(--radius, 8px); background: var(--surface-2, #1a2230); color: var(--text, #e8ecf2);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.35); max-width: min(620px, calc(100vw - 32px)); }
+.opt-wiz-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 260px); gap: 12px; }
+.opt-islands { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin: 8px 0; padding: 12px; border-radius: var(--radius, 8px); background: radial-gradient(120% 120% at 50% 0%, #10243a, #07111e); }
+.opt-islands.list { grid-template-columns: 1fr; background: none; padding: 0; }
+.opt-islands [role='row'] { display: contents; }
+.opt-island { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--border, #ffffff33); border-radius: var(--radius, 8px); cursor: pointer; background: #0b1726; }
+.opt-island[data-mark='want'] { border-color: #e2b46a; box-shadow: 0 0 12px #e2b46a44; }
+.opt-island[data-mark='avoid'] { border-color: #6fa6dc; box-shadow: 0 0 12px #6fa6dc33; }
+.opt-island:focus-visible { outline: 2px solid var(--gold-400, #d6ba78); outline-offset: 2px; }
+.opt-mark-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+.opt-mark-buttons [aria-pressed='true'] { border-color: var(--gold-400, #d6ba78); color: var(--gold-400, #d6ba78); }
+.opt-ask { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.opt-answer { padding: 8px; border: 1px solid var(--border, #ffffff33); border-radius: var(--radius, 8px); max-height: 180px; overflow-y: auto; }
+.opt-candidate { margin: 8px 0; }
+.opt-confirm { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+@container (max-width: 940px) { .opt-main, .opt-wiz-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .opt-area * { transition: none !important; animation: none !important; } }
+/* Notable chooser: checkbox, then name over its stat lines; names wrap on words, never letter by letter. */
+.opt-notable { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid var(--border, #ffffff1c); }
+.opt-notable > input { margin-top: 8px; }
+.opt-notable-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.opt-notable-text small { overflow-wrap: break-word; }
+.opt-area .atlas-game-name > span, .opt-panel .atlas-game-name > span { overflow-wrap: break-word; word-break: normal; min-width: 6em; }
+.opt-check { min-width: 12em; }
+/* Result explanation: totals, what Apply changes, why points are left; node names fold away. */
+.opt-left { color: var(--text-muted, #a9a392); font-size: 13px; }
+.opt-summary { margin: 0 0 4px; }
+.opt-unspent { margin: 0 0 6px; padding: 6px 10px; border-left: 2px solid var(--gold-400, #d6ba78); background: #d6ba7810; font-size: 13px; }
+.opt-result[data-stale] { opacity: .7; }
+.opt-names { margin: 4px 0; }
+.opt-names summary { cursor: pointer; }
+.opt-names ul { margin: 4px 0 0; padding-left: 18px; }
+/* The Apply bar: pinned to the bottom of the side column (AtlasArea .atlas-side-footer), inline in Plan with AI. */
+.opt-apply-bar { display: flex; flex-direction: column; gap: 6px; }
+.opt-apply-bar [role='alert'] { margin: 0; font-size: 13px; }
+.opt-apply-bar .atlas-row-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+/* In the side column the mechanic list gets most of the height instead of a short scroller. */
+.atlas-side-optimizer .opt-list { max-height: min(48vh, 520px); }

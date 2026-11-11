@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+	<Build level="90" targetVersion="3_0" bandit="None" className="Templar" ascendClassName="Inquisitor" mainSocketGroup="1" viewMode="TREE" pantheonMajorGod="Arakaali" pantheonMinorGod="Garukhan">
+	</Build>
+	<Import />
+	<Calcs />
+	<Skills sortGemsByDPSField="CombinedDPS" activeSkillSet="1" sortGemsByDPS="true" defaultGemQuality="20" defaultGemLevel="characterLevel"><SkillSet id="1"><Skill enabled="true" includeInFullDPS="true" label="Main" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Righteous Fire" skillId="RighteousFire" gemId="Metadata/Items/Gems/SkillGemRighteousFire" variantId="RighteousFire" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Burning Damage" skillId="SupportBurningDamage" gemId="Metadata/Items/Gems/SupportGemIncreasedBurningDamage" variantId="SupportBurningDamage" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Elemental Focus" skillId="SupportElementalFocus" gemId="Metadata/Items/Gems/SupportGemElementalFocus" variantId="SupportElementalFocus" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Increased Area of Effect" skillId="SupportIncreasedAreaOfEffect" gemId="Metadata/Items/Gems/SupportGemIncreasedAreaOfEffect" variantId="SupportIncreasedAreaofEffect" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/><Gem nameSpec="Concentrated Effect" skillId="SupportConcentratedEffect" gemId="Metadata/Items/Gems/SupportGemConcentratedEffect" variantId="SupportConcentratedEffect" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Body Armour"><Gem nameSpec="Purity of Elements" skillId="PurityOfElements" gemId="Metadata/Items/Gems/SkillGemPurity" variantId="PurityOfElements" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Boots"><Gem nameSpec="Phase Run" skillId="PhaseRun" gemId="Metadata/Items/Gems/SkillGemNewPhaseRun" variantId="PhaseRun" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Gloves"><Gem nameSpec="Malevolence" skillId="Malevolence" gemId="Metadata/Items/Gems/SkillGemDamageOverTimeAura" variantId="Malevolence" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill><Skill enabled="true" includeInFullDPS="false" label="" mainActiveSkill="1" mainActiveSkillCalcs="1" slot="Helmet"><Gem nameSpec="Arcane Cloak" skillId="ArcaneCloak" gemId="Metadata/Items/Gems/SkillGemArcaneCloak" variantId="ArcaneCloak" level="20" quality="20" enabled="true" enableGlobal1="true" enableGlobal2="false" count="1"/></Skill></SkillSet></Skills>
+	<Tree activeSpec="1">
+		<Spec treeVersion="3_29" classId="5" ascendClassId="1" masteryEffects="{32241,47642},{11505,36313},{2828,1251},{27307,31556}" nodes="61525,61871,19417,43193,40059,60769,48214,37486,53884,662,63965,41472,1203,49254,17735,61471,58218,5743,9386,14057,58402,36949,10031,15064,29199,10575,6712,21330,17821,39648,60398,13009,32241,29049,5916,4713,7444,64210,11505,56029,42760,40366,25970,34423,48118,55332,2828,24324,37163,885,26866,35724,13164,8198,55993,29061,60472,23027,52742,51804,30370,46340,12536,21262,33923,44799,58453,50029,367,14021,27307,34661,44983,12852,1031,7938,21958,33755,11924,31462,13559,61804,44184,14936,60501,10893,18715,14040,35958,40508,4184,27203,48362,11420,2292,42795,4432,7503,27929,59005,61217,4177,38989,15046,29106,25332,26270,19103,35260,48298,18767,38701,12250,60554,27611,55643,33864,19374,6949,23659,32932,9392,5935" secondaryAscendClassId="0">
+		<Sockets><Socket nodeId="2491" itemId="16"/><Socket nodeId="6230" itemId="16"/><Socket nodeId="7960" itemId="16"/><Socket nodeId="21984" itemId="16"/><Socket nodeId="26196" itemId="16"/><Socket nodeId="26725" itemId="16"/><Socket nodeId="28475" itemId="16"/><Socket nodeId="31683" itemId="16"/><Socket nodeId="32763" itemId="16"/><Socket nodeId="33631" itemId="16"/><Socket nodeId="33989" itemId="16"/><Socket nodeId="34483" itemId="16"/><Socket nodeId="36634" itemId="16"/><Socket nodeId="41263" itemId="16"/><Socket nodeId="46882" itemId="16"/><Socket nodeId="48768" itemId="16"/><Socket nodeId="54127" itemId="16"/><Socket nodeId="55190" itemId="16"/><Socket nodeId="60735" itemId="16"/><Socket nodeId="61419" itemId="16"/><Socket nodeId="61834" itemId="16"/></Sockets></Spec>
+	</Tree>
+	<Notes>
+
+	</Notes>
+	<TreeView searchStr="" zoomY="0" showHeatMap="nil" zoomLevel="3" showStatDifferences="true" zoomX="0" />
+	<Items activeItemSet="1" useSecondWeaponSet="nil"><Item id="1">Rarity: UNIQUE
+The Grey Spire
+Judgement Staff
+Variant: Pre 3.11.0
+Variant: Pre 3.25.0
+Variant: Pre 3.29.0
+Variant: Current
+Requires Level 68, 113 Str, 113 Int
+Implicits: 3
+{variant:1}+18% Chance to Block Attack Damage
+{variant:3,4}+25% Chance to Block Attack Damage
+{variant:2}+20% Chance to Block Spell Damage
+Has no Sockets
+{variant:1,2,3}(250-300)% increased Global Damage
+{variant:4}(300-400)% increased Global Damage
+(20-30)% increased Attack Speed
+{variant:1,2,3}+(1-4)% to all maximum Resistances
+{variant:4}+(1-5)% to all maximum Resistances
+{variant:4}Implicit Modifier magnitudes are doubled
+</Item><Item id="3">Rarity: RARE
+Solver Helmet
+Divine Crown
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B R R R
+Implicits: 1
+{crafted}{enchant}40% increased Righteous Fire Damage
++130 to maximum Life
++51 to Dexterity
+{crafted}+17% to Fire and Cold Resistances
++36% to Cold Resistance
++18 to maximum Energy Shield
++29 to maximum Life
++65 to Armour
++29 to maximum Life</Item><Item id="4">Rarity: RARE
+Solver Body Armour
+Twilight Regalia
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B-R-B-B-B B
+Implicits: 1
+{crafted}{enchant}40% reduced Attribute Requirements
+{crafted}58% increased Energy Shield
+32% reduced Attribute Requirements
++160 to maximum Life
++44 to Intelligence
++36% to Lightning Resistance
+33% increased Energy Shield
+14% increased Stun and Block Recovery</Item><Item id="5">Rarity: RARE
+Solver Gloves
+Warlock Gloves
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: B B B B
+Implicits: 0
++51 to Dexterity
++30% to Lightning Resistance
+{crafted}+17% to Cold and Lightning Resistances
++70 to maximum Life
++12 to maximum Energy Shield
++23 to maximum Life
+55% increased Energy Shield</Item><Item id="6">Rarity: RARE
+Solver Boots
+Paladin Boots
+Item Level: 75
+Quality: 20
+LevelReq: 84
+Sockets: G R R R
+Implicits: 1
+{crafted}{enchant}10% increased Movement Speed if you haven't been Hit Recently
+Drops Burning Ground while moving, dealing 2500 Fire Damage per second for 4 seconds
++30% to Fire Resistance
+{crafted}+13% to Cold and Chaos Resistances
+20% increased Movement Speed
++70 to maximum Life
+55% increased Armour and Energy Shield</Item><Item id="7">Rarity: RARE
+Solver Amulet
+Agate Amulet
+Item Level: 75
+LevelReq: 65
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
++20 to Strength and Intelligence
+{tags:dot_multi,damage}{suffix}+9% to Damage over Time Multiplier
+{tags:elemental_damage,damage,elemental,fire}{suffix}31% increased Fire Damage
+{tags:frenzy_charge,unveiled_mod}{suffix}{crafted}+1 to Minimum Frenzy Charges
+{tags:resource,life}{prefix}+70 to maximum Life
+{tags:defences,energy_shield}{prefix}8% increased maximum Energy Shield
+{tags:defences,energy_shield}{prefix}+27 to maximum Energy Shield
+</Item><Item id="8">Rarity: RARE
+Solver Ring
+Vermillion Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+6% increased maximum Life
+{tags:elemental,fire,resistance}{suffix}+24% to Fire Resistance
+{tags:chaos,resistance}{suffix}+10% to Chaos Resistance
+{tags:dot_multi,damage}{suffix}+14% to Damage over Time Multiplier
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:unveiled_mod,damage}{prefix}{crafted}15% increased Damage
+</Item><Item id="9">Rarity: RARE
+Solver Ring
+Vermillion Ring
+Item Level: 75
+LevelReq: 80
+Catalyst: Dextral
+CatalystQuality: 20
+Implicits: 1
+6% increased maximum Life
+{tags:elemental,fire,resistance}{suffix}+24% to Fire Resistance
+{tags:chaos,resistance}{suffix}+10% to Chaos Resistance
+{tags:dot_multi,damage}{suffix}+14% to Damage over Time Multiplier
+{tags:resource,life}{prefix}+55 to maximum Life
+{tags:unveiled_mod,damage}{prefix}{crafted}15% increased Damage
+</Item><Item id="10">Rarity: RARE
+Solver Belt
+Heavy Belt
+Item Level: 75
+LevelReq: 67
+Catalyst: Prismatic
+CatalystQuality: 20
+Implicits: 1
++30 to Strength
+{tags:resource,life}{prefix}+85 to maximum Life
+{tags:elemental,fire,resistance}{suffix}+45% to Fire Resistance
+{tags:chaos,resistance}{suffix}+16% to Chaos Resistance
+{tags:elemental,cold,lightning,resistance}{suffix}{crafted}+17% to Cold and Lightning Resistances
+</Item><Item id="11">Rarity: MAGIC
+Eternal Life Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 0
+Grants Immunity to Bleeding for 12 seconds if used while Bleeding
+Grants Immunity to Corrupted Blood for 12 seconds if used while affected by Corrupted Blood
+23% reduced Charges per use
+</Item><Item id="12">Rarity: MAGIC
+Eternal Mana Flask
+Item Level: 75
+Quality: 20
+LevelReq: 65
+Implicits: 2
+{crafted}{enchant}90% increased Duration
+{crafted}{enchant}Gains no Charges during Effect
+23% reduced Charges per use
+</Item><Item id="13">Rarity: MAGIC
+Quicksilver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 52
+Implicits: 2
+{crafted}{enchant}65% increased effect
+{crafted}{enchant}Gains no Charges during Effect
+9% increased Movement Speed during Effect
+23% reduced Charges per use
+</Item><Item id="14">Rarity: MAGIC
+Sulphur Flask
+Item Level: 75
+Quality: 20
+LevelReq: 46
+Implicits: 3
+{crafted}{enchant}65% increased effect
+{crafted}{enchant}Gains no Charges during Effect
+Creates Consecrated Ground on Use
+30% reduced Duration
+25% increased effect
+51% increased Armour during Effect
+</Item><Item id="15">Rarity: MAGIC
+Silver Flask
+Item Level: 75
+Quality: 20
+LevelReq: 50
+Implicits: 0
+36% increased Charge Recovery
+</Item><Item id="16">Rarity: NORMAL
+Cobalt Jewel
+Item Level: 75
+LevelReq: 0
+Implicits: 0
+</Item><ItemSet id="1" useSecondWeaponSet="nil"><Slot name="Weapon 1" itemId="1"/><Slot name="Helmet" itemId="3"/><Slot name="Body Armour" itemId="4"/><Slot name="Gloves" itemId="5"/><Slot name="Boots" itemId="6"/><Slot name="Amulet" itemId="7"/><Slot name="Ring 1" itemId="8"/><Slot name="Ring 2" itemId="9"/><Slot name="Belt" itemId="10"/><Slot name="Flask 1" itemId="11"/><Slot name="Flask 2" itemId="12"/><Slot name="Flask 3" itemId="13"/><Slot name="Flask 4" itemId="14"/><Slot name="Flask 5" itemId="15" active="true"/></ItemSet></Items>
+	<Config ><Input name="enemyIsBoss" string="None"/><Input name="bandit" string="None"/><Input name="arcaneCloakUsedRecentlyCheck" boolean="true"/><Input name="buffOnslaught" boolean="true"/><Input name="buffPhasing" boolean="true"/><Input name="conditionKilledRecently" boolean="true"/><Input name="targetBrandedEnemy" boolean="false"/><Input name="conditionChampionIntimidate" boolean="false"/><Input name="conditionSacrificeMinion" boolean="false"/></Config>
+</PathOfBuilding>

@@ -1,0 +1,128 @@
+/* Start (Home with nothing saved yet, or opened from the Library's League starts). Redesign 01, section 3.2.
+   Colour rules as in 13-builds-design: the Builds ember marks "where you are" (eyebrow, hover, focus), the theme accent
+   fills only the one primary action (New build) and the Follow buttons; everything else is neutral. */
+
+/* Starts under the title bar (padding, not inset) so the bar's glass blurs Start's own light background, not the dark sky. */
+.start { position: absolute; inset: 0; padding-top: 40px; box-sizing: border-box; display: flex; flex-direction: column; white-space: normal; color: var(--text); }
+.start:where([data-mode="light"] *) { background: var(--surface-0); }
+.start-scroll { flex: 1 1 auto; min-height: 0; }
+.start-col { width: min(1120px, calc(100% - 64px)); margin: 0 auto; padding: 28px 0 32px; display: flex; flex-direction: column; gap: 26px; box-sizing: border-box; }
+
+.start-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-bottom: -12px; padding: 4px 8px 4px 4px; border: 0; border-radius: 8px; background: none; color: var(--text-2); font: 500 13px Geist, sans-serif; cursor: pointer; }
+.start-back:hover { color: var(--text-strong); background: rgba(var(--line-rgb), .06); }
+.start-back:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--area-build-rgb), .7); }
+
+.start-head { display: flex; flex-direction: column; gap: 8px; position: relative; }
+.start-archive { position: absolute; top: 0; right: 0; }
+.start-head .eyebrow { color: var(--area-build); }
+.start-head .eyebrow::before { content: ""; display: inline-block; width: 18px; height: 2px; margin: 0 8px 3px 0; border-radius: 1px; vertical-align: middle; background: var(--area-build); }
+.start-h { margin: 0; font: 600 44px/1.05 'Cormorant Garamond', serif; color: var(--text-display); text-shadow: 0 0 50px rgba(var(--area-build-rgb), .2); }
+.start-sub { margin: 0; color: var(--text-3); font-size: 15px; line-height: 1.5; }
+
+/* Class arc (large windows only; on smaller ones the New build tile opens the class grid instead). */
+.start-arc { display: flex; justify-content: center; }
+.start .arc-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.start .arc { position: relative; width: 960px; max-width: 100%; height: 220px; touch-action: pan-y; outline: none; user-select: none; border-radius: 16px; }
+.start .arc:focus-visible { box-shadow: 0 0 0 2px rgba(var(--area-build-rgb), .6); }
+.start .arc-item { position: absolute; left: 50%; bottom: 0; width: 180px; margin-left: -90px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transform-origin: 50% 100%; border: 0; background: none; padding: 0; }
+.start .arc-item .img { flex: none; width: 128px; height: 128px; border-radius: 50%; background-size: cover; background-position: center; transition: box-shadow .5s, transform .25s cubic-bezier(.3, 1.6, .5, 1); }
+.start .arc-item .nm { font: 600 17px 'Cormorant Garamond', serif; letter-spacing: .04em; white-space: nowrap; }
+.start .arc-nav { display: flex; align-items: center; gap: 14px; }
+.start .arc-nav .circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(var(--line-rgb), .14); background: rgba(var(--glass-hi-rgb), .5); color: var(--text-3); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.start .arc-nav .circ:hover { color: var(--text-strong); border-color: rgba(var(--area-build-rgb), .5); }
+.start .arc-dots { display: flex; align-items: center; gap: 6px; }
+.start .arc-dots button { height: 6px; padding: 0; border: 0; border-radius: 3px; cursor: pointer; transition: width .4s cubic-bezier(.22, .8, .24, 1), background .4s; }
+.start .arc-cap { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+.start .arc-cap b { color: var(--text-strong); font-weight: 600; }
+
+/* Four ways to begin. */
+.start-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.start-tile { min-width: 0; display: flex; flex-direction: column; border-radius: 16px; border: 1px solid rgba(var(--line-rgb), .09); background: rgba(var(--shadow-rgb), calc(.34 * var(--shadow-k))); overflow: hidden; }
+.start-tile:where([data-mode="light"] *) { background: var(--surface-2); }
+.start-tile:hover { border-color: rgba(var(--area-build-rgb), .45); }
+.start-tile .tile-main {
+  flex: 1 1 auto; min-height: 96px; position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 18px; box-sizing: border-box;
+  border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.start-tile .tile-main:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--area-build-rgb), .8); border-radius: 16px; }
+.start-tile .tile-main:disabled { cursor: progress; opacity: .6; }
+.start-tile .t { display: inline-flex; align-items: center; gap: 8px; font: 600 16px Geist, sans-serif; color: var(--text-strong); }
+.start-tile .d { color: var(--text-muted); font-size: 12.5px; line-height: 1.45; }
+.start-tile .kbd { position: absolute; top: 14px; right: 14px; }
+.start-tile .paste-box { margin: -6px 14px 14px; height: 34px; display: flex; align-items: center; padding: 0 10px; border-radius: 9px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); }
+.start-tile:where([data-mode="light"] *) .paste-box { background: var(--surface-3); }
+.start-tile .paste-box:focus-within { border-color: rgba(var(--area-build-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .14); }
+.start-tile .paste-box input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text-strong); font: 400 13px Geist, sans-serif; padding: 0; outline: 0; }
+/* The one primary action on the page: filled with the theme accent, like every primary button. */
+.start-tile.primary { border: 0; background: linear-gradient(180deg, var(--gold-300), var(--gold-600)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 8px 22px rgba(var(--accent-rgb), .3); }
+.start-tile.primary:hover { filter: brightness(1.06); }
+.start-tile.primary .tile-main, .start-tile.primary .t, .start-tile.primary .d { color: var(--text-on-accent); }
+.start-tile.primary .d { opacity: .85; }
+.start-tile.primary .tile-main:focus-visible { box-shadow: inset 0 0 0 2px var(--text-on-accent); }
+
+/* Library read failed: in place of the tiles. */
+.start-error { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 20px; border-radius: 16px; border: 1px solid rgba(var(--line-rgb), .12); background: linear-gradient(180deg, rgba(var(--glass-rgb), .82), rgba(var(--glass-rgb), .9)); }
+.start-error > pom-icon { flex: none; color: var(--warning-text); }
+.start-error .tx { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.start-error .tx b { font: 600 20px/1.2 'Cormorant Garamond', serif; color: var(--text-display); }
+.start-error .why { color: var(--text-muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.start-error .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* League starts and the after-build links. */
+.start-sec-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.start-sec-head .lbl { font: 600 11px Geist, sans-serif; letter-spacing: .16em; color: var(--gold-label); }
+.start-sec-head .rule { flex: 1 1 40px; height: 1px; background: linear-gradient(90deg, rgba(var(--line-rgb), .12), transparent); }
+.start-find { flex: 0 1 220px; width: 220px; min-width: 140px; }
+.start-leagues, .start-after { display: flex; flex-direction: column; gap: 14px; }
+/* The section keeps the starter-chooser class for the regression flows; it lines up with the tiles, not the old page box. */
+.start .start-leagues { padding: 0; margin: 0; max-width: none; height: auto; overflow: visible; }
+.start-note { margin: 0; color: var(--text-2); font-size: 13.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.start-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.start .starter-card { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .1); background: rgba(var(--shadow-rgb), calc(.34 * var(--shadow-k))); }
+.start:where([data-mode="light"] *) .starter-card { background: var(--surface-2); }
+.start .starter-card:hover { border-color: rgba(var(--area-build-rgb), .4); }
+.start .starter-title { margin: 0; font: 600 20px/1.15 'Cormorant Garamond', serif; color: var(--text-display); overflow-wrap: anywhere; }
+.start .starter-meta { margin: 0; font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+.start .starter-note { margin: 4px 0 0; font-size: 12px; color: var(--text-2); }
+.start .starter-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+.start-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.start-link { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(var(--line-rgb), .09); background: rgba(var(--shadow-rgb), calc(.25 * var(--shadow-k))); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.start-link:where([data-mode="light"] *) { background: var(--surface-2); }
+.start-link > pom-icon { grid-row: 1 / 3; color: var(--text-muted); }
+.start-link .t { color: var(--text-strong); font-weight: 600; font-size: 13.5px; }
+.start-link .d { color: var(--text-muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.start-link:hover:not(:disabled) { border-color: rgba(var(--area-build-rgb), .45); }
+.start-link:focus-visible { outline: none; border-color: rgba(var(--area-build-rgb), .8); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .2); }
+.start-link:disabled { cursor: default; opacity: .7; }
+
+/* Footer: always visible at the bottom; the page above it scrolls. */
+.start-foot { flex: none; height: 36px; display: flex; align-items: center; gap: 18px; padding: 0 28px; white-space: nowrap; font-size: 12.5px; color: var(--text-faint); border-top: 1px solid rgba(var(--line-rgb), .06); background: rgba(var(--glass-rgb), .55); backdrop-filter: blur(12px); }
+.start-foot .link { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font: inherit; color: var(--text-muted); cursor: pointer; }
+.start-foot .link:hover { color: var(--text-strong); }
+.start-foot .link.gold { color: var(--gold-text); display: inline; }
+.start-foot .sp { flex: 1; }
+.start-foot .dot { width: 3px; height: 3px; border-radius: 2px; background: var(--surface-5); }
+.start-foot .signin { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* Default 1400x900 window and other heights under 960: tighter spacing so the first row of league starts is fully in view. */
+@media (max-height: 959px) {
+  .start-col { gap: 16px; padding-top: 14px; }
+  .start .arc-wrap { gap: 8px; }
+  .start-h { font-size: 38px; }
+}
+/* 1280x720 and other smaller windows: no arc, smaller title, three cards across. */
+@media (max-width: 1359px), (max-height: 819px) {
+  .start-arc { display: none; }
+  .start-h { font-size: 36px; }
+  .start-col { gap: 22px; padding-top: 22px; }
+}
+@media (max-width: 1359px) {
+  .start-col { width: min(1120px, calc(100% - 48px)); }
+  .start-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .start-foot { padding: 0 24px; }
+}
+@media (max-width: 999px) {
+  .start-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .start-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .start-links { grid-template-columns: minmax(0, 1fr); }
+}

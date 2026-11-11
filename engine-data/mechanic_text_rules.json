@@ -1,0 +1,27 @@
+{
+  "about": "Text rules (solver-knowledge DESIGN.md section (f)): read mod lines the Rust parser leaves unread or partly read. Each row is a form (subject + verb + count + object), not one item's text. Applied only when a caller loads this file (solves do; the answer-key tests never do). mods: '$x' a capture as a number, '$x/100|1' divided by 100 or 1 when absent, '$x:title' a capture with a capital. gate: a capture looked up in killQualifiers (its tags go on every emitted mod); an unknown qualifier reads nothing.",
+  "rules": [
+    {
+      "id": "strike-targets-text",
+      "class": "strike-targets",
+      "match": "^(?:non-vaal )?strike skills? (?:target|hit) (?<n>\\d+) additional (?:nearby )?enem(?:y|ies)$",
+      "mods": [
+        { "name": "AdditionalStrikeTarget", "type": "BASE", "value": "$n", "tags": [ { "type": "SkillType", "skillType": 21 }, { "type": "SkillType", "skillType": 38, "neg": true } ] }
+      ]
+    },
+    {
+      "id": "explode-kill-text",
+      "class": "explode-on-kill",
+      "match": "^enem(?:y|ies)(?: you| your \\w+)? kill(?:ed)?(?: (?:with|by) (?<q>[^,]+?))? (?:have a (?<c>\\d+)% chance to )?explode,? dealing (?:a )?(?<a>\\d+)% of their (?:maximum )?life as (?<t>\\w+) damage$",
+      "gate": "q",
+      "mods": [
+        { "name": "ExplodeMod", "type": "LIST", "value": { "type": "$t:title", "chance": "$c/100|1", "amount": "$a", "keyOfScaledMod": "chance" } },
+        { "name": "CanExplode", "type": "FLAG", "value": true }
+      ]
+    }
+  ],
+  "killQualifiers": {
+    "strike skills": [ { "type": "SkillType", "skillType": 21 } ],
+    "strike skill": [ { "type": "SkillType", "skillType": 21 } ]
+  }
+}

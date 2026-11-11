@@ -1,0 +1,48 @@
+{
+ "skill": "Essence Drain",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Occultist chaos DoT",
+    "ascendancy": "Occultist",
+    "supports": [
+     "Void Manipulation",
+     "Swift Affliction",
+     "Controlled Destruction"
+    ],
+    "why": "Occultist curses and chaos damage scale Essence Drain's DoT"
+   },
+   {
+    "name": "Trickster chaos DoT",
+    "ascendancy": "Trickster",
+    "supports": [
+     "Void Manipulation",
+     "Deadly Ailments",
+     "Swift Affliction"
+    ],
+    "why": "Trickster damage over time and defence"
+   },
+   {
+    "name": "Pathfinder poison drain",
+    "ascendancy": "Pathfinder",
+    "supports": [
+     "Void Manipulation",
+     "Unbound Ailments",
+     "Deadly Ailments"
+    ],
+    "why": "Pathfinder flask poison scaling"
+   }
+  ]
+ }
+}

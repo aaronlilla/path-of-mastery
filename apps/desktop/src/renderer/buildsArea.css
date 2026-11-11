@@ -1,0 +1,106 @@
+/* Builds area colour (--area-build-rgb, tokens.css): the Builds area marks "where you are" and "what is selected" with its
+   own colour, the way Wealth and Loot Filter do, while gold stays the brand colour for primary buttons and labels.
+   Scope: the build library, the first-launch screens, the build workspace and the new-build class picker. */
+
+/* Title bar: the open area's name carries the area colour, so the title reads as part of the Builds area. */
+.titlebar[data-area="builds"] .tb-title { color: var(--text-strong); }
+.titlebar[data-area="builds"] .tb-title::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 8px 1px 0; border-radius: 3px; vertical-align: middle;
+  background: var(--area-build); box-shadow: 0 0 8px rgba(var(--area-build-rgb), .7);
+}
+
+/* Library */
+.lib-wash { background: radial-gradient(55% 45% at 50% 36%, rgba(var(--area-build-rgb), .1), transparent 70%), linear-gradient(transparent 22%, rgba(var(--void-rgb), .88) 48%); }
+.lib-wash.first { background: radial-gradient(55% 45% at 50% 36%, rgba(var(--area-build-rgb), .1), transparent 70%), linear-gradient(transparent 30%, rgba(var(--void-rgb), .9) 62%); }
+.lib-head .eyebrow { color: var(--area-build); }
+.lib-head .eyebrow::before {
+  content: ""; display: inline-block; width: 18px; height: 2px; margin: 0 8px 3px 0; border-radius: 1px; vertical-align: middle; background: var(--area-build);
+}
+.lib-search:focus-within { border-color: rgba(var(--area-build-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .14); }
+.lib-sort:hover, .lib-sort[aria-expanded="true"] { border-color: rgba(var(--area-build-rgb), .45); }
+.lib .folder:hover { border-color: rgba(var(--area-build-rgb), .45); }
+.lib .folder.on { border-color: rgba(var(--area-build-rgb), .6); background: rgba(var(--area-build-rgb), .1); }
+.lib .folder.on pom-icon { color: var(--area-build); }
+.lib .row[data-sel] {
+  background: linear-gradient(180deg, rgba(var(--area-build-rgb), .11), rgba(var(--area-build-rgb), .04)); border-color: rgba(var(--area-build-rgb), .35);
+  box-shadow: 0 0 22px -8px rgba(var(--area-build-rgb), .45), inset 3px 0 0 var(--area-build);
+}
+.lib .card:hover { border-color: rgba(var(--area-build-rgb), .45); }
+.lib .card[data-sel] { border-color: rgba(var(--area-build-rgb), .55); box-shadow: 0 0 30px -10px rgba(var(--area-build-rgb), .45); }
+.lib .big-tile:hover { border-color: rgba(var(--area-build-rgb), .45); }
+.lib .paste-box:focus-within { border-color: rgba(var(--area-build-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .14); }
+.lib .folder[data-drop] { border-color: rgba(var(--area-build-rgb), .75); background: rgba(var(--area-build-rgb), .16); box-shadow: 0 0 0 2px rgba(var(--area-build-rgb), .25); }
+
+/* Library hover and keyboard focus in the area colour (cards and list rows, grid and list views). */
+.lib .row:hover:not([data-sel]) { background: rgba(var(--area-build-rgb), .06); border-color: rgba(var(--area-build-rgb), .3); }
+.lib .card:focus-visible, .lib .row:focus-visible { outline: none; border-color: rgba(var(--area-build-rgb), .8); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .22); }
+
+/* Liquid glass (public/ds/liquid-glass.js) paints tiles with !important in the accent colour and a transparent border; in the
+   library the selected / hovered / focused build tile uses the Builds colour instead, as a ring since the border is hidden. */
+.lib :is(.card, .row)[data-lg="tile"][data-sel] {
+  --rim: var(--area-build-rgb) !important;
+  background: radial-gradient(120% 120% at var(--ilx, 30%) var(--ily, 0%), rgba(var(--area-build-rgb), .2), rgba(var(--area-build-rgb), .05) 55%, rgba(var(--area-build-rgb), .015)), rgba(var(--void-rgb), .5) !important;
+  box-shadow: 0 0 0 1px rgba(var(--area-build-rgb), .5), 0 0 26px -6px rgba(var(--area-build-rgb), .4), inset 0 0 22px -8px rgba(var(--area-build-rgb), .3) !important;
+}
+.lib :is(.card, .row)[data-lg="tile"]:hover:not([data-sel]) { box-shadow: 0 0 0 1px rgba(var(--area-build-rgb), .4), inset 0 1px 2px rgba(var(--shadow-rgb, 0, 0, 0), calc(.35 * var(--shadow-k, 1))) !important; }
+.lib :is(.card, .row)[data-lg="tile"]:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(var(--area-build-rgb), .85), 0 0 0 5px rgba(var(--area-build-rgb), .2) !important; }
+
+/* League-start chooser (first launch) */
+.starter-head .eyebrow { color: var(--area-build); }
+
+/* Build workspace */
+.bw-bg { background: radial-gradient(80% 60% at 60% 30%, rgba(var(--area-build-rgb), .06), transparent 70%), var(--surface-0); }
+.bw-tabs > button.tab[aria-selected="true"] { box-shadow: inset 0 -2px 0 var(--area-build); }
+.bw-tabs > button.tab[aria-selected="true"] pom-icon { color: var(--area-build); opacity: 1; }
+.bw-tabs > button.tab:hover:not([aria-selected="true"]) { box-shadow: inset 0 -2px 0 rgba(var(--area-build-rgb), .35); }
+.bw-tabs .tb-act:hover { border-color: rgba(var(--area-build-rgb), .5); }
+.bw-tabs .tb-act[aria-pressed="true"] { color: var(--text-strong); border-color: rgba(var(--area-build-rgb), .6); background: rgba(var(--area-build-rgb), .1); }
+
+/* Builds colour pass: selection and "where you are" use the ember
+   area colour; gold stays on primary buttons, labels and the brand. Colour only: no layout or behaviour change. */
+.bw-tabs > button.tab[aria-selected="true"] { font-weight: 600; background: linear-gradient(180deg, transparent 40%, rgba(var(--area-build-rgb), .1)); }
+.bw-tabs > button.tab:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--area-build-rgb), .7); border-radius: 8px; }
+/* Import/Export open: it is the one active place, so the tab underneath stops looking selected (one "you are here"). */
+.bw-tabs:has(.tb-act[aria-pressed="true"]) > button.tab[aria-selected="true"] { color: var(--text-muted); font-weight: 500; background: none; box-shadow: none; }
+.bw-tabs:has(.tb-act[aria-pressed="true"]) > button.tab[aria-selected="true"] pom-icon { color: inherit; opacity: .8; }
+:where(.bw) .chip-unsaved { background: rgba(var(--area-build-rgb), .1); border-color: rgba(var(--area-build-rgb), .45); color: var(--area-build); font-weight: 600; }
+:where(.bw) .chip-unsaved i { background: var(--area-build); box-shadow: 0 0 8px rgba(var(--area-build-rgb), .8); }
+.bw-class i { box-shadow: 0 0 0 2px rgba(var(--area-build-rgb), .18); }
+/* Calcs section chips and Config section nav: hover and keyboard focus carry the area colour. */
+.bw .calc-chips button:hover { border-color: rgba(var(--area-build-rgb), .5); background: rgba(var(--area-build-rgb), .08); }
+.bw .calc-chips button:hover pom-icon { color: var(--area-build) !important; }
+.bw .calc-chips button:focus-visible { outline: none; border-color: rgba(var(--area-build-rgb), .7); box-shadow: 0 0 0 3px rgba(var(--area-build-rgb), .16); }
+.bw .cfg-nav button:hover { background: rgba(var(--area-build-rgb), .09); box-shadow: inset 2px 0 0 var(--area-build); }
+.bw .cfg-nav button:hover > pom-icon { color: var(--area-build); }
+.bw .cfg-nav button:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--area-build-rgb), .6); }
+/* Library card footer: the numbers saved in the build file. */
+:where(.lib) .card .stats {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding-top: 10px; border-top: 1px solid rgba(var(--line-rgb), .09);
+  font-variant-numeric: tabular-nums; min-width: 0;
+}
+:where(.lib) .card .stats .st { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+:where(.lib) .card .stats .k { font: 600 10px Geist, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+:where(.lib) .card .stats b { font: 600 14px Geist, sans-serif; white-space: nowrap; }
+:where(.lib) .card .stats b.dps { color: var(--stat-dps); }
+:where(.lib) .card .stats b.life { color: var(--stat-life, #ff7a6b); }
+:where(.lib) .card .stats .v { font-size: 12.5px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:where([data-mode="light"]) :where(.lib) .card .stats b.dps { color: #7a5200; }
+:where([data-mode="light"]) :where(.lib) .card .stats b.life { color: #a52a1c; }
+/* Header points meter: a short label after each count. */
+.bw-pm-lbl { margin-left: 2px; color: var(--text-muted); font-size: 12px; }
+.bw-top:not([data-hs="0"]) .bw-pm-lbl { display: none; }
+/* Library empty / no-match card: a solid glass panel so the class art behind it does not bleed through; display headline. */
+:where(.lib) .lib-empty-list {
+  padding: 40px 16px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .82), rgba(var(--glass-rgb), .9));
+  border-color: rgba(var(--area-build-rgb), .28); backdrop-filter: blur(14px);
+}
+:where(.lib) .lib-empty-list b { font: 600 24px/1.15 'Cormorant Garamond', Georgia, serif; color: var(--text-display); }
+/* Calcs in light mode: labels coloured by build-file colour codes (^xADAA47 Lightning:, ^xB97123 Fire:) are the raw dark-mode game colours
+   and fall to ~1.5:1 on parchment. Darken them in place (same hue), as the light tokens do for --dmg-*. */
+:is([data-mode="light"]) [data-screen-label="Calcs / Tab / Content"] span[style*="color"] { filter: brightness(.62) saturate(1.25); }
+/* Skills: the chosen socket group in the list. */
+.bw .sk-list [role="option"][aria-selected="true"] { box-shadow: inset 2px 0 0 var(--area-build); }
+
+/* New build: the chosen class */
+.class-opt:hover { border-color: rgba(var(--area-build-rgb), .45); }
+.class-opt[aria-checked="true"] { border-color: rgba(var(--area-build-rgb), .65); background: rgba(var(--area-build-rgb), .1); }

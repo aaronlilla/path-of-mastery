@@ -1,0 +1,11 @@
+/* Add Mod picker (upstream's Mod Browser); tokens only. */
+.cfg-modpick { display: flex; flex-direction: column; gap: 10px; }
+.cfg-modpick .search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 6px 0 12px; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); color: var(--text-muted); }
+.cfg-modpick .search input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: var(--text-strong); font: inherit; outline: none; box-shadow: none; border-radius: 0; }
+.cfg-modpick .search button { flex: none; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cfg-modpick .list { height: min(380px, 46vh); overflow-y: auto; overflow-x: hidden; padding: 4px; border-radius: 12px; background: rgba(var(--shadow-rgb), calc(.28 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .07); display: flex; flex-direction: column; gap: 1px; scrollbar-width: thin; }
+.cfg-modpick .mod { flex: none; padding: 6px 10px; border-radius: 7px; cursor: pointer; color: var(--rarity-magic); overflow-wrap: anywhere; }
+.cfg-modpick .mod:hover { background: rgba(var(--line-rgb), .06); }
+.cfg-modpick .mod.on { background: rgba(var(--accent-rgb), .14); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .22); }
+.cfg-modpick .none { padding: 12px; color: var(--text-muted); }
+.cfg-modpick .count { color: var(--text-muted); font-size: 12px; }

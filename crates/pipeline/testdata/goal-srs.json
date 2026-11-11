@@ -1,0 +1,48 @@
+{
+ "skill": "Summon Raging Spirit",
+ "level": 90,
+ "wealth": "league-start",
+ "targets": [
+  {
+   "name": "DPS",
+   "metric": "combined"
+  }
+ ],
+ "assume": {
+  "playMode": "mapping"
+ },
+ "plan": {
+  "leads": [
+   {
+    "name": "Necromancer spirits",
+    "ascendancy": "Necromancer",
+    "supports": [
+     "Minion Damage",
+     "Melee Splash",
+     "Minion Speed"
+    ],
+    "why": "Necromancer minion nodes and offerings scale the spirits"
+   },
+   {
+    "name": "Occultist spirits",
+    "ascendancy": "Occultist",
+    "supports": [
+     "Minion Damage",
+     "Added Fire Damage",
+     "Minion Speed"
+    ],
+    "why": "Occultist curses and ES for survivability"
+   },
+   {
+    "name": "Hierophant spirits",
+    "ascendancy": "Hierophant",
+    "supports": [
+     "Minion Damage",
+     "Melee Splash",
+     "Minion Speed"
+    ],
+    "why": "Hierophant mana and totems"
+   }
+  ]
+ }
+}
