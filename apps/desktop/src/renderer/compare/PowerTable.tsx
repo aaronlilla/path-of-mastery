@@ -118,10 +118,9 @@ export function PowerTable({ version, report, sort, onSort, onClose, engineId, k
   );
   return (
     <div className="cmp-pt" data-lg="tile">
-      <div className="hd">
+      <div className="hd" title={tr('compare_PowerTable.adding_each_element_of_b')}>
         <Icon name="chart-bar" size={15} style={{ color: 'var(--gold-label)' }} />
         <b>{tr('compare_PowerTable.power_report_label', { label: lbl(report.stat.label) })}</b>
-        <span className="m">{tr('compare_PowerTable.adding_each_element_of_b')}</span>
         <span style={{ flex: 1 }} />
         <button type="button" className="icon-btn" aria-label={tr('compare_PowerTable.close_power_report')} onClick={onClose}>
           <Icon name="x" size={13} />

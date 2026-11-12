@@ -5,15 +5,17 @@
 .calc-note b { color: var(--text-2); font-weight: 500; }
 
 /* toolbar */
-.calc-tb {
-  flex: none; position: relative !important; min-height: 56px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px; min-width: 0; z-index: 5; pointer-events: auto;
-  border-radius: 16px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .56), rgba(var(--glass-rgb), .6)); border: 1px solid rgba(var(--line-rgb), .09);
-  box-shadow: 0 18px 50px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .06);
-}
-.calc-tb .sp { flex: 1; min-width: 0; }
+/* The box (glass, height, padding, one row) comes from .tab-tb in tabs2.css. */
+.calc-tb { flex: none; position: relative !important; z-index: 5; pointer-events: auto; }
+.calc-tb > .calc-sel:nth-child(-n+2) { min-width: 160px; }
+.calc-tb > .right { flex: 0 1 auto; min-width: 0; }
+.calc-tb .right .calc-search { min-width: 140px; }
+/* A definite width (the same as the flex basis) keeps the group's natural width fixed. Without it the group measured wider than its two controls and left a dead strip at the toolbar's right edge. */
+.calc-tb .right > .calc-search { width: 180px; }
+.calc-tb .right > .calc-sel { width: 150px; }
 .calc-sel { min-width: 110px; display: flex; }
 .calc-sel .trig, .calc-ghost {
-  width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  width: 100%; height: var(--control-h); display: flex; align-items: center; gap: var(--s-4); padding: 0 var(--s-5) 0 var(--s-6); border-radius: var(--r-lg); cursor: pointer; text-align: left; font: inherit; color: inherit;
   background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
 }
 .calc-sel .trig:hover:not(:disabled), .calc-sel .trig[aria-expanded="true"] { border-color: rgba(var(--accent-rgb), .45); }
@@ -50,12 +52,12 @@
 .calc-mode button[aria-checked="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 2px 6px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); color: var(--text-strong); font-weight: 500; }
 
 /* body */
-.calc-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; padding-right: 10px; scrollbar-gutter: stable; pointer-events: auto; }
+.calc-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; padding-right: var(--s-5); scrollbar-gutter: stable; pointer-events: auto; }
 .calc-sync { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 12px; margin: 0 0 8px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .16); background: rgba(var(--line-rgb), .05); color: var(--text-2); font-size: 12.5px; white-space: normal; }
 .calc-sync b { color: var(--text-strong); font-weight: 500; }
 .calc-hint { padding: 4px 2px 8px; color: var(--text-muted); font-size: 12.5px; white-space: normal; }
-.calc-chips { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 8px; background: linear-gradient(180deg, rgba(var(--void-rgb), .9), rgba(var(--void-rgb), .7)); backdrop-filter: blur(10px); }
-.calc-chips button { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .1); background: rgba(var(--line-rgb), .03); color: var(--text-2); font: 500 12.5px/26px Geist, sans-serif; cursor: pointer; }
+.calc-chips { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: var(--s-2); padding: var(--s-2) 0 var(--s-4); background: linear-gradient(180deg, rgba(var(--void-rgb), .9), rgba(var(--void-rgb), .7)); backdrop-filter: blur(10px); }
+.calc-chips button { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--s-5); border-radius: var(--r-pill); border: 1px solid rgba(var(--line-rgb), .06); background: rgba(var(--line-rgb), .03); color: var(--text-2); font: 500 12.5px/22px Geist, sans-serif; cursor: pointer; }
 .calc-chips button:hover { color: var(--text-strong); border-color: rgba(var(--accent-rgb), .45); }
 .calc-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
 .calc-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -65,7 +67,7 @@
 /* cards */
 .calc-card { border-radius: 14px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .74), rgba(var(--glass-rgb), .78)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); overflow: hidden; scroll-margin-top: 48px; min-width: 0; }
 .calc-card.has-hit { border-color: rgba(var(--accent-rgb), .35); }
-.calc-sub .hd { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-height: 36px; padding: 4px 12px 4px 10px; cursor: pointer; user-select: none; min-width: 0; border-bottom: 1px solid rgba(var(--line-rgb), .06); background: linear-gradient(180deg, color-mix(in srgb, var(--tone, var(--stat-neutral)) 12%, transparent), transparent); }
+.calc-sub .hd { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-height: 36px; padding: var(--s-2) var(--s-6); cursor: pointer; user-select: none; min-width: 0; border-bottom: 1px solid rgba(var(--line-rgb), .06); background: linear-gradient(180deg, color-mix(in srgb, var(--tone, var(--stat-neutral)) 12%, transparent), transparent); }
 .calc-sub .hd[aria-expanded="false"] { border-bottom-color: transparent; }
 .calc-sub:not(.calc-first) .hd { min-height: 30px; border-top: 1px solid rgba(var(--line-rgb), .06); background: transparent; font-size: 12.5px; }
 .calc-sub .hd .t { font-weight: 600; color: var(--text-strong); overflow-wrap: anywhere; white-space: normal; flex: 0 1 auto; min-width: 0; }
@@ -82,7 +84,9 @@
 .calc-row .cells { flex: 0 0 auto; max-width: 100%; display: flex; justify-content: flex-end; }
 .calc-row.multi .cells { flex: 1 1 0; min-width: 0; display: grid; gap: 4px; }
 .calc-row .c { min-width: 0; text-align: right; color: var(--text-display, var(--text-strong)); white-space: normal; overflow-wrap: normal; word-break: normal; padding: 1px 4px; border-radius: 4px; border: 0; background: transparent; font: inherit; line-height: 1.25; }
-.calc-row:not(.multi) .c { white-space: nowrap; }
+.calc-row:not(.multi) .c, .calc-row.one .c { white-space: nowrap; }
+/* A wide card keeps its columns close to the labels; the row bands still run the full width. */
+.calc-card.wide .calc-row.multi .cells { max-width: 900px; }
 .calc-row .c.h { color: var(--text-muted); font-size: 12px; }
 .calc-row.head { min-height: 22px; }
 .calc-row .c.cbtn { cursor: pointer; }
@@ -134,6 +138,15 @@
 }
 @container tab (max-width: 799px) {
   .calc-mlbl { display: none; }
+}
+/* Narrow pane: any Calcs or Fight toolbar wraps instead of running past the pane edge. */
+@container tab (max-width: 819px) {
+  .calc-tb { flex-wrap: wrap; height: auto; min-height: var(--tab-tb-h); padding-block: var(--s-4); }
+}
+/* Below 1100 the minion switch loses its label (it stays in the title and aria). Only a toolbar with six or more controls wraps. */
+@container tab (max-width: 1099px) {
+  .calc-sw > span:last-child { display: none; }
+  .calc-tb:has(> :nth-child(n+6)) { flex-wrap: wrap; height: auto; min-height: var(--tab-tb-h); padding-block: var(--s-4); }
 }
 
 .calc-tip .node-tip { display: flex; flex-direction: column; gap: 4px; min-width: 260px; max-width: 360px; }

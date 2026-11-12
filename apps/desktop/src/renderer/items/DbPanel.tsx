@@ -189,15 +189,15 @@ export function DbPanel({ env, validSlots, tipFor, shared, onPick, onCtrl, tip, 
     }
   };
 
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreFilters = Number(league !== DB_DEFAULTS.league) + Number(req !== DB_DEFAULTS.req) + Number(obt !== DB_DEFAULTS.obt);
+  const modeLabel = { any: tr('items_DbPanel.anywhere'), names: tr('items_DbPanel.names'), mods: tr('items_DbPanel.modifiers') };
   const sorting = progress !== null;
   const win = useWindowedRows(rows.length, 29, tab);
   return (
     <>
-      <div style={{ flex: 'none', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px', minWidth: 0 }}>
+      <div title={tr('items_DbPanel.click_to_preview_ctrl_click')} style={{ flex: 'none', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px', minWidth: 0 }}>
         <SegControl label={tr('items_DbPanel.item_database')} value={tab} options={[{ value: 'unique', label: tr('items_DbPanel.uniques') }, { value: 'rare', label: tr('items_DbPanel.rare_templates') }, { value: 'shared', label: tr('items_DbPanel.shared') }]} onChange={setTab} />
-        <span title={tr('items_DbPanel.click_to_preview_ctrl_click')} className="it-sub" style={{ flex: '1 1 auto', textAlign: 'right', whiteSpace: 'nowrap', fontSize: 12 }}>
-          {tr('items_DbPanel.ctrl_click_to_equip_shift')}
-        </span>
       </div>
       {tab === 'shared' ? (
         <SharedList env={env} shared={shared} tip={tip} tipFor={tipFor} onOpen={(text, label) => onPick('shared', text, label)} onCtrl={onCtrl} dragRef={dragRef} />
@@ -212,12 +212,9 @@ export function DbPanel({ env, validSlots, tipFor, shared, onPick, onCtrl, tip, 
             <Icon name="chevron-down" size={12} />
           </button>
         )}
-        {tab === 'unique' && filterBtn('league', league, leagues, setLeague)}
-        {tab === 'unique' && filterBtn('req', req, REQ_FILTERS, setReq)}
-        {tab === 'unique' && filterBtn('obt', obt, OBT_FILTERS, setObt)}
       </div>
-      <div style={{ flex: 'none', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        <div className="it-search" style={{ flexBasis: 140 }}>
+      <div style={{ flex: 'none', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--s-3)', minWidth: 0 }}>
+        <div className="it-search" style={{ flexBasis: 140, height: 'var(--control-h-sm)' }}>
           <Icon name="search" size={15} />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr('items_DbPanel.search')} aria-label={tr('items_DbPanel.search_the_item_database')} maxLength={100} />
           {q && (
@@ -226,9 +223,22 @@ export function DbPanel({ env, validSlots, tipFor, shared, onPick, onCtrl, tip, 
             </button>
           )}
         </div>
-        <SegControl tall label={tr('items_DbPanel.search_in')} value={mode} options={[{ value: 'any', label: tr('items_DbPanel.anywhere') }, { value: 'names', label: tr('items_DbPanel.names') }, { value: 'mods', label: tr('items_DbPanel.modifiers') }]} onChange={setMode} />
+        {tab === 'unique' && (
+          <button type="button" className="it-btn sm ghost" aria-expanded={moreOpen} onClick={() => setMoreOpen((v) => !v)}>
+            {tr('items_DbPanel.filters')}
+            {moreFilters > 0 && ` · ${moreFilters}`}
+          </button>
+        )}
+        <PickButton small dataKey="mode" title={tr('items_DbPanel.search_in')} value={modeLabel[mode as 'any' | 'names' | 'mods']} onOpen={(el) => openMenu(el, (['any', 'names', 'mods'] as const).map((k) => ({ key: k, label: modeLabel[k], on: k === mode, run: () => setMode(k) })), 130)} />
       </div>
-      <div style={{ flex: 1, minHeight: 90, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      {tab === 'unique' && moreOpen && (
+        <div className="it-filters">
+          {filterBtn('league', league, leagues, setLeague)}
+          {filterBtn('req', req, REQ_FILTERS, setReq)}
+          {filterBtn('obt', obt, OBT_FILTERS, setObt)}
+        </div>
+      )}
+      <div style={{ flex: '1 1 0', minHeight: 120, position: 'relative', display: 'flex', flexDirection: 'column' }}>
       {sorting && (
         <div className="it-sortbar" role="status">
           <span>{tr('items_DbPanel.sorting_by_sort_progress', { sort: sortLabel(sort), progress: Math.floor((progress ?? 0) * 100) })}</span>

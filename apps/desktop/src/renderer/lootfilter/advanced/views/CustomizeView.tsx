@@ -10,6 +10,7 @@ import { BuildTiers } from '../customize/BuildTiers';
 import { RuleBuilder } from '../customize/RuleBuilder';
 import { RulesList } from '../customize/RulesList';
 import { TierList } from '../customize/TierList';
+import { FloatMenu } from '../shell/FloatMenu';
 import { addCustomTier, customKey, customTierRules, onlyType, tierKeyOfItem } from '../shell/edits';
 import { useAdvShell } from '../shell/selection';
 import '../customize/adv-cz.css';
@@ -34,6 +35,7 @@ export function CustomizeView({ nav }: { nav: LfNav }) {
   const [openG, setOpenG] = useState<Record<string, boolean>>({});
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
   const [newRule, setNewRule] = useState(false);
+  const [moreAt, setMoreAt] = useState<{ x: number; y: number } | null>(null);
 
   const tree = useMemo(() => (cat ? buildTree(cat) : []), [cat]);
   const counts = useMemo(() => (cat ? ruleCounts(lf.doc.rules, cat) : new Map<string, { mod: number; build: number }>()), [cat, lf.doc.rules]);
@@ -158,7 +160,7 @@ export function CustomizeView({ nav }: { nav: LfNav }) {
       ? tr('lootfilter_advanced_views_CustomizeView.count_rules_the_first_rule', { count: lf.doc.rules.length })
       : seeInstead
         ? tr('lootfilter_advanced_views_CustomizeView.lives_in_name', { name: sectionName(seeInstead.def) })
-        : [tr(tierCount === 1 ? 'h_lootB_Guided.tiers_one' : 'h_lootB_Guided.tiers_other', { n: tierCount }) + (ruleTiers ? `, ${tr('h_lootB_Guided.matched_by_rule', { n: ruleTiers })}` : ''), itemCount ? tr(itemCount === 1 ? 'h_lootB_Guided.named_one' : 'h_lootB_Guided.named_other', { n: itemCount }) : '', tr('h_lootB_Guided.drag_hint')].filter(Boolean).join(' · ');
+        : [tr(tierCount === 1 ? 'h_lootB_Guided.tiers_one' : 'h_lootB_Guided.tiers_other', { n: tierCount }) + (ruleTiers ? `, ${tr('h_lootB_Guided.matched_by_rule', { n: ruleTiers })}` : ''), itemCount ? tr(itemCount === 1 ? 'h_lootB_Guided.named_one' : 'h_lootB_Guided.named_other', { n: itemCount }) : ''].filter(Boolean).join(' · ');
 
   const stacked = lf.doc.setup.stackedTiering !== false;
   const hasStacked = !!node && (node.def.scope === 'currency' || node.def.id === 'cards');
@@ -209,7 +211,7 @@ export function CustomizeView({ nav }: { nav: LfNav }) {
   return (
     <div className="adv-cz" data-screen-label="Loot Filter / Customize">
       <div className="adv-cz-tree lf-card" data-lg="panel" data-screen-label="Loot Filter / Customize / Section tree">
-        <div style={{ padding: '10px 10px 6px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ padding: 'var(--s-6) var(--s-6) var(--s-3)', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ position: 'relative', display: 'flex' }}>
             <Icon name="search" size={15} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-muted)' }} />
             <input className="adv-sh-field" style={{ paddingLeft: 30 }} aria-label={tr('lootfilter_advanced_views_CustomizeView.search_sections_and_items')} placeholder={tr('lootfilter_advanced_views_CustomizeView.search_sections_and_items')} value={q} onChange={(e) => setQ(e.target.value)} />
@@ -255,32 +257,22 @@ export function CustomizeView({ nav }: { nav: LfNav }) {
 
       <div className="adv-cz-main lf-card" data-lg="panel" data-screen-label="Loot Filter / Customize / Tier list">
         <div className="adv-cz-mhead">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, flex: '1 1 240px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, flex: '1 1 0' }}>
             <span className="ellipsis" title={types.length ? `NeverSink name: ${types.map((t) => '$type->' + t.type).join(', ')}` : title} style={{ font: "600 22px/1.1 'Cormorant Garamond',serif", color: 'var(--text-display)' }}>{title}</span>
             <span className="ellipsis" title={sub} style={{ color: 'var(--text-muted)', fontSize: 12 }}>{sub}</span>
           </div>
           {!isBuild && !isRules && types.length > 0 && (
             <>
-              <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.move_items_between_tiers_using')} onClick={() => nav.setAdvancedView('retier')}>
+              <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.move_items_between_tiers_using')} aria-label={tr('lootfilter_advanced_views_CustomizeView.retier_from_prices')} onClick={() => nav.setAdvancedView('retier')}>
                 <Icon name="coins" size={14} />
-                {tr('lootfilter_advanced_views_CustomizeView.retier_from_prices')}
+                <span className="adv-cz-lbl">{tr('lootfilter_advanced_views_CustomizeView.retier_from_prices')}</span>
               </button>
-              {hasStacked && (
-                <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.stacks_of_cheap_currency_get')} aria-pressed={stacked} onClick={toggleStacked}>
-                  <Icon name="layers" size={14} />
-                  <span className="adv-sh-tog" data-on={stacked ? '1' : '0'}>
-                    <span />
-                  </span>
-                  {tr('lootfilter_advanced_views_CustomizeView.stacked_tiering')}
-                </button>
-              )}
-              <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.add_a_tier_you_can')} onClick={addTier}>
+              <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.add_a_tier_you_can')} aria-label={tr('lootfilter_advanced_views_CustomizeView.add_tier')} onClick={addTier}>
                 <Icon name="plus" size={14} />
-                {tr('lootfilter_advanced_views_CustomizeView.add_tier')}
+                <span className="adv-cz-lbl">{tr('lootfilter_advanced_views_CustomizeView.add_tier')}</span>
               </button>
-              <button type="button" className="adv-sh-btn" title={tr('lootfilter_advanced_views_CustomizeView.put_this_section_back_to')} onClick={resetSection}>
-                <Icon name="reset" size={14} />
-                {tr('lootfilter_advanced_views_CustomizeView.reset_section')}
+              <button type="button" className="adv-sh-ib" aria-haspopup="menu" aria-label={tr('lootfilter_advanced_views_CustomizeView.more')} title={tr('lootfilter_advanced_views_CustomizeView.more')} onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setMoreAt({ x: r.right - 280, y: r.bottom + 4 }); }}>
+                <Icon name="more" size={14} />
               </button>
             </>
           )}
@@ -291,6 +283,22 @@ export function CustomizeView({ nav }: { nav: LfNav }) {
             </button>
           )}
         </div>
+        {moreAt && (
+          <FloatMenu at={moreAt} onClose={() => setMoreAt(null)} width={280} label={tr('lootfilter_advanced_views_CustomizeView.more')}>
+            {hasStacked && (
+              <button type="button" role="menuitemcheckbox" aria-checked={stacked} className="adv-sh-level" title={tr('lootfilter_advanced_views_CustomizeView.stacks_of_cheap_currency_get')} onClick={() => { setMoreAt(null); toggleStacked(); }}>
+                <span className="adv-sh-radio" data-on={stacked} />
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_CustomizeView.stacked_tiering')}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.4, whiteSpace: 'normal' }}>{tr('lootfilter_advanced_views_CustomizeView.stacks_of_cheap_currency_get')}</span>
+                </span>
+              </button>
+            )}
+            <button type="button" role="menuitem" className="adv-sh-level" style={{ gridTemplateColumns: '1fr' }} title={tr('lootfilter_advanced_views_CustomizeView.put_this_section_back_to')} onClick={() => { setMoreAt(null); resetSection(); }}>
+              <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_CustomizeView.reset_section')}</span>
+            </button>
+          </FloatMenu>
+        )}
         <div className="adv-cz-mbody lf-scroll">
           {isBuild ? (
             <BuildTiers />

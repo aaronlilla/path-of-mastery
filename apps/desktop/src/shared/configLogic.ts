@@ -92,11 +92,8 @@ export function isSegmented(opt: ConfigOptionDef): boolean {
   return l.reduce((n, i) => n + stripCodes(i.label).length, 0) <= (l.length === 2 ? 30 : 16);
 }
 
-/** Width of a dropdown trigger, from its longest entry. */
-export function dropdownWidth(opt: ConfigOptionDef): number {
-  const longest = Math.max(0, ...(opt.list ?? []).map((i) => stripCodes(i.label).length));
-  return Math.max(150, Math.min(200, Math.round(longest * 7.4 + 48)));
-}
+/** The four map prefix and four map suffix options: the tab draws each run as one 2 x 2 grid under its sub-heading. */
+export const isMapModSlot = (opt: ConfigOptionDef): boolean => /^Map(Prefix|Suffix)\d+$/.test(opt.var ?? '');
 
 export interface ViewOpts {
   q: string;

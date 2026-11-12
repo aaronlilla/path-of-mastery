@@ -192,7 +192,7 @@ export function ItemsView(p: Props) {
         <span>{tr('compare_ItemsView.slot')}</span>
         <span>{tr('compare_ItemsView.a_this_build')}</span>
         <span>{tr('compare_ItemsView.b_touppercase', { bLabel: p.bLabel.toUpperCase() })}</span>
-        <span className="r">{tr('compare_ItemsView.touppercase_if_swapped', { value: lbl(base?.stat.label ?? 'DPS').toUpperCase() })}</span>
+        <span className="r" title={tr('CompareTab.change_to_full_dps_if')}>{tr('compare_ItemsView.touppercase_if_swapped', { value: lbl(base?.stat.label ?? 'DPS').toUpperCase() })}</span>
       </div>
       {rows
         .filter((r) => r.head || !p.onlyDiff || r.a?.name !== r.b?.name)

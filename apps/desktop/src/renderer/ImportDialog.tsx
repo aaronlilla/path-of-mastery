@@ -226,13 +226,13 @@ export function ImportDialog({ initialTab = 0, initialText = '', onClose, onImpo
       <div className="scrim" onClick={onClose} />
       <div className="dialog-wrap" onKeyDown={key}>
         <div className="dialog medium" style={{ width: 640 }} role="dialog" aria-modal="true" aria-label={tr('ImportDialog.import_a_build')} data-lg="pop" data-solid="" data-screen-label="Import dialog">
-          <div className="dialog-head" style={{ paddingRight: 20 }}>
+          <div className="dialog-head">
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span className="dialog-title">{tr('ImportDialog.import_a_build')}</span>
               <span className="dialog-sub">{tr('ImportDialog.ctrl_i_opens_as_a')}</span>
             </div>
             <button type="button" className="icon-btn" aria-label={tr('ImportDialog.close')} onClick={onClose}>
-              <Icon name="x" size={14} />
+              <Icon name="x" size={16} />
             </button>
           </div>
           <div className="seg tabs" role="tablist" style={{ margin: '0 24px', width: 'auto' }} data-lg="tile">
@@ -243,7 +243,7 @@ export function ImportDialog({ initialTab = 0, initialText = '', onClose, onImpo
               </button>
             ))}
           </div>
-          <div className="dialog-body" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, minHeight: 220 }}>
+          <div className="dialog-body" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, minHeight: tab === 0 ? undefined : 220 }}>
             {tab === 0 && (
               <>
                 <label className="field-label">
@@ -257,16 +257,10 @@ export function ImportDialog({ initialTab = 0, initialText = '', onClose, onImpo
                     spellCheck={false}
                     aria-label={tr('ImportDialog.build_code_or_link')}
                   />
-                  <span className={'field-msg ' + (message.tone === 'muted' ? '' : message.tone)}>{message.text}</span>
+                  {message.text && <span className={'field-msg ' + (message.tone === 'muted' ? '' : message.tone)}>{message.text}</span>}
                 </label>
                 {read.state === 'ok' && <ImportPreview d={read.d} />}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <button type="button" className="btn sm" onClick={() => void openFile()}>
-                    <Icon name="folder-open" size={14} />
-                    {tr('ImportDialog.open_a_build_file')}
-                  </button>
-                  {fileError && <span className="field-msg bad">{fileError}</span>}
-                </div>
+                {fileError && <span className="field-msg bad">{fileError}</span>}
               </>
             )}
             {tab === 1 && !authed && (
@@ -394,7 +388,13 @@ export function ImportDialog({ initialTab = 0, initialText = '', onClose, onImpo
             )}
           </div>
           <div className="dialog-foot">
-            <span className="note">{tr('ImportDialog.to_share_or_export_this')}</span>
+            {tab === 0 && (
+              <button type="button" className="btn" onClick={() => void openFile()}>
+                <Icon name="folder-open" size={14} />
+                {tr('ImportDialog.open_a_build_file')}
+              </button>
+            )}
+            <span className="note">{currentXml ? tr('ImportDialog.to_share_or_export_this') : null}</span>
             <button type="button" className="btn ghost" onClick={onClose}>{tr('ImportDialog.cancel')}</button>
             <button type="button" className="btn gold" aria-disabled={!ready || busy || charBusy || undefined} onClick={() => void go()} style={ready ? undefined : { background: 'rgba(var(--line-rgb),.1)', boxShadow: 'none', color: 'var(--text-faint)', cursor: 'not-allowed' }}>
               {(busy || charBusy) && <span className="spinner" />}

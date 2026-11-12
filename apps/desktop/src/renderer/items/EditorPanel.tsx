@@ -12,7 +12,7 @@ import { AltVariantRows, CatalystRow, ClusterRow, VariantGroupRows } from './Edi
 import { variantModel } from './variantGroups';
 import { stacksSliders } from './affixMath';
 import { colourOf, influenceColour, ItemTooltip } from './ItemTooltip';
-import { modLabel, applyMutation, eldritchInfluenceAllowed, extraAffixLine, type Mutation, hasImplicitCount, toggleDisabled, INFLUENCE_LINES, removeLine, setInfluences, setVariant, variantNames, setQuality, setRange, setRarity, setSockets, setTitle, type SocketSpec } from './itemText';
+import { modLabel, applyMutation, eldritchInfluenceAllowed, extraAffixLine, type Mutation, hasImplicitCount, toggleDisabled, INFLUENCE_LINES, removeLine, textLines, setInfluences, setVariant, variantNames, setQuality, setRange, setRarity, setSockets, setTitle, type SocketSpec } from './itemText';
 import { itemArt, PickButton, RollSlider, type MenuEntry, type TipSpec } from './parts';
 import type { SlotDef } from './slots';
 import { compareLines } from './statCompare';
@@ -209,7 +209,6 @@ export function EditorPanel(p: EditorProps) {
       <div className="it-glass it-body it-editor" data-lg="panel" data-motion={p.swapped ? 'off' : undefined} data-r="tab-body it-editor" data-open="0">
         <div className="it-ed-empty">
           <span className="t">{env.model.items.length ? tr('items_EditorPanel.select_an_item') : tr('items_EditorPanel.add_your_first_item')}</span>
-          <span className="s">{env.model.items.length ? tr('items_EditorPanel.pick_an_item_from_the') : tr('items_EditorPanel.paste_an_item_copied_in')}</span>
         </div>
       </div>
     );
@@ -234,6 +233,21 @@ export function EditorPanel(p: EditorProps) {
     if (!hasImplicitCount(t)) t = await env.normalise(t);
     setSub({ k, text: t, slot });
   };
+
+  // The rarely used one-off changes sit behind one Add… button; a corrupted item keeps its red Corrupted button.
+  const showCorrupted = Boolean(info?.valid && info.corrupted && info.corruptible !== false);
+  const addEntries: MenuEntry[] = [];
+  if (info?.valid) {
+    if (enchantAvail) addEntries.push({ key: 'ench1', label: tr('items_EditorPanel.change_enchantment'), sub: tr('items_EditorPanel.change_the_item_s_enchantment'), run: () => void openSub('enchant', 1) });
+    if (enchantAvail && (info.maxEnchants ?? 1) >= 2 && enchantCount > 0) addEntries.push({ key: 'ench2', label: tr('items_EditorPanel.change_enchantment_2'), sub: tr('items_EditorPanel.change_the_item_s_second'), run: () => void openSub('enchant', 2) });
+    if (info.anointable) {
+      for (const n of [1, 2, 3, 4].filter((n) => n === 1 || ((info.maxEnchants ?? 1) >= n && enchantCount >= n - 1))) {
+        addEntries.push({ key: `anoint${n}`, label: n === 1 ? tr('items_EditorPanel.anoint') : tr('items_EditorPanel.anoint_n', { n }), sub: n === 1 ? tr('items_EditorPanel.anoint_the_item_with_a') : tr('items_EditorPanel.anoint_the_item_with_another', { n }), run: () => void openSub('anoint', n) });
+      }
+    }
+    if (info.canAddImplicit !== false) addEntries.push({ key: 'impl', label: tr('items_EditorPanel.add_implicit'), sub: tr('items_EditorPanel.add_an_implicit_modifier'), run: () => void openSub('implicit') });
+    if (info.corruptible !== false && !info.corrupted) addEntries.push({ key: 'corrupt', label: tr('items_EditorPanel.corrupt'), sub: tr('items_EditorPanel.corrupt_the_item_with_new'), run: () => void openSub('corrupt') });
+  }
 
   /** Where the item is or would be, for the dialogs to rank and compare modifiers there. */
   const ctx: DialogCtx = (() => {
@@ -338,32 +352,31 @@ export function EditorPanel(p: EditorProps) {
               <Icon name="chevron-down" size={13} />
             </button>
           </div>
-          <button type="button" className="it-btn" title={tr('items_EditorPanel.edit_the_item_as_text')} onClick={() => setTextMode(textMode === null ? work : null)} style={textMode !== null ? { borderColor: 'rgba(var(--accent-rgb), .5)' } : undefined}>
+          <button type="button" className="it-btn" title={tr('items_EditorPanel.edit_the_item_as_text')} aria-label={tr('items_EditorPanel.edit_text')} onClick={() => setTextMode(textMode === null ? textLines(work).join('\n') : null)} style={textMode !== null ? { borderColor: 'rgba(var(--accent-rgb), .5)' } : undefined}>
             <Icon name="edit" size={15} />
-            {tr('items_EditorPanel.edit_text')}
+            <span className="lbl">{tr('items_EditorPanel.edit_text')}</span>
           </button>
           {info?.valid && info.type === 'Jewel' && info.jewelRadius && (
-            <button type="button" className="it-btn" title={tr('items_EditorPanel.see_this_jewel_s_radius')} onClick={() => setRadiusOpen(true)}>
+            <button type="button" className="it-btn" title={tr('items_EditorPanel.see_this_jewel_s_radius')} aria-label={tr('items_EditorPanel.radius')} onClick={() => setRadiusOpen(true)}>
               <Icon name="tree" size={15} />
-              {tr('items_EditorPanel.radius')}
+              <span className="lbl">{tr('items_EditorPanel.radius')}</span>
             </button>
           )}
           {sel.k === 'draft' && (
-            <button type="button" className="it-btn ghost" title={tr('items_EditorPanel.close_this_item_without_adding')} onClick={p.closeEditor}>
+            <button type="button" className="it-btn ghost" title={tr('items_EditorPanel.close_this_item_without_adding')} aria-label={tr('items_EditorPanel.cancel')} onClick={p.closeEditor}>
               <Icon name="x" size={15} />
-              {tr('items_EditorPanel.cancel')}
+              <span className="lbl">{tr('items_EditorPanel.cancel')}</span>
             </button>
           )}
           {opened.current?.key === key && opened.current.text !== baseText && (
-            <button type="button" className="it-btn ghost" title={tr('items_EditorPanel.undo_every_change_since_you')} onClick={() => edit(() => opened.current!.text)}>
+            <button type="button" className="it-btn ghost" title={tr('items_EditorPanel.undo_every_change_since_you')} aria-label={tr('items_EditorPanel.revert')} onClick={() => edit(() => opened.current!.text)}>
               <Icon name="undo" size={15} />
-              {tr('items_EditorPanel.revert')}
+              <span className="lbl">{tr('items_EditorPanel.revert')}</span>
             </button>
           )}
           <span className="it-ed-end">
-          <button type="button" className="it-btn" title={tr('items_EditorPanel.trade_search_for_items_like')} aria-label={tr('items_EditorPanel.buy_similar')} disabled={!info?.valid} onClick={() => info && p.onBuy(info, target?.name ?? equippedSlot?.name ?? 'Weapon 1')}>
+          <button type="button" className="it-btn" style={{ width: 36, padding: 0, justifyContent: 'center' }} title={tr('items_EditorPanel.trade_search_for_items_like')} aria-label={tr('items_EditorPanel.buy_similar')} disabled={!info?.valid} onClick={() => info && p.onBuy(info, target?.name ?? equippedSlot?.name ?? 'Weapon 1')}>
             <Icon name="bag" size={15} />
-            <span className="lbl">{tr('items_EditorPanel.buy_similar')}</span>
           </button>
           {inBuild && (
             <button type="button" className="it-btn ghost danger-h" style={{ width: 36, padding: 0, justifyContent: 'center' }} title={tr('items_EditorPanel.delete_this_item_del')} aria-label={tr('items_EditorPanel.delete_this_item')} onClick={() => p.askDelete([sel.id])}>
@@ -388,37 +401,43 @@ export function EditorPanel(p: EditorProps) {
 
         {info?.valid && (
           <div className="it-form">
-            <div className="it-frow">
+            <div className="it-frow kv">
               <span className="k">{tr('items_EditorPanel.rarity')}</span>
-              <PickButton
-                dataKey="ed:rar"
-                value={RARITIES.find((r) => r.v === info.rarity)?.label}
-                colour={rc}
-                onOpen={(el) => p.openMenu(el, RARITIES.map((r) => ({ key: r.v, label: r.label, colour: r.c, on: r.v === info.rarity, run: () => edit((t) => setRarity(t, r.v)) })), 140)}
-              />
-              {(info.rarity === 'RARE' || info.rarity === 'UNIQUE' || info.rarity === 'RELIC') && (
-                <input className="it-input" style={{ flex: '1 1 160px', minWidth: 120 }} aria-label={tr('items_EditorPanel.item_name')} defaultValue={info.title ?? ''} key={`n${key}${info.title}`} onBlur={(e) => e.target.value.trim() !== (info.title ?? '') && edit((t) => setTitle(t, e.target.value))} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
-              )}
-              <span style={{ flex: 1 }} />
-              {!info.noQuality && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ color: 'var(--text-3)' }}>{tr('items_EditorPanel.quality')}</span>
+              <div className="v">
+                <PickButton
+                  dataKey="ed:rar"
+                  value={RARITIES.find((r) => r.v === info.rarity)?.label}
+                  colour={rc}
+                  onOpen={(el) => p.openMenu(el, RARITIES.map((r) => ({ key: r.v, label: r.label, colour: r.c, on: r.v === info.rarity, run: () => edit((t) => setRarity(t, r.v)) })), 140)}
+                />
+                {(info.rarity === 'RARE' || info.rarity === 'UNIQUE' || info.rarity === 'RELIC') && (
+                  <input className="it-input" style={{ flex: '1 1 160px', minWidth: 120 }} aria-label={tr('items_EditorPanel.item_name')} defaultValue={info.title ?? ''} key={`n${key}${info.title}`} onBlur={(e) => e.target.value.trim() !== (info.title ?? '') && edit((t) => setTitle(t, e.target.value))} onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
+                )}
+              </div>
+            </div>
+
+            {!info.noQuality && (
+              <div className="it-frow kv">
+                <span className="k">{tr('items_EditorPanel.quality')}</span>
+                <div className="v">
                   <div className="it-stepper">
                     <button type="button" aria-label={tr('items_EditorPanel.less_quality')} onClick={() => edit((t) => setQuality(t, Math.max(0, (info.quality ?? 0) - 1)))}><Icon name="minus" size={12} /></button>
                     <span className="v" style={{ color: (info.quality ?? 0) > 0 ? 'var(--mod-explicit)' : undefined }}>{info.quality ?? 0}</span>
                     <button type="button" aria-label={tr('items_EditorPanel.more_quality')} onClick={() => edit((t) => setQuality(t, Math.min(30, (info.quality ?? 0) + 1)))}><Icon name="plus" size={12} /></button>
                   </div>
-                </span>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
 
-            <div className="it-frow">
-              <span className="k" title={tr('items_EditorPanel.sockets_are_white_by_default')} style={{ cursor: 'help' }}>{tr('items_EditorPanel.sockets')}</span>
+            {(canSock || addEntries.length > 0 || showCorrupted) && (
+            <div className={'it-frow' + (canSock ? ' kv' : '')}>
+              {canSock && <span className="k" title={tr('items_EditorPanel.sockets_are_white_by_default')} style={{ cursor: 'help' }}>{tr('items_EditorPanel.sockets')}</span>}
+              <div className="v">
               {canSock ? (
                 <>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <span style={{ display: 'flex', flexWrap: 'wrap', minWidth: 0, alignItems: 'center', gap: 1 }}>
                     {sockets.map((s, i) => (
-                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
                         {i > 0 && (
                           <button type="button" className="it-link" title={specs[i - 1]!.link ? tr('items_EditorPanel.unlink_these_sockets') : tr('items_EditorPanel.link_these_sockets')} aria-label={specs[i - 1]!.link ? tr('items_EditorPanel.unlink_these_sockets') : tr('items_EditorPanel.link_these_sockets')} onClick={() => edit((t) => setSockets(t, specs.map((x, j) => (j === i - 1 ? { ...x, link: !x.link } : x))))}>
                             <span style={{ background: specs[i - 1]!.link ? 'var(--text-2)' : 'var(--surface-5)' }} />
@@ -446,57 +465,38 @@ export function EditorPanel(p: EditorProps) {
                       <Icon name="plus" size={12} />
                     </button>
                   )}
-                  <span className="it-sub" style={{ fontSize: 12 }}>{sockets.length ? `${linkLabel(specs)}` : tr('items_EditorPanel.no_sockets')}</span>
+                  {sockets.length > 0 && <span className="it-sub" style={{ fontSize: 12 }}>{linkLabel(specs)}</span>}
                 </>
-              ) : (
-                <span className="it-sub">{info.type === 'Jewel' ? tr('items_EditorPanel_2.jewels_have_no_sockets') : tr('items_EditorPanel.this_base_has_no_sockets')}</span>
-              )}
+              ) : null}
               <span style={{ flex: 1 }} />
-              {info.corruptible !== false && (
-                <button type="button" className="it-corrupt" title={info.corrupted ? tr('items_EditorPanel.corrupted_open_to_roll_its') : tr('items_EditorPanel.corrupt_the_item_with_new')} onClick={() => void openSub('corrupt')} style={info.corrupted ? { background: 'rgba(240, 58, 58, .12)', border: '1px solid rgba(240, 58, 58, .5)', color: 'var(--mod-corrupted)' } : { background: 'transparent', border: '1px solid rgba(var(--line-rgb), .1)', color: 'var(--text-2)' }}>
+              {showCorrupted && (
+                <button type="button" className="it-corrupt" title={tr('items_EditorPanel.corrupted_open_to_roll_its')} onClick={() => void openSub('corrupt')} style={{ background: 'rgba(240, 58, 58, .12)', border: '1px solid rgba(240, 58, 58, .5)', color: 'var(--mod-corrupted)' }}>
                   <Icon name="corrupted" size={14} />
-                  {info.corrupted ? tr('items_EditorPanel.corrupted') : tr('items_EditorPanel.corrupt')}
+                  {tr('items_EditorPanel.corrupted')}
                 </button>
               )}
-              {enchantAvail && (
-                <button type="button" className="it-btn sm" title={tr('items_EditorPanel.change_the_item_s_enchantment')} onClick={() => void openSub('enchant', 1)}>
-                  <Icon name="sparkle" size={14} />
-                  {tr('items_EditorPanel.change_enchantment')}
-                </button>
-              )}
-              {enchantAvail && (info.maxEnchants ?? 1) >= 2 && enchantCount > 0 && (
-                <button type="button" className="it-btn sm" title={tr('items_EditorPanel.change_the_item_s_second')} onClick={() => void openSub('enchant', 2)}>
-                  <Icon name="sparkle" size={14} />
-                  {tr('items_EditorPanel.change_enchantment_2')}
-                </button>
-              )}
-              {info.anointable &&
-                [1, 2, 3, 4]
-                  .filter((n) => n === 1 || ((info.maxEnchants ?? 1) >= n && enchantCount >= n - 1))
-                  .map((n) => (
-                    <button key={n} type="button" className="it-btn sm" title={n === 1 ? tr('items_EditorPanel.anoint_the_item_with_a') : tr('items_EditorPanel.anoint_the_item_with_another', { n })} onClick={() => void openSub('anoint', n)}>
-                      <Icon name="oil" size={14} />
-                      {n === 1 ? tr('items_EditorPanel.anoint') : tr('items_EditorPanel.anoint_n', { n })}
-                    </button>
-                  ))}
-              {info.canAddImplicit !== false && (
-                <button type="button" className="it-btn sm" title={tr('items_EditorPanel.add_an_implicit_modifier')} onClick={() => void openSub('implicit')}>
+              {addEntries.length > 0 && (
+                <button type="button" className="it-btn sm" data-mt="ed:add" aria-haspopup="listbox" onClick={(e) => p.openMenu(e.currentTarget, addEntries, 260)}>
                   <Icon name="plus" size={14} />
-                  {tr('items_EditorPanel.add_implicit')}
+                  {tr('items_EditorPanel.add_menu')}
                 </button>
               )}
+              </div>
             </div>
+            )}
 
             {variantModel(work) && <VariantGroupRows model={variantModel(work)!} edit={edit} openMenu={p.openMenu} />}
 
             {!variantModel(work) && variantNames(work).length > 1 && (
-              <div className="it-frow">
+              <div className="it-frow kv">
                 <span className="k">{tr('items_EditorPanel.variant')}</span>
-                <PickButton
-                  dataKey="ed:variant"
-                  value={variantNames(work)[(info.selectedVariant ?? 1) - 1]}
-                  onOpen={(el) => p.openMenu(el, variantNames(work).map((n, i) => ({ key: String(i), label: n, on: i + 1 === info.selectedVariant, run: () => edit((t) => setVariant(t, i + 1)) })), 320)}
-                />
+                <div className="v">
+                  <PickButton
+                    dataKey="ed:variant"
+                    value={variantNames(work)[(info.selectedVariant ?? 1) - 1]}
+                    onOpen={(el) => p.openMenu(el, variantNames(work).map((n, i) => ({ key: String(i), label: n, on: i + 1 === info.selectedVariant, run: () => edit((t) => setVariant(t, i + 1)) })), 320)}
+                  />
+                </div>
               </div>
             )}
 
@@ -507,8 +507,9 @@ export function EditorPanel(p: EditorProps) {
             {info.crafted && info.cluster && <ClusterRow text={work} mods={mods} edit={edit} openMenu={p.openMenu} />}
 
             {info.canInfluence && (
-              <div className="it-frow">
+              <div className="it-frow kv">
                 <span className="k" title={tr('items_EditorPanel.an_influence_lets_the_modifier')} style={{ cursor: 'help' }}>{tr('items_EditorPanel.influence')}</span>
+                <div className="v">
                 {[0, 1].map((slotIdx) => {
                   const eldritch = eldritchInfluenceAllowed(info.type, work);
                   const cur = info.influences?.[slotIdx];
@@ -520,7 +521,7 @@ export function EditorPanel(p: EditorProps) {
                       key={slotIdx}
                       type="button"
                       className="it-pick"
-                      style={{ flex: '0 1 170px', minWidth: 130 }}
+                      style={{ flex: '1 1 130px', minWidth: 130 }}
                       disabled={disabled}
                       data-mt={`ed:inf${slotIdx}`}
                       aria-haspopup="listbox"
@@ -551,6 +552,7 @@ export function EditorPanel(p: EditorProps) {
                     </button>
                   );
                 })}
+                </div>
               </div>
             )}
 
@@ -647,13 +649,11 @@ export function EditorPanel(p: EditorProps) {
         {info?.valid && (
           <div className="it-card" style={{ borderColor: rc }}>
             <ItemTooltip info={info} art={art} />
-            <div className="it-cmp">
+            {!equippedSlot && <div className="it-cmp">
               <span className="h">
-                {equippedSlot ? tr('items_EditorPanel.equipped_in_label', { label: equippedSlot.label }) : target ? tr('items_EditorPanel.if_you_equip_this_in', { label: target.label }) : tr('items_EditorPanel.not_equipped')}
+                {target ? tr('items_EditorPanel.if_you_equip_this_in', { label: target.label }) : tr('items_EditorPanel.not_equipped')}
               </span>
-              {equippedSlot ? (
-                <span style={{ color: 'var(--text-faint)' }}>{tr('items_EditorPanel.its_stats_are_already_counted')}</span>
-              ) : !target ? (
+              {!target ? (
                 <span style={{ color: 'var(--text-faint)' }}>{tr('items_EditorPanel.no_slot_fits_this_item_2')}</span>
               ) : cmpLines === null ? (
                 <span style={{ color: 'var(--text-faint)' }}>{tr('items_EditorPanel.calculating')}</span>
@@ -667,7 +667,7 @@ export function EditorPanel(p: EditorProps) {
                   </span>
                 ))
               )}
-            </div>
+            </div>}
           </div>
         )}
       </div>

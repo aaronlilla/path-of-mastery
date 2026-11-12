@@ -154,7 +154,6 @@ export function ExportTreeDialog({ xml, onClose }: { xml: string; onClose: () =>
     >
       <div className="ts-form" data-screen-label="Dialog / Export Tree">
         <label className="field-label">
-          <span className="lbl">{tr('TreeSetsDialogs.passive_tree_link_2')}</span>
           <input className="input mono" readOnly value={link || tr('h_rA_misc.preparing_link')} aria-label={tr('TreeSetsDialogs.passive_tree_link')} onFocus={(e) => e.currentTarget.select()} />
         </label>
         <div className="ts-row">

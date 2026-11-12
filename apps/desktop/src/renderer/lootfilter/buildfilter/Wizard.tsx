@@ -6,12 +6,11 @@ import { LabelChip } from '../LabelChip';
 import { useLf } from '../lfStore';
 import type { LfNav } from '../LootFilterArea';
 import { useBuildFilter, useGameData } from '../useBuildFilter';
-import { buildLead } from '../../../shared/lootfilter/profile.js';
 import { LevelingPicker } from './LevelingPicker';
 import { LEVELING_GUIDE } from '../../../shared/leagueContent';
 import { PreviewColumns } from './PreviewColumns';
 import { StageStrip } from './StageStrip';
-import { GROUPS, bandText } from './model';
+import { GROUPS } from './model';
 import { Eyebrow } from '../advanced/sim/kit';
 import { requestWrite, setBuildWriteGate } from './writeGate';
 import './buildfilter.css';
@@ -86,7 +85,6 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
   const reasonOf = (g: string): string => lfBuild(bf.built?.rules.find((r) => r.build?.group === g)?.build?.reason ?? '');
 
   const p = bf.built?.profile;
-  const lead = p ? buildLead(p) : '';
   const bodyBase = p?.armour['Body Armours']?.base;
   const lvl = bf.plan?.skills[0];
 
@@ -115,11 +113,11 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
       <div className="bf-top">
         <div className="adv-v-head" style={{ flex: 1, minWidth: 0 }}>
           <span className="adv-v-title">{tr('lootfilter_buildfilter_Wizard.build_filter')}</span>
-          <span className="adv-v-sub">{lead ? `${lead}. ` : ''}{bf.active ? tr('lootfilter_buildfilter_Wizard.on_for_this_build') : tr('lootfilter_buildfilter_Wizard.not_made_yet')}</span>
+          <span className="adv-v-sub">{bf.active ? tr('lootfilter_buildfilter_Wizard.on_for_this_build') : tr('lootfilter_buildfilter_Wizard.not_made_yet')}</span>
         </div>
         <div className="bf-steps" role="tablist" aria-label={tr('lootfilter_buildfilter_Wizard.steps')}>
           {STEPS.map((s, i) => (
-            <button key={s} type="button" role="tab" aria-selected={step === i} data-step={i + 1} onClick={() => setStep(i)}>
+            <button key={s} type="button" role="tab" aria-selected={step === i} data-step={i + 1} title={i === 1 ? tr('lootfilter_buildfilter_Wizard.the_game_gives_a_filter') : undefined} onClick={() => setStep(i)}>
               <span className="bf-num">{i + 1}</span>
               {s}
             </button>
@@ -135,10 +133,10 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
       {bf.built && p && step === 0 && (
         <div className="adv-bl-grid" data-step-body="1">
           <div className="lf-card adv-v-panel">
-            <Eyebrow>{tr('lootfilter_buildfilter_Wizard.source')}</Eyebrow>
             <span title={build.name} style={{ font: "600 20px/1.1 'Cormorant Garamond',serif", color: 'var(--text-display)', overflowWrap: 'anywhere', minWidth: 0 }}>{build.name}</span>
+            <span className="adv-v-muted">{tr('lootfilter_buildfilter_Wizard.class_level', { class: p.ascendancy || p.className, level: p.level })}</span>
             <div style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0,1fr)', gap: '8px 14px' }}>
-              {([[tr('lootfilter_buildfilter_Wizard_2.class'), p.ascendancy || p.className], [tr('lootfilter_buildfilter_Wizard_2.main_skill'), p.mainSkill?.name ?? tr('lootfilter_buildfilter_Wizard_2.none_found')], [tr('lootfilter_buildfilter_Wizard_2.level'), String(p.level)], [tr('lootfilter_buildfilter_Wizard_2.weapons'), p.weaponClasses.length ? p.weaponClasses.join(', ') : tr('lootfilter_buildfilter_Wizard_2.none')]] as [string, string][]).map(([k, v]) => (
+              {([[tr('lootfilter_buildfilter_Wizard_2.main_skill'), p.mainSkill?.name ?? tr('lootfilter_buildfilter_Wizard_2.none_found')], [tr('lootfilter_buildfilter_Wizard_2.weapons'), p.weaponClasses.length ? p.weaponClasses.join(', ') : tr('lootfilter_buildfilter_Wizard_2.none')]] as [string, string][]).map(([k, v]) => (
                 <span key={k} style={{ display: 'contents' }}>
                   <span className="adv-v-muted">{k}</span>
                   <span style={{ color: 'var(--text-strong)', fontSize: 12.5, overflowWrap: 'anywhere' }}>{v}</span>
@@ -148,11 +146,10 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
             <div className="adv-v-row" style={{ paddingTop: 10, borderTop: '1px solid rgba(var(--line-rgb),.08)' }}>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <span style={{ color: 'var(--text-strong)' }}>{tr('lootfilter_buildfilter_Wizard.how_you_play')}</span>
-                <span className="adv-v-muted" style={{ fontSize: 12, lineHeight: 1.4 }}>{bf.draft.mode === 'ssf' ? tr('lootfilter_buildfilter_Wizard.self_found_you_craft_and') : tr('lootfilter_buildfilter_Wizard.trade_other_classes_rares_stay')}</span>
               </div>
               <div className="seg" role="group" aria-label={tr('lootfilter_buildfilter_Wizard.play_mode')} data-lg="tile">
-                <button type="button" aria-pressed={bf.draft.mode === 'ssf'} onClick={() => bf.setDraft({ mode: 'ssf' })}>{tr('lootfilter_buildfilter_Wizard.ssf')}</button>
-                <button type="button" aria-pressed={bf.draft.mode === 'trade'} onClick={() => bf.setDraft({ mode: 'trade' })}>{tr('lootfilter_buildfilter_Wizard.trade')}</button>
+                <button type="button" aria-pressed={bf.draft.mode === 'ssf'} title={tr('lootfilter_buildfilter_Wizard.self_found_you_craft_and')} onClick={() => bf.setDraft({ mode: 'ssf' })}>{tr('lootfilter_buildfilter_Wizard.ssf')}</button>
+                <button type="button" aria-pressed={bf.draft.mode === 'trade'} title={tr('lootfilter_buildfilter_Wizard.trade_other_classes_rares_stay')} onClick={() => bf.setDraft({ mode: 'trade' })}>{tr('lootfilter_buildfilter_Wizard.trade')}</button>
               </div>
             </div>
           </div>
@@ -165,7 +162,7 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
                   <div key={g.id} className="bf-group" data-group={g.id} data-on={on}>
                     <div className="adv-v-row">
                       <span className="bf-group-name">{g.label}</span>
-                      <span className="bf-n">{groups.get(g.id)}</span>
+                      <span className="bf-n" title={tr('lootfilter_buildfilter_Wizard.rules_in_group', { count: groups.get(g.id) })} aria-label={tr('lootfilter_buildfilter_Wizard.rules_in_group', { count: groups.get(g.id) })}>{groups.get(g.id)}</span>
                       <span style={{ flex: 1 }} />
                       <Switch checked={on} label={g.label} onChange={() => bf.toggleGroup(g.id)} />
                     </div>
@@ -180,8 +177,6 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
 
       {bf.built && p && step === 1 && (
         <div className="lf-card adv-v-panel" data-step-body="2">
-          <Eyebrow>{tr('lootfilter_buildfilter_Wizard.stages_by_area_level')}</Eyebrow>
-          <span className="adv-v-muted">{tr('lootfilter_buildfilter_Wizard.the_game_gives_a_filter')}</span>
           <StageStrip stages={stages} selected={stage?.id ?? ''} onSelect={setSel} />
           <div className="adv-v-row" style={{ flexWrap: 'wrap', gap: 18 }}>
             {/* The leveling skill and the swap come from the leveling guide's data: switched off with it (shared/leagueContent.ts). */}
@@ -218,10 +213,6 @@ export function BuildFilterWizard({ nav }: { nav: LfNav }) {
 
       {bf.built && p && stage && step === 2 && (
         <div className="lf-card adv-v-panel" data-step-body="3">
-          <div className="adv-v-row" style={{ gap: 14, flexWrap: 'wrap' }}>
-            <Eyebrow>{tr('lootfilter_buildfilter_Wizard.preview')}</Eyebrow>
-            <span className="adv-v-muted">{tr('lootfilter_buildfilter_Wizard.stage_id_name_area_stage', { id: stage.id, name: lfBuild(stage.name), stage: bandText(stage) })}</span>
-          </div>
           <StageStrip stages={stages} selected={stage.id} onSelect={setSel} />
           <PreviewColumns built={bf.built} stage={stage} off={bf.draft.disabled} />
           <Eyebrow>{tr('lootfilter_buildfilter_Wizard.test_drops_at_area_lo', { lo: stage.lo })}</Eyebrow>

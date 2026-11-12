@@ -10,7 +10,7 @@ export interface SelOption {
 }
 
 /** A toolbar dropdown: the design's captioned trigger and a glass menu (arrows and Enter choose, Escape closes). */
-export function CalcSelect({ caption, ariaLabel, value, valueNode, options, onChange, grow, basis, disabled, title, emptyOption }: { caption: string; ariaLabel: string; value: string; valueNode: ReactNode; options: SelOption[]; onChange: (v: string) => void; grow: number; basis: number; disabled?: boolean; title?: string; emptyOption?: { label: string; action: string } }) {
+export function CalcSelect({ caption, ariaLabel, value, valueNode, options, onChange, grow, basis, disabled, title, emptyOption, align }: { caption: string; ariaLabel: string; value: string; valueNode: ReactNode; options: SelOption[]; onChange: (v: string) => void; grow: number; basis: number; disabled?: boolean; title?: string; emptyOption?: { label: string; action: string }; align?: 'left' | 'right' }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -49,7 +49,7 @@ export function CalcSelect({ caption, ariaLabel, value, valueNode, options, onCh
         </span>
         <Icon name="chevron-down" size={12} />
       </button>
-      <PortalMenu anchor={trigger} open={open} onClose={close} role="listbox" label={ariaLabel} minWidth={Math.max(240, basis)}>
+      <PortalMenu anchor={trigger} open={open} onClose={close} role="listbox" label={ariaLabel} minWidth={Math.max(240, basis)} align={align}>
         {options.length === 0 && emptyOption && <div className="menu-item" aria-disabled="true" style={{ color: 'var(--text-muted)' }}>{emptyOption.label}</div>}
         {options.map((o, i) => (
           <button

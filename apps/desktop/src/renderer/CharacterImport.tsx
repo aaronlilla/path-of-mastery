@@ -216,21 +216,19 @@ export function PlatformSeg({ value, onChange, label = tr('CharacterImport_2.pla
   );
 }
 
-export function Tog({ on, onChange, label, sub, title }: { on: boolean; onChange: (v: boolean) => void; label: string; sub: string; title?: string }) {
+export function Tog({ on, onChange, label, sub, title }: { on: boolean; onChange: (v: boolean) => void; label: string; sub?: string; title?: string }) {
   return (
     <div className="ix-tog" title={title} onClick={() => onChange(!on)}>
       <Switch checked={on} onChange={onChange} label={label} />
       <span className="t">
         <span>{label}</span>
-        <span className="s">{sub}</span>
+        {sub && <span className="s">{sub}</span>}
       </span>
     </div>
   );
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-const SUB_OFF = tr('CharacterImport.off_imported_ones_are_added');
-const SUB_ON = tr('CharacterImport.on_yours_are_removed_before');
 
 function ImportNotes({ notes, error }: { notes: string[]; error: string }) {
   return (
@@ -311,7 +309,6 @@ export function AccountCard(p: CardProps) {
         <>
           <div className="ix-row">
             <span className="ix-status">
-              {tr('CharacterImport.character_import_status')}
               <span className="v good">
                 {src.status.kind === 'loading' ? <Icon name="refresh" size={12} spin /> : src.status.kind === 'error' ? <Icon name="error" size={12} /> : <Icon name="check-circle" size={12} />}
                 {src.status.kind === 'loading' ? tr('CharacterImport.fetching') : src.status.kind === 'error' ? <span className="bad">{src.status.text}</span> : tr('CharacterImport.authenticated')}
@@ -332,18 +329,18 @@ export function AccountCard(p: CardProps) {
             <div className="ix-tile" data-lg="tile">
               <button type="button" className="btn" data-lg="control" disabled={noChar} onClick={() => void run.run('tree')}>
                 <Icon name={run.busy === 'tree' ? 'refresh' : 'import'} size={16} spin={run.busy === 'tree'} />
-                {run.busy === 'tree' ? tr('CharacterImport.importing') : tr('CharacterImport.import_passive_tree_and_jewels')}
+                {run.busy === 'tree' ? tr('CharacterImport.importing') : tr('CharacterImport.passive_tree_and_jewels')}
               </button>
-              <Tog on={flags.deleteJewels} onChange={setFlag('deleteJewels')} label={tr('CharacterImport.delete_jewels_first', { jewels: plural(c.jewels, 'jewel', 'jewels') })} sub={flags.deleteJewels ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_equipped_jewels_when')} />
+              <Tog on={flags.deleteJewels} onChange={setFlag('deleteJewels')} label={tr('CharacterImport.delete_jewels_first', { jewels: plural(c.jewels, 'jewel', 'jewels') })} title={tr('CharacterImport.delete_all_equipped_jewels_when')} />
             </div>
             <div className="ix-tile" data-lg="tile">
               <button type="button" className="btn" data-lg="control" disabled={noChar} onClick={() => void run.run('items')}>
                 <Icon name={run.busy === 'items' ? 'refresh' : 'import'} size={16} spin={run.busy === 'items'} />
-                {run.busy === 'items' ? tr('CharacterImport.importing') : tr('CharacterImport.import_items_and_skills')}
+                {run.busy === 'items' ? tr('CharacterImport.importing') : tr('CharacterImport.items_and_skills')}
               </button>
-              <Tog on={flags.deleteSkills} onChange={setFlag('deleteSkills')} label={tr('CharacterImport.delete_skillgroups_first', { skillGroups: plural(c.skillGroups, 'skill group', 'skill groups') })} sub={flags.deleteSkills ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_existing_skills_when')} />
-              <Tog on={flags.deleteItems} onChange={setFlag('deleteItems')} label={tr('CharacterImport.delete_items_first', { items: plural(c.items, 'item', 'items') })} sub={flags.deleteItems ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_equipped_items_when')} />
-              <Tog on={flags.ignoreWeaponSwap} onChange={setFlag('ignoreWeaponSwap')} label={tr('CharacterImport.ignore_weapon_swap')} sub={flags.ignoreWeaponSwap ? tr('CharacterImport.on_items_and_skills_in') : tr('CharacterImport.off_weapon_swap_items_and')} title={tr('CharacterImport.ignore_items_and_skills_in')} />
+              <Tog on={flags.deleteSkills} onChange={setFlag('deleteSkills')} label={tr('CharacterImport.delete_skillgroups_first', { skillGroups: plural(c.skillGroups, 'skill group', 'skill groups') })} title={tr('CharacterImport.delete_all_existing_skills_when')} />
+              <Tog on={flags.deleteItems} onChange={setFlag('deleteItems')} label={tr('CharacterImport.delete_items_first', { items: plural(c.items, 'item', 'items') })} title={tr('CharacterImport.delete_all_equipped_items_when')} />
+              <Tog on={flags.ignoreWeaponSwap} onChange={setFlag('ignoreWeaponSwap')} label={tr('CharacterImport.ignore_weapon_swap')} title={tr('CharacterImport.ignore_items_and_skills_in')} />
             </div>
           </div>
           <ImportNotes notes={run.notes} error={run.error} />
@@ -351,7 +348,6 @@ export function AccountCard(p: CardProps) {
       ) : (
         <>
           <span className="ix-status">
-            {tr('CharacterImport.character_import_status')}
             <span className="v warn">
               <Icon name="lock" size={12} />
               {tr('CharacterImport.not_authenticated')}
@@ -431,18 +427,18 @@ export function NameCard(p: CardProps) {
           {tr('CharacterImport.import_by_account_name')}
         </span>
       </div>
-      <div className="ix-row">
-        <span className="ix-status">
-          {tr('CharacterImport.character_import_status')}
-          <span className={'v ' + stCls}>
-            {src.status.kind === 'ok' && <i className="dot" />}
-            {src.status.kind === 'idle' && <Icon name="clock" size={12} />}
-            {src.status.kind === 'loading' && <Icon name="refresh" size={12} spin />}
-            {src.status.kind === 'error' && <Icon name="error" size={12} />}
-            {src.status.text}
+      {src.status.kind !== 'idle' && (
+        <div className="ix-row">
+          <span className="ix-status">
+            <span className={'v ' + stCls}>
+              {src.status.kind === 'ok' && <i className="dot" />}
+              {src.status.kind === 'loading' && <Icon name="refresh" size={12} spin />}
+              {src.status.kind === 'error' && <Icon name="error" size={12} />}
+              {src.status.text}
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
+      )}
       <div className="ix-row">
         <PlatformSeg value={src.realm} onChange={src.setRealm} />
         <div className={'ix-field' + (src.status.kind === 'error' ? ' bad' : missingDisc ? ' warn' : '')} data-lg="tile">
@@ -470,10 +466,12 @@ export function NameCard(p: CardProps) {
         </button>
         <CapSelect caption="" valueLabel={tr('CharacterImport.history')} options={histOptions} value={typed} onChange={pickHistory} width={110} minWidth={110} ariaLabel={tr('CharacterImport.account_history')} />
       </div>
-      <span className="ix-note">
-        {missingDisc ? <span style={{ color: 'var(--negative-text)' }}>{tr('CharacterImport.missing_discriminator_e_g_trim', { typed: typed.trim() })} </span> : null}
-        {tr('CharacterImport.missing_the_1234_discriminator_find')}
-      </span>
+      {missingDisc && (
+        <span className="ix-note">
+          <span style={{ color: 'var(--negative-text)' }}>{tr('CharacterImport.missing_discriminator_e_g_trim', { typed: typed.trim() })} </span>
+          {tr('CharacterImport.missing_the_1234_discriminator_find')}
+        </span>
+      )}
       {ok && (
         <>
           <div className="ix-row">
@@ -498,14 +496,14 @@ export function NameCard(p: CardProps) {
           <details className="ix-opts">
             <summary>{tr('CharacterImport.import_options')}</summary>
           <div className="ix-row">
-            <Tog on={flags.deleteJewels} onChange={setFlag('deleteJewels')} label={tr('CharacterImport.delete_jewels')} sub={flags.deleteJewels ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_equipped_jewels_when')} />
-            <Tog on={flags.deleteSkills} onChange={setFlag('deleteSkills')} label={tr('CharacterImport.delete_skills')} sub={flags.deleteSkills ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_existing_skills_when')} />
-            <Tog on={flags.deleteItems} onChange={setFlag('deleteItems')} label={tr('CharacterImport.delete_equipment')} sub={flags.deleteItems ? SUB_ON : SUB_OFF} title={tr('CharacterImport.delete_all_equipped_items_when')} />
-            <Tog on={flags.ignoreWeaponSwap} onChange={setFlag('ignoreWeaponSwap')} label={tr('CharacterImport.ignore_weapon_swap')} sub={flags.ignoreWeaponSwap ? tr('CharacterImport.on_items_and_skills_in') : tr('CharacterImport.off_weapon_swap_items_and')} title={tr('CharacterImport.ignore_items_and_skills_in')} />
+            <Tog on={flags.deleteJewels} onChange={setFlag('deleteJewels')} label={tr('CharacterImport.delete_jewels')} title={tr('CharacterImport.delete_all_equipped_jewels_when')} />
+            <Tog on={flags.deleteSkills} onChange={setFlag('deleteSkills')} label={tr('CharacterImport.delete_skills')} title={tr('CharacterImport.delete_all_existing_skills_when')} />
+            <Tog on={flags.deleteItems} onChange={setFlag('deleteItems')} label={tr('CharacterImport.delete_equipment')} title={tr('CharacterImport.delete_all_equipped_items_when')} />
+            <Tog on={flags.ignoreWeaponSwap} onChange={setFlag('ignoreWeaponSwap')} label={tr('CharacterImport.ignore_weapon_swap')} title={tr('CharacterImport.ignore_items_and_skills_in')} />
           </div>
           </details>
           <ImportNotes notes={run.notes} error={run.error} />
-          <span className="ix-tip">{tr('CharacterImport.tip_after_you_finish_importing')}</span>
+          {run.notes.length > 0 && <span className="ix-tip">{tr('CharacterImport.tip_after_you_finish_importing')}</span>}
         </>
       )}
     </section>

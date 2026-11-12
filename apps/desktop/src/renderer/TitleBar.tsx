@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { LANGUAGE_CODES, type AppSettings, type LanguageCode, type ModePref } from '../shared/library.js';
+import { useEffect, useRef, useState } from 'react';
+import { type AppSettings, type LanguageCode, type ModePref } from '../shared/library.js';
 import { crest } from './art';
-import { Icon, Kbd, PortalMenu, useDismiss } from './ui';
-import { LANGUAGE_NAMES, resolveLanguage } from './i18n';
+import { Icon, Kbd, useDismiss } from './ui';
 import { ClaudeMark } from './ClaudeMark';
 import { SearchPalette, type PaletteAssistant } from './search/SearchPalette';
 import type { SearchDoc } from './search/searchIndex';
@@ -55,7 +54,8 @@ export interface TitleBarProps {
   searchOpen: boolean;
   setSearchOpen: (v: boolean) => void;
   /** The Loot Filter area fills the title bar's context and search slots itself (portals), so there is one search and one title. */
-  lfSlots?: { setCtx: (el: HTMLElement | null) => void; setSearch: (el: HTMLElement | null) => void };
+  /** setCtx is left out while Loot filter Full shows (its header names the filter; R8). */
+  lfSlots?: { setCtx?: (el: HTMLElement | null) => void; setSearch: (el: HTMLElement | null) => void };
 }
 
 const AREAS: { id: Area; label: string; icon: string; area: string }[] = ([
@@ -100,13 +100,13 @@ export function TitleBar(p: TitleBarProps) {
           ))}
         </nav>
         {p.area === 'filter' && p.lfSlots ? (
-          <div className="tb-lfslot tb-nodrag" ref={p.lfSlots.setCtx} />
+          p.lfSlots.setCtx && <div className="tb-lfslot tb-nodrag" ref={p.lfSlots.setCtx} />
         ) : (
           p.title && <span className="tb-title" title={p.title}>{p.title}</span>
         )}
         {p.area !== 'filter' && p.subtitle && (
           <>
-            <span className="tb-dot" />
+            {p.title && <span className="tb-dot" />}
             <span className="tb-sub">{p.subtitle}</span>
           </>
         )}
@@ -123,7 +123,6 @@ export function TitleBar(p: TitleBarProps) {
       <div className="tb-right">
         <UpdatePill />
         <SyncPill onRevealBuilds={p.onRevealBuilds} onResolve={p.onResolve} hidden={!me} />
-        <LanguageButton current={resolveLanguage(p.settings.language)} onPick={p.onLanguage} />
         <button type="button" className="tb-gear" aria-label={tr('TitleBar.settings')} title={tr('TitleBar.settings_ctrl')} onClick={() => p.onOpenSettings()}>
           <Icon name="settings" size={16} />
         </button>
@@ -182,28 +181,6 @@ function WindowControls({ maximized }: { maximized: boolean }) {
         <Icon name="x" size={12} />
       </button>
     </div>
-  );
-}
-
-/** The globe next to the gear: the nine languages, each in its own name, the current one checked. */
-function LanguageButton({ current, onPick }: { current: LanguageCode; onPick: (code: LanguageCode) => void }) {
-  const [open, setOpen] = useState(false);
-  const btn = useRef<HTMLButtonElement>(null);
-  const close = useCallback(() => setOpen(false), []);
-  return (
-    <>
-      <button ref={btn} type="button" className="tb-gear" aria-label={tr('TitleBar.language')} title={tr('TitleBar.language')} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        <Icon name="globe" size={16} />
-      </button>
-      <PortalMenu anchor={btn} open={open} onClose={close} align="right" role="menu" label={tr('TitleBar.language')} minWidth={190}>
-        {LANGUAGE_CODES.map((c) => (
-          <button key={c} type="button" role="menuitemradio" aria-checked={c === current} lang={c} className="menu-item" onClick={() => { close(); if (c !== current) onPick(c); }}>
-            <span className="grow">{LANGUAGE_NAMES[c]}</span>
-            {c === current && <Icon name="check" size={14} style={{ color: 'var(--gold-text)' }} />}
-          </button>
-        ))}
-      </PortalMenu>
-    </>
   );
 }
 

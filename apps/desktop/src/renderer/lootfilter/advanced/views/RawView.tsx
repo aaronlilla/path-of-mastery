@@ -206,10 +206,10 @@ export function RawView({ nav: _nav }: { nav: LfNav }) {
 
   return (
     <Page fill>
-      <Head title={tr('lootfilter_advanced_views_RawView.advanced')} sub={tr('lootfilter_advanced_views_RawView.filter_code_for_your_rules_2')}>
+      <Head title={tr('lootfilter_advanced_views_RawView.advanced')}>
         <Seg<Tab> value={tab} label={tr('lootfilter_advanced_views_RawView.which_part_of_the_filter')} options={tabOpts} onChange={(t) => { if (!editing) { setTab(t); setLine(1); setJump(null); } }} />
         {tab === 'mine' && <Btn onClick={editing ? finishEdit : startEdit} disabled={!gen}>{editing ? tr('lootfilter_advanced_views_RawView.done_editing') : tr('lootfilter_advanced_views_RawView.edit')}</Btn>}
-        <Btn kind="gold" icon="gamepad" onClick={() => void runTest()} disabled={!gen || busy || editing} title={tr('lootfilter_advanced_views_RawView.writes_the_filter_as_a')}>
+        <Btn icon="gamepad" onClick={() => void runTest()} disabled={!gen || busy || editing} title={tr('lootfilter_advanced_views_RawView.writes_the_filter_as_a')}>
           {tr('lootfilter_advanced_views_RawView.test_in_game_folder')}
         </Btn>
       </Head>
@@ -262,7 +262,7 @@ export function RawView({ nav: _nav }: { nav: LfNav }) {
             <Eyebrow>{tr('lootfilter_advanced_views_RawView.diagnostics')}</Eyebrow>
             <span className="adv-s-faint">{gen && lf.validation ? diagSummaryText(shown) : tr('lootfilter_advanced_views_RawView.checking')}</span>
           </div>
-          {shown.slice(0, 120).map((d, i) => (
+          {shown.filter((d) => d.kind !== 'ok').slice(0, 120).map((d, i) => (
             <button key={i} type="button" className="adv-s-dg" onClick={() => goLine(d.line)} disabled={editing}>
               <i style={{ background: dotColour(d.kind) }} />
               <b>{tr('lootfilter_advanced_views_RawView.line_line', { line: d.line })}</b>

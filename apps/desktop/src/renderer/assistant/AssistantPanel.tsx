@@ -6,7 +6,7 @@ import { ALL_PROVIDERS, chatView, EFFORT_CHOICES, MCP_CLIENTS, MODEL_CHOICES, PR
 import { ClaudeMark } from '../ClaudeMark';
 import { useDelayedFlag } from '../delayedFlag';
 import type { OpenBuild, TabId } from '../types';
-import { Icon, useDismiss, useToast } from '../ui';
+import { Icon, PortalMenu, useDismiss, useToast } from '../ui';
 import './assistant.css';
 import { ChangeCard, ErrorBox, Reply, Thinking, ToolSteps, ToolsUsed } from './blocks';
 import { AiStatusPanel } from '../gates/ai/AiStatus.js';
@@ -186,12 +186,6 @@ type Live = Assistant;
 const EFFORT_WORD: Record<string, string> = { low: tr('h_c_AP.eff_low'), medium: tr('h_c_AP.eff_medium'), high: tr('h_c_AP.eff_high'), max: tr('h_c_AP.eff_max') };
 type View = 'chat' | 'connector' | 'solve';
 
-/** "kaelen@proton.me" shows as "kaelen@…", the way the design draws it. */
-function shortAccount(email: string): string {
-  const at = email.indexOf('@');
-  return at > 0 ? `${email.slice(0, Math.min(at, 14))}@…` : email;
-}
-
 /** "Data for patch X": amber when the game data is behind the live patch; click checks again now. */
 function KbBadge() {
   const [st, setSt] = useState<KbUiStatus | null>(null);
@@ -214,7 +208,7 @@ function KbBadge() {
       disabled={!st || st.refreshing}
       onClick={() => void window.pom.kb.refresh().then((r) => r.ok && setSt(r.value))}
     >
-      {b.tone === 'busy' ? tr('assistant_AssistantPanel.updating_game_data') : b.text.startsWith('Data for patch ') ? <><span className="pre">{tr('h_c_AP.data_for_patch')} </span>{b.text.slice('Data for patch '.length)}</> : fromMain('assistant_text', b.text)}
+      {b.tone === 'busy' ? tr('assistant_AssistantPanel.updating_game_data') : b.text.startsWith('Data for patch ') ? <><span className="pre">{tr('h_c_AP.data_short')} </span>{b.text.slice('Data for patch '.length)}</> : fromMain('assistant_text', b.text)}
     </button>
   );
 }
@@ -251,17 +245,20 @@ function PanelHeader({ a, view, onView, onClose }: { a: Live; view: View; onView
         <span className="lbl">{tr('assistant_AssistantPanel.solve')}</span>
       </button>
       <span className="sp" />
-      <KbBadge />
-      {view !== 'solve' && cur?.state === 'ready' ? (
-        <AccountMenu a={a} st={cur} onChat={() => onView('chat')} />
-      ) : view !== 'solve' && cur && cur.state === 'loggedOut' ? (
-        // The sign-in button lives in the body, next to what it is for; the header only says where things stand.
-        <span className="who" title={tr('assistant_AssistantPanel.not_signed_in', { id: PROVIDER_LABEL[cur.id] })}>
-          <i className="off" />
-          
-          {tr('assistant_AssistantPanel.not_signed_in_2')}
-        </span>
-      ) : null}
+      {/* Second row: a plain status line, the account on the left and the game-data patch on the right. */}
+      <div className="hd2">
+        {view !== 'solve' && cur?.state === 'ready' ? (
+          <AccountMenu a={a} st={cur} onChat={() => onView('chat')} />
+        ) : view !== 'solve' && cur && cur.state === 'loggedOut' ? (
+          // The sign-in button lives in the body, next to what it is for; the header only says where things stand.
+          <span className="who" title={tr('assistant_AssistantPanel.not_signed_in', { id: PROVIDER_LABEL[cur.id] })}>
+            <i className="off" />
+            
+            {tr('assistant_AssistantPanel.not_signed_in_2')}
+          </span>
+        ) : null}
+        <KbBadge />
+      </div>
       <button
         type="button"
         className="ib"
@@ -323,7 +320,7 @@ function AccountMenu({ a, st, onChat }: { a: Live; st: ProviderStatus; onChat: (
         onClick={() => setOpen((v) => !v)}
       >
         <i />
-        {st.account ? shortAccount(st.account) : tr('assistant_AssistantPanel.signed_in')}
+        <span className="nm">{st.account || tr('assistant_AssistantPanel.signed_in')}</span>
         <Icon name="chevron-down" size={12} />
       </button>
       {open && (
@@ -488,7 +485,7 @@ export function Thread({ a, loading, onRecovery, status }: { a: Live; loading: b
   return (
     <>
       {/* State row: the header says where AI stands, "Ready" included (no recovery button when Ready); not "Ready" over a signed-out provider. */}
-      {chrome.gate && <AiStatusPanel state={chrome.gate} inApp
+      {chrome.gate && <AiStatusPanel state={chrome.gate} inApp className="gate"
         onRecovery={() => {
           const code = chrome.gate?.code;
           if (code === 'AI_SERVICE_UNAVAILABLE' || code === 'RATE_LIMITED') a.retry();
@@ -549,12 +546,10 @@ export function Thread({ a, loading, onRecovery, status }: { a: Live; loading: b
         })}
         {a.thread.messages.length === 0 && !a.turn && (
           <div className="starter">
-            <span className="h">{tr('assistant_AssistantPanel.ask_about_this_build')}</span>
-            <span className="p">{tr('assistant_AssistantPanel.the_assistant_reads_this_build_s')}</span>
-            <span className="try">{tr('assistant_AssistantPanel.try_asking')}</span>
             {STARTERS.map((q) => (
               <button key={q} type="button" onClick={() => setComposerDraft(q)}>
                 {q}
+                <Icon name="chevron-right" size={13} />
               </button>
             ))}
           </div>
@@ -593,6 +588,10 @@ export function Composer({ a, loading }: { a: Live; loading: boolean }) {
   const draft = useComposerDraft();
   const sending = useRef(false);
   const prov = a.prefs.provider;
+  const [pick, setPick] = useState(false);
+  const pickBtn = useRef<HTMLButtonElement>(null);
+  const closePick = useCallback(() => setPick(false), []);
+  const modelId = a.prefs.model?.[prov] ?? '';
   useEffect(() => {
     if (!takeDraft(draft.n)) return;
     setText(draft.text);
@@ -640,6 +639,11 @@ export function Composer({ a, loading }: { a: Live; loading: boolean }) {
               {t}
             </button>
           ))}
+          {(MODEL_CHOICES[prov].length > 0 || EFFORT_CHOICES[prov].length > 0) && (
+            <button ref={pickBtn} type="button" className="at" aria-haspopup="menu" aria-expanded={pick} title={tr('assistant_AssistantPanel.model')} onClick={() => setPick((v) => !v)}>
+              {tr('assistant_AssistantPanel.model')} · {MODEL_CHOICES[prov].find((m) => m.id === modelId)?.label ?? tr('assistant_AssistantPanel.default')}
+            </button>
+          )}
           {a.busy ? (
             <button type="button" className="send stop" onClick={a.stop} aria-label={tr('assistant_AssistantPanel.stop')}>
               <span className="stopglyph" />
@@ -652,7 +656,8 @@ export function Composer({ a, loading }: { a: Live; loading: boolean }) {
             </button>
           )}
         </div>
-        {(MODEL_CHOICES[prov].length > 0 || EFFORT_CHOICES[prov].length > 0) && <div className="cpick">
+        <PortalMenu anchor={pickBtn} open={pick} onClose={closePick} align="left" role="group" label={tr('assistant_AssistantPanel.model')}>
+        <div className="cpick">
           <label>
             
             {tr('assistant_AssistantPanel.model')}
@@ -669,7 +674,8 @@ export function Composer({ a, loading }: { a: Live; loading: boolean }) {
               {EFFORT_CHOICES[prov].map((x) => <option key={x} value={x}>{x === 'xhigh' ? tr('assistant_AssistantPanel.extra_high') : EFFORT_WORD[x] ?? x[0]!.toUpperCase() + x.slice(1)}</option>)}
             </select>
           </label>
-        </div>}
+        </div>
+        </PortalMenu>
       </div>
     </div>
   );
@@ -763,8 +769,11 @@ function ProviderState({ a, st, compact }: { a: Live; st: ProviderStatus; compac
           
           {tr('assistant_AssistantPanel.cancel')}
         </button>
-        <p className="small">{tr('assistant_AssistantPanel.no_page_opened_open_a_terminal')}</p>
-        <CopyChip text={st.loginCommand} />
+        <details>
+          <summary style={{ cursor: 'pointer', fontSize: 12.5, color: 'var(--text-muted)' }}>{tr('assistant_AssistantPanel.no_page_opened')}</summary>
+          <p className="small">{tr('assistant_AssistantPanel.no_page_opened_open_a_terminal')}</p>
+          <CopyChip text={st.loginCommand} />
+        </details>
       </div>
     );
   }

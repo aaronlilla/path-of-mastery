@@ -73,7 +73,6 @@ const RAIL: { id: string; label: string; key: string; icon: string }[] = [
   { id: 'themes', label: tr('lootfilter_advanced_AdvancedApp.themes'), key: 'Alt 4', icon: 'palette' },
   { id: 'advanced', label: tr('lootfilter_advanced_AdvancedApp.filter_text'), key: 'Alt 5', icon: 'code' },
   { id: 'export', label: tr('lootfilter_advanced_AdvancedApp.export'), key: 'Alt 6', icon: 'download' },
-  { id: 'components', label: tr('lootfilter_advanced_AdvancedApp.components'), key: 'Alt 7', icon: 'layers' },
 ];
 
 /** Views that show the Inspector beside them. */
@@ -125,6 +124,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
   const [importR, setImportR] = useState<ImportResult | null>(null);
   const [writeConfirm, setWriteConfirm] = useState<Extract<WriteOutcome, { kind: 'needs-confirm' }> | null>(null);
   const [name, setName] = useState(lf.doc.name);
+  const nameEsc = useRef(false);
   useEffect(() => setName(lf.doc.name), [lf.doc.name, lf.doc.id]);
 
   const ground: Ground = lf.ui.advGround === 'bright' ? 'bright' : 'dark';
@@ -147,7 +147,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
   useEffect(() => {
     if (askOpen) setInspectorOpen(false);
   }, [askOpen]);
-  const mainW = w - 24 - (railLabels ? 184 : 56) - 12 - (askPush ? 412 : 0) - 352;
+  const mainW = w - 24 - (railLabels ? 184 : 56) - 12 - (askPush ? 352 : 0) - 352;
   const insDrawer = mainW < 640;
   // Too narrow to put the Inspector beside the content: it becomes a drawer over the content, closed until the
   // player selects something, and it goes back to the saved choice when the window is wide again.
@@ -155,7 +155,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
     setInspectorOpen(insDrawer ? false : lfRef.current.ui.advInspector !== false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insDrawer]);
-  const pickRight = (insVisible ? 360 : 12) + (askPush ? 412 : 0);
+  const pickRight = (insVisible ? 360 : 12) + (askPush ? 352 : 0);
 
   // ---- actions -------------------------------------------------------------------------------------
   const toastUndo = useCallback(
@@ -480,12 +480,14 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
             onChange={(e) => setName(e.target.value)}
             onBlur={() => {
               const n = name.trim();
-              if (n && n !== lf.doc.name) lf.renameFilter(lf.doc.id, n);
+              if (!nameEsc.current && n && n !== lf.doc.name) lf.renameFilter(lf.doc.id, n);
               else setName(lf.doc.name);
+              nameEsc.current = false;
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
               if (e.key === 'Escape') {
+                nameEsc.current = true;
                 setName(lf.doc.name);
                 (e.target as HTMLInputElement).blur();
               }
@@ -501,12 +503,9 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
             <Icon name="chevron-down" size={11} style={{ opacity: 0.6 }} />
           </button>
           <span style={{ flex: '1 1 0', minWidth: 8 }} />
-          {insView && (
-            <button type="button" className="adv-sh-hbtn" aria-pressed={insVisible} title={insVisible ? tr('lootfilter_advanced_AdvancedApp.hide_the_inspector_i') : tr('lootfilter_advanced_AdvancedApp.show_the_inspector_i')} onClick={() => (inspectorOpen ? closeInspector() : openInspector())} style={{ borderColor: insVisible ? 'rgba(var(--area-filter-rgb),.55)' : undefined, background: insVisible ? 'rgba(var(--area-filter-rgb),.12)' : undefined }}>
-              <Icon name="sidebar-right" size={14} />
-              <span className="adv-sh-lbl">{tr('lootfilter_advanced_AdvancedApp.inspector')}</span>
-            </button>
-          )}
+          <button type="button" className="adv-sh-hbtn" disabled={!insView} aria-pressed={insVisible} aria-label={tr('lootfilter_advanced_AdvancedApp.inspector')} title={insVisible ? tr('lootfilter_advanced_AdvancedApp.hide_the_inspector_i') : tr('lootfilter_advanced_AdvancedApp.show_the_inspector_i')} onClick={() => (inspectorOpen ? closeInspector() : openInspector())} style={{ borderColor: insVisible ? 'rgba(var(--area-filter-rgb),.55)' : undefined, background: insVisible ? 'rgba(var(--area-filter-rgb),.12)' : undefined }}>
+            <Icon name="sidebar-right" size={14} />
+          </button>
           <button type="button" className="adv-sh-ib" title={tr('lootfilter_advanced_AdvancedApp.undo_ctrl_z')} aria-label={tr('lootfilter_advanced_AdvancedApp.undo')} style={{ opacity: lf.canUndo ? 1 : 0.4 }} onClick={() => lf.undo()}>
             <Icon name="undo" size={16} />
           </button>
@@ -533,7 +532,6 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
           </button>
           <button type="button" className="adv-sh-write" title={tr('lootfilter_advanced_AdvancedApp.write_the_filter_into_the_2')} onClick={() => requestWrite()} disabled={lf.phase === 'writing' || !g}>
             {writingSlow ? tr('lootfilter_advanced_AdvancedApp.writing') : tr('lootfilter_advanced_AdvancedApp.write_to_game')}
-            <span className="adv-sh-k on-gold">{tr('lootfilter_advanced_AdvancedApp.ctrl_s')}</span>
           </button>
         </header>
 
@@ -545,10 +543,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
                 <button type="button" className="adv-sh-rbtn" aria-label={r.label} aria-current={view === r.id ? 'page' : undefined} title={`${r.label}  ·  ${r.key}`} onClick={() => nav.setAdvancedView(r.id)} style={{ justifyContent: railLabels ? 'flex-start' : 'center' }}>
                   <Icon name={r.icon} size={16} style={{ flex: 'none' }} />
                   {railLabels && (
-                    <>
-                      <span style={{ flex: 1, minWidth: 0, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.label}</span>
-                      <span className="adv-sh-rkey" style={{ flex: 'none', font: "500 10.5px 'Geist Mono'" }}>{r.key}</span>
-                    </>
+                    <span style={{ flex: 1, minWidth: 0, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.label}</span>
                   )}
                 </button>
               </span>
@@ -562,7 +557,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
           <main className="adv-sh-main" data-screen-label={`Loot Filter / ${view}`}>
             <View nav={nav} />
           </main>
-          {insVisible && <Inspector drawer={insDrawer} right={12 + (askPush ? 412 : 0)} picker={picker} setPicker={setPicker} nav={nav} />}
+          {insVisible && <Inspector drawer={insDrawer} right={12 + (askPush ? 352 : 0)} picker={picker} setPicker={setPicker} nav={nav} />}
           {askOpen && <AskPanel drawer={!askPush} onClose={() => setAskOpen(false)} nav={nav} />}
         </div>
 
@@ -579,7 +574,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
             {v && <span style={{ color: pre.warnings > 0 ? 'var(--warning-text)' : 'var(--text-muted)' }}>{tr('lootfilter_advanced_AdvancedApp.count_warnings', { count: pre.warnings })}</span>}
           </button>
           <span>{writtenText}</span>
-          <span role="status">{lf.saveStatus === 'saved' ? tr('lootfilter_advanced_AdvancedApp.saved_on_this_pc') : lf.saveStatus === 'saving' ? tr('lootfilter_advanced_AdvancedApp.saving') : <button type="button" className="adv-sh-sbtn" style={{ color: 'var(--negative-text)' }} onClick={lf.openSaveFailed}>{tr('lootfilter_advanced_AdvancedApp.save_failed')}</button>}</span>
+          <span role="status">{lf.saveStatus === 'saved' ? null : lf.saveStatus === 'saving' ? tr('lootfilter_advanced_AdvancedApp.saving') : <button type="button" className="adv-sh-sbtn" style={{ color: 'var(--negative-text)' }} onClick={lf.openSaveFailed}>{tr('lootfilter_advanced_AdvancedApp.save_failed')}</button>}</span>
           <span style={{ flex: 1 }} />
           <span title={lf.priceError ?? ''}>{pricesText}</span>
           <button ref={gameBtn} type="button" className="adv-sh-sbtn muted" title={tr('lootfilter_advanced_AdvancedApp.change_game')} onClick={() => openHdr('game', gameBtn.current)}>
@@ -612,7 +607,7 @@ export function AdvancedApp({ nav }: { nav: LfNav }) {
         {insVisible && picker === 'icon' && target && <IconPicker look={look} right={pickRight} onChange={(s) => apply({ icon: s }, tr('lootfilter_advanced_AdvancedApp.changed_minimap_icon'))} onClose={() => setPicker(null)} />}
         {insVisible && picker === 'beam' && target && <BeamPicker look={look} right={pickRight} onChange={(s) => apply({ beam: s }, tr('lootfilter_advanced_AdvancedApp.changed_beam'))} onClose={() => setPicker(null)} />}
 
-        {explainName && <ExplainDrawer name={explainName} right={(insVisible ? 352 : 12) + (askPush ? 412 : 0)} nav={nav} onClose={() => setExplainName(null)} />}
+        {explainName && <ExplainDrawer name={explainName} right={(insVisible ? 352 : 12) + (askPush ? 352 : 0)} nav={nav} onClose={() => setExplainName(null)} />}
 
         {/* menus and popovers */}
         {menu?.kind === 'item' && <ItemMenu at={menu.at} name={menu.name} onClose={() => setMenu(null)} openPicker={shell.openPicker} />}

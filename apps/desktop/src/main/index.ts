@@ -19,6 +19,7 @@ import { TimelessInstaller } from './timelessData.js';
 import type { TimelessInstallStatus } from '../shared/timelessStatus.js';
 import { resolveEngineDataDir } from './engineDataDir.js';
 import { APP_ID } from './appIdentity.js';
+import { migrateOldUserData, OLD_USER_DATA_FOLDER } from './migrateUserData.js';
 
 import { runClickBench } from './clickBench.js';
 
@@ -116,6 +117,14 @@ function timelessStatusNow(): TimelessInstallStatus {
 
 async function main(): Promise<void> {
   if (process.env.POM_USER_DATA) app.setPath('userData', process.env.POM_USER_DATA);
+  else {
+    try {
+      const n = migrateOldUserData(join(app.getPath('appData'), ...OLD_USER_DATA_FOLDER.split('/')), app.getPath('userData'));
+      if (n) console.log(`[app] copied ${n} items from the old data folder`);
+    } catch (e) {
+      console.log(`[app] old data copy failed: ${(e as NodeJS.ErrnoException).code ?? 'error'}`);
+    }
+  }
   console.log(`[app] user data: ${app.getPath('userData')}`);
   // The engine reads game data only from this folder, whatever the working directory is; the engine host and the
   // main-process readers inherit it. An installed app keeps its derived caches in user data (the install may be read-only).

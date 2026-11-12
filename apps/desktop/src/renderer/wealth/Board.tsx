@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { askChaos, clampMult, filterListings, isOnline, MULT_MAX, MULT_MIN, SELLERS_TO_SHOW, sellerCount, whisper, type BulkFilter, type BulkListing, type BulkSort, type BulkView } from '../../shared/bulk.js';
 import { fmtChaos, type Cat } from '../../shared/wealth.js';
 import { useAcct } from '../accounts/useAccount';
-import { Icon, useToast } from '../ui.js';
+import { Icon, PortalMenu, useToast } from '../ui.js';
 import { catName, Chip, Empty, Panel, Seg } from './wui.js';
 import { tr } from '../i18n';
 import { fmtAgo, lot, msg } from './mainText';
@@ -13,6 +13,27 @@ const SORTS: [BulkSort, string][] = [['new', tr('wealth_Board_2.newest')], ['pri
 const lotText = (l: BulkListing) => lot(l.items);
 const lotFull = (l: BulkListing) => lot(l.items, l.items.length);
 type Result = { ok: true } | { ok: false; error: string };
+
+/** Vouch and Report: rare trust actions, one tap behind the row's menu. */
+function VoteMenu({ l, act }: { l: BulkListing; act: (p: Promise<Result>, done: string) => Promise<boolean> }) {
+  const [open, setOpen] = useState(false);
+  const btn = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <button ref={btn} type="button" className="w-btn alt sm" aria-label={tr('wealth_Board.more')} title={tr('wealth_Board.more')} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <Icon name="more" size={14} />
+      </button>
+      <PortalMenu anchor={btn} open={open} onClose={() => setOpen(false)} align="right" label={tr('wealth_Board.more')}>
+        <button type="button" role="menuitem" className="menu-item" disabled={l.voted === 'vouch'} title={tr('wealth_Board.this_seller_traded_fairly')} onClick={() => { setOpen(false); void act(window.pom.wealth.boardVouch(l.id), tr('wealth_Board.vouch_added')); }}>
+          <span className="grow">{l.voted === 'vouch' ? tr('wealth_Board.vouched') : tr('wealth_Board.vouch')}</span>
+        </button>
+        <button type="button" role="menuitem" className="menu-item" disabled={l.voted === 'report'} title={tr('wealth_Board.report_a_scam_two_independent')} onClick={() => { setOpen(false); void act(window.pom.wealth.boardReport(l.id), tr('wealth_Board.reported_two_independent_reports_hid')); }}>
+          <span className="grow">{l.voted === 'report' ? tr('wealth_Board.reported') : tr('wealth_Board.report')}</span>
+        </button>
+      </PortalMenu>
+    </>
+  );
+}
 
 /** Bulk board: bulk sellers' listings from the community backend. Without an account there is nothing to show but how to get it. */
 export function Board({ view, now, reload, onStash }: { view: BulkView | null; now: number; reload: () => void; onStash: () => void }) {
@@ -132,12 +153,7 @@ export function Board({ view, now, reload, onStash }: { view: BulkView | null; n
                   <button type="button" className="w-btn alt sm" aria-expanded={offering?.id === l.id} onClick={() => setOffering(offering?.id === l.id ? null : { id: l.id, mult: l.mult })}>
                     {tr('wealth_Board.offer')}
                   </button>
-                  <button type="button" className="w-link" disabled={l.voted === 'vouch'} title={tr('wealth_Board.this_seller_traded_fairly')} onClick={() => void act(window.pom.wealth.boardVouch(l.id), tr('wealth_Board.vouch_added'))}>
-                    {l.voted === 'vouch' ? tr('wealth_Board.vouched') : tr('wealth_Board.vouch')}
-                  </button>
-                  <button type="button" className="w-link" disabled={l.voted === 'report'} title={tr('wealth_Board.report_a_scam_two_independent')} onClick={() => void act(window.pom.wealth.boardReport(l.id), tr('wealth_Board.reported_two_independent_reports_hid'))}>
-                    {l.voted === 'report' ? tr('wealth_Board.reported') : tr('wealth_Board.report')}
-                  </button>
+                  <VoteMenu l={l} act={act} />
                 </span>
               </div>
               {offering?.id === l.id && (
@@ -169,7 +185,7 @@ export function Board({ view, now, reload, onStash }: { view: BulkView | null; n
         </div>
         <div className="w-foot">
           <span>{tr('wealth_Board.count_listings_from_now_sellers', { count: rows.length, now: sellerCount(view.listings, now) })}</span>
-          <span className="faint">{tr('wealth_Board.online_means_the_seller_has', { SELLERS_TO_SHOW })}</span>
+          <span className="faint" title={tr('wealth_Board.online_means_the_seller_has', { SELLERS_TO_SHOW })}>{tr('wealth_Board.online_short')}</span>
         </div>
       </Panel>
       {view.sampleListings && view.sampleListings.length > 0 && (
@@ -180,7 +196,7 @@ export function Board({ view, now, reload, onStash }: { view: BulkView | null; n
             {view.sampleListings.map((l) => (
               <div key={l.id} className="w-bb-item">
                 <div className="w-bb-r" data-sample="" data-online={isOnline(l, now)}>
-                  <span className="w-bb-who"><i /><b>{l.seller}</b><em>{tr('wealth_Board.sample')}</em></span>
+                  <span className="w-bb-who"><i /><b>{l.seller}</b></span>
                   <span className="w-name wrap" title={lotFull(l)}>{lotText(l)}<i>{catName(l.cat)}</i></span>
                   <span className="r">{fmt(askChaos(l))}</span>
                   <span className="r"><Chip tone="neutral">{`${l.mult}%`}</Chip></span>

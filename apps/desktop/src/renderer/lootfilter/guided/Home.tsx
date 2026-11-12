@@ -30,8 +30,6 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
   const cat = lf.catalog;
   const br = useBuildRules();
   const play = usePlay();
-  const onbMap = (lf.ui.guidedOnb ?? {}) as Record<string, boolean>;
-  const onb = !onbMap[lf.doc.id];
   const [only, setOnly] = useState<'all' | 'mine'>('all');
   const [showHidden, setShowHidden] = useState(true);
   const dismissed = (Array.isArray(lf.ui.guidedSuggDismissed) ? lf.ui.guidedSuggDismissed : []) as string[];
@@ -187,7 +185,7 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 className="gd-h1">{tr('lootfilter_guided_Home.your_loot_filter')}</h1>
           <p className="gd-sub gd-subline">
-            {mine.length ? tr('lootfilter_guided_Home.count_changes_on_top_of', { count: entries.length, base }) : tr('lootfilter_guided_Home.base_ready_to_use', { base })} {pricesLine}
+            {mine.length ? tr('lootfilter_guided_Home.count_changes_on_top_of', { count: entries.length, base }) : tr('lootfilter_guided_Home.base_ready_to_use', { base })}{!lf.prices && !lf.pricesLoading && <> {pricesLine}</>}
           </p>
         </div>
         <button className="gd-secondary" onClick={() => api.openWizard({}, 1)}>
@@ -195,33 +193,17 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
           {tr('lootfilter_guided_Home.change_something')}
         </button>
         {lf.build && lf.build.info.valid && (
-          <button className="gd-secondary" onClick={() => api.nav.openAdvanced('build')}>
+          <button className="gd-secondary" title={buildOn ? tr('lootfilter_guided_Home.edit_the_filter_for_name', { name: lf.build.name }) : tr('lootfilter_guided_Home.build_filter_for_name', { name: lf.build.name })} onClick={() => api.nav.openAdvanced('build')}>
             <Icon name="tree" size={16} />
-            {buildOn ? tr('lootfilter_guided_Home.edit_the_filter_for_name', { name: lf.build.name }) : tr('lootfilter_guided_Home.build_filter_for_name', { name: lf.build.name })}
+            {buildOn ? tr('lootfilter_guided_Home.edit_build_filter') : tr('lootfilter_guided_Home.build_filter')}
           </button>
         )}
       </div>
-
-      {onb && (
-        <div className="gd-onb" role="note" aria-label={tr('lootfilter_guided_Home.how_this_works')}>
-          <Icon name="lightbulb" size={16} style={{ color: 'var(--text-muted)', flex: 'none' }} />
-          <span style={{ flex: 1, minWidth: 0 }}>{tr('lootfilter_guided_Home.click_any_item_to_change')}</span>
-          <button className="gd-iconbtn" aria-label={tr('lootfilter_guided_Home.dismiss')} title={tr('lootfilter_guided_Home.dismiss')} onClick={() => lf.setUi('guidedOnb', { ...onbMap, [lf.doc.id]: true })}>
-            <Icon name="x" size={14} />
-          </button>
-        </div>
-      )}
 
       <div className="gd-homegrid">
         <section className="gd-card gd-board" aria-label={tr('lootfilter_guided_Home.how_it_looks_in_game')}>
           <div className="gd-boardhd">
             <h3>{tr('lootfilter_guided_Home.how_it_looks_in_game')}</h3>
-            <div className="gd-legend lf-faint" aria-label={tr('lootfilter_guided_Home.legend')}>
-              <span><s>{tr('lootfilter_guided_Home.name')}</s> {tr('lootfilter_guided_Home.hidden')}</span>
-              <span><Icon name="volume-low" size={12} /> {tr('lootfilter_guided_Home.sound')}</span>
-              <span><Icon name="flare" size={12} /> {tr('lootfilter_guided_Home.beam')}</span>
-              <span><span className="gd-legdot" /> {tr('lootfilter_guided_Home.changed_by_you')}</span>
-            </div>
             <span className="sp" />
             <div className="gd-seg" role="group" aria-label={tr('lootfilter_guided_Home.show')}>
               {[['all', tr('lootfilter_guided_Home_2.all_items')], ['mine', tr('lootfilter_guided_Home_2.only_my_changes')]].map(([k, l]) => (
@@ -234,6 +216,12 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
               <button className="gd-switch" role="switch" aria-checked={showHidden} aria-label={tr('lootfilter_guided_Home.show_hidden_items')} onClick={() => setShowHidden(!showHidden)} />
               {tr('lootfilter_guided_Home.show_hidden_items')}
             </label>
+          </div>
+          <div className="gd-legend gd-legendbar lf-faint" aria-label={tr('lootfilter_guided_Home.legend')}>
+            <span><s>{tr('lootfilter_guided_Home.name')}</s> {tr('lootfilter_guided_Home.hidden')}</span>
+            <span><Icon name="volume-low" size={12} /> {tr('lootfilter_guided_Home.sound')}</span>
+            <span><Icon name="flare" size={12} /> {tr('lootfilter_guided_Home.beam')}</span>
+            <span><span className="gd-legdot" /> {tr('lootfilter_guided_Home.changed_by_you')}</span>
           </div>
           {!cat ? (
             <div className="lf-muted gd-boardwait">{tr('lootfilter_guided_Home.reading_neversink_baseversion', { baseVersion: lf.baseVersion })}</div>
@@ -328,7 +316,6 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
             <h3>{tr('lootfilter_guided_Home.your_changes')}</h3>
             <span className="gd-count" aria-label={tr('lootfilter_guided_Home.length_changes', { count: entries.length })}>{entries.length}</span>
           </div>
-          {entries.length > 1 && <div className="hint gd-railhint">{tr('lootfilter_guided_Home.they_run_in_order_when')}</div>}
           {!entries.length && (
             <div className="gd-railempty">
               <b>{tr('lootfilter_guided_Home.no_changes_yet')}</b>
@@ -356,8 +343,7 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
                           {!on && <span className="gd-offpill">{tr('lootfilter_guided_Home.off')}</span>}
                         </div>
                         <div className="gd-rowsub">
-                          {plural(group.length, 'item type')} · {on ? tr('lootfilter_guided_Home.on') : tr('lootfilter_guided_Home.off_2')}
-                          {ix === entries.length - 1 && entries.length > 1 ? tr('lootfilter_guided_Home.newest') : ''}
+                          {plural(group.length, 'item type')}
                         </div>
                       </div>
                       <div className="gd-rowctl">
@@ -405,9 +391,6 @@ export function Home({ api, resume, dismissResume, continueResume }: { api: Guid
                     </div>
                     <div className="gd-rowsub">
                       {n ? tr('lootfilter_guided_Home.count_item_types', { count: n }) : gearBases ? tr('lootfilter_guided_Home.gear_rule') : g ? tr('lootfilter_guided_Home.tiers_and_gear') : `${ruleKind(r, cat)} · ${r.source}`}
-                      {' · '}
-                      {r.enabled ? tr('lootfilter_guided_Home.on') : tr('lootfilter_guided_Home.off_2')}
-                      {ix === entries.length - 1 && entries.length > 1 ? tr('lootfilter_guided_Home.newest') : ''}
                     </div>
                   </div>
                   <div className="gd-rowctl">

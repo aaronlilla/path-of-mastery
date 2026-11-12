@@ -6,14 +6,11 @@
 
 /* toolbar */
 .cfg-tb {
-  max-width: 1440px; margin: 0 auto; position: absolute !important; left: 0; right: 0; top: 0; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 10px; overflow: visible; min-width: 0;
-  border-radius: 16px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .56), rgba(var(--glass-rgb), .6)); border: 1px solid rgba(var(--line-rgb), .09);
-  box-shadow: 0 18px 50px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .06); pointer-events: auto; z-index: 5;
+  max-width: 1440px; margin: 0 auto; position: absolute !important; left: 0; right: 0; top: 0; pointer-events: auto; z-index: 5;
 }
-.cfg-tb .sp { flex: 1; }
-.cfg-setwrap { position: relative; flex: 0 1 220px; min-width: 110px; }
+.cfg-setwrap { position: relative; flex: 0 1 180px; min-width: 110px; }
 .cfg-set {
-  width: 100%; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  width: 100%; height: var(--control-h); display: flex; align-items: center; gap: var(--s-4); padding: 0 10px 0 12px; border-radius: var(--r-lg); cursor: pointer; text-align: left; font: inherit; color: inherit;
   background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
 }
 .cfg-set:hover, .cfg-set[aria-expanded="true"] { border-color: rgba(var(--accent-rgb), .45); }
@@ -23,7 +20,7 @@
 .cfg-set > pom-icon { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
 .cfg-set[aria-expanded="true"] > pom-icon { transform: rotate(180deg); }
 .cfg-btn {
-  flex: none; height: 36px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 10px; font: 500 13.5px Geist, sans-serif; white-space: nowrap; cursor: pointer;
+  flex: none; height: var(--control-h); padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 10px; font: 500 13.5px Geist, sans-serif; white-space: nowrap; cursor: pointer;
   background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .5), rgba(var(--glass-rgb), .42)); border: 1px solid rgba(var(--line-rgb), .1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 6px rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); color: var(--text);
 }
@@ -36,9 +33,8 @@
 .cfg-ico.del:hover { color: var(--negative-text); }
 .cfg-ico:disabled { opacity: .35; cursor: default; }
 .cfg-ico:disabled:hover { color: var(--text-muted); background: transparent; }
-.cfg-vr { width: 1px; height: 24px; background: rgba(var(--line-rgb), .1); margin: 0 6px; flex: none; }
 .cfg-search {
-  flex: 0 1 320px; min-width: 110px; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 6px 0 12px; border-radius: 10px;
+  flex: 1 1 200px; min-width: 140px; height: var(--control-h); display: flex; align-items: center; gap: var(--s-4); padding: 0 var(--s-6); border-radius: var(--r-lg);
   background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k)));
 }
 .cfg-search > pom-icon { flex: none; color: var(--text-muted); }
@@ -46,7 +42,7 @@
 .cfg-search button { flex: none; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; }
 .cfg-search button:hover { color: var(--text-strong); }
 .cfg-search:focus-within { border-color: rgba(var(--accent-rgb), .55); }
-.cfg-oc { flex: none; display: inline-flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px 0 8px; border-radius: 16px; border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-strong); font: 500 12.5px Geist, sans-serif; white-space: nowrap; cursor: pointer; }
+.cfg-oc { flex: none; display: inline-flex; align-items: center; gap: var(--s-5); height: var(--control-h); padding: 0 var(--s-6); border-radius: var(--r-pill); border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-strong); font: 500 12.5px Geist, sans-serif; white-space: nowrap; cursor: pointer; }
 .cfg-oc .trk { position: relative; width: 28px; height: 16px; border-radius: 8px; background: rgba(var(--line-rgb), .22); }
 .cfg-oc .knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-strong); transition: left var(--dur-quick, 160ms) var(--ease, ease); }
 .cfg-oc.on { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .12); }
@@ -82,7 +78,7 @@
 
 /* body */
 .cfg-body {
-  position: absolute; left: 0; right: 0; top: 68px; bottom: 0; max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-content: start; align-items: start;
+  position: absolute; left: 0; right: 0; top: calc(var(--tab-tb-h) + var(--panel-inset)); bottom: 0; max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-content: start; align-items: start;
   overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; pointer-events: auto;
 }
 .cfg-nav {
@@ -102,29 +98,37 @@
   break-inside: avoid; margin-bottom: 14px; border-radius: 14px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .74), rgba(var(--glass-rgb), .78)); border: 1px solid rgba(var(--line-rgb), .08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); padding: 10px 6px; display: flex; flex-direction: column; gap: 2px;
 }
-.cfg-card .ttl { display: flex; align-items: center; gap: 9px; padding: 2px 10px 8px; font: 600 21px/1 'Cormorant Garamond', serif; color: var(--text-display); }
+.cfg-card .ttl { display: flex; align-items: center; gap: 9px; padding: var(--s-1) var(--s-6); margin-bottom: var(--s-3); font: 600 21px/1 'Cormorant Garamond', serif; color: var(--text-display); }
 .cfg-card .ttl { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; }
 .cfg-card .ttl > pom-icon:first-child { color: var(--gold-label); }
-.cfg-card .ttl .ttl-t { flex: 1; min-width: 0; }
+.cfg-card .ttl .ttl-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .cfg-card .ttl > pom-icon:last-child { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
 .cfg-card .ttl[aria-expanded='false'] > pom-icon:last-child { transform: rotate(-90deg); }
 .cfg-card .ttl:hover > pom-icon:last-child { color: var(--text-strong); }
 /* The prototype's cards show no chevron: it appears on hover, on keyboard focus, and while a card is collapsed. */
 .cfg-card .ttl > pom-icon:last-child { opacity: 0; }
 .cfg-card .ttl:hover > pom-icon:last-child, .cfg-card .ttl:focus-visible > pom-icon:last-child, .cfg-card .ttl[aria-expanded='false'] > pom-icon:last-child { opacity: 1; }
-.cfg-hint { padding: 18px 16px; color: var(--text-muted); }
-.cfg-empty { padding: 18px 16px; flex-direction: row; align-items: center; gap: 10px; color: var(--text-2); white-space: normal; }
+.cfg-hint { padding: 18px var(--s-6); color: var(--text-muted); }
+.cfg-empty { padding: 18px var(--s-6); flex-direction: row; align-items: center; gap: 10px; color: var(--text-2); white-space: normal; }
 .cfg-empty > pom-icon { flex: none; color: var(--text-muted); }
 .cfg-empty .tx { flex: 1; min-width: 0; }
 .cfg-empty button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: rgba(var(--accent-rgb), .14); color: var(--gold-text); font: 600 12.5px Geist, sans-serif; cursor: pointer; }
 .cfg-empty button:hover { background: rgba(var(--accent-rgb), .22); }
 
 /* rows */
-.cfg-sub { padding: 8px 12px 2px; display: flex; align-items: center; gap: 7px; font-weight: 600; color: var(--rarity-gem-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cfg-sub { min-height: var(--control-h-sm); padding: var(--s-4) var(--s-6) var(--s-1); display: flex; align-items: center; gap: 7px; font-weight: 600; color: var(--rarity-gem-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .cfg-sub img { flex: none; width: 20px; height: 20px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
-.cfg-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; transition: background .2s, box-shadow .2s; }
-.cfg-row .l { color: var(--text-3); overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.cfg-row .c { display: flex; justify-content: flex-end; min-width: 0; }
+.cfg-row { display: grid; grid-template-columns: minmax(0, 1fr) var(--ctl-col); gap: var(--s-6); align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; transition: background .2s, box-shadow .2s; }
+.cfg-row .l { color: var(--text-3); overflow: hidden; min-width: 0; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.3; padding: 3px 0; } /* long (German) names wrap to two lines instead of one cut-off line */
+.cfg-row .c { display: flex; justify-content: flex-start; min-width: 0; }
+.cfg-row .c > .switch { margin-left: auto; }
+.cfg-row .c > .cfg-dd, .cfg-row .c > .cfg-num, .cfg-row .c > .cfg-text { flex: 1 1 auto; }
+.cfg-row .c > .cfg-seg { align-self: flex-start; flex: 1 1 auto; }
+.cfg-row .c > .cfg-seg > button { flex: 1 1 0; min-width: max-content; justify-content: center; } /* equal pills when they fit, content width when not */
+/* Switch rows need no value column: the name gets the room (R6). */
+.cfg-row:has(> .c > .switch) { grid-template-columns: minmax(0, 1fr) max-content; }
+/* A seg wider than the column (Pride "Initial effect / Maximum effect") widens its own row's column leftward instead of spilling past the card. */
+.cfg-row:has(> .c > .cfg-seg) { grid-template-columns: minmax(0, 1fr) minmax(var(--ctl-col), max-content); }
 .cfg-row.on { background: rgba(var(--accent-rgb), .06); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .12); }
 .cfg-row.on .l { color: var(--text-strong); }
 .cfg-row.dim { opacity: .75; }
@@ -132,15 +136,16 @@
 .cfg-row.bad .l { color: var(--negative-text); }
 .cfg-row .switch { flex: none; }
 .cfg-dd { position: relative; flex: 0 1 auto; min-width: 110px; }
+.cfg-row .cfg-dd { width: 100% !important; } /* CfgDropdown sets an inline width; every dropdown fills the value column */
 .cfg-select {
-  width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 8px; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  width: 100%; height: var(--control-h-sm); display: flex; align-items: center; gap: var(--s-4); padding: 0 10px 0 12px; border-radius: var(--r-md); cursor: pointer; text-align: left; font: inherit; color: inherit;
   background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
 }
 .cfg-select:hover, .cfg-select[aria-expanded="true"] { border-color: rgba(var(--accent-rgb), .45); }
 .cfg-select .v { flex: 1; min-width: 0; color: var(--text-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cfg-select > pom-icon { flex: none; color: var(--text-muted); transition: transform var(--dur-quick, 160ms); }
 .cfg-select[aria-expanded="true"] > pom-icon { transform: rotate(180deg); }
-.cfg-num { flex: 0 1 96px; min-width: 96px; width: 96px; height: 30px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); }
+.cfg-num { flex: 0 1 96px; min-width: 96px; width: 96px; height: var(--control-h-sm); display: flex; align-items: center; padding: 0 12px; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))); }
 .cfg-num:focus-within { border-color: rgba(var(--accent-rgb), .55); }
 /* The number box is a plain field, not a glass tile: the tile style blanks the border, so an empty box vanished. */
 .cfg-root .cfg-num { background: linear-gradient(rgba(var(--line-rgb), .045), rgba(var(--line-rgb), .045)), rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border-color: rgba(var(--line-rgb), .26); box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb), calc(.4 * var(--shadow-k))) !important; }
@@ -148,9 +153,16 @@
 .cfg-root .cfg-num:focus-within { border-color: rgba(var(--accent-rgb), .55); }
 .cfg-num input { flex: 1; min-width: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: right; color: var(--text-strong); font: inherit; outline: none; }
 .cfg-num input::placeholder { color: var(--text-faint); }
-.cfg-seg { height: 30px; }
+.cfg-seg { height: var(--control-h-sm); }
 .cfg-seg > button { height: 22px; padding: 0 11px; font-size: 13.5px; }
 .cfg-text { width: 100%; min-height: 80px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k))); color: var(--text-strong); font: 500 12.5px/1.5 'Geist Mono', monospace; }
+
+/* map prefix / suffix: one 2 x 2 grid per group, one cell per option (each cell keeps its data-ck and state classes) */
+.cfg-multi { container-type: inline-size; padding: 0 12px; }
+.cfg-cap { padding-top: var(--s-2); font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.cfg-grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3) var(--s-6); padding: var(--s-2) 0; }
+.cfg-cell { display: block; min-height: 0; padding: 0; border-radius: var(--r-md); }
+@container (max-width: 435px) { .cfg-grid4 { grid-template-columns: minmax(0, 1fr); } }
 
 /* dropdown menu */
 .cfg-dd-search { display: flex; align-items: center; gap: 8px; height: 34px; margin: 0 2px 4px; padding: 0 10px; border-radius: 8px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .12); }
@@ -192,8 +204,12 @@
 .cfg-tip .neg { color: var(--negative-text); }
 
 /* narrow: one column, no section nav (responsive.css also does this under 1200) */
-@container tab (max-width: 1199px) { .cfg-body { grid-template-columns: minmax(0, 1fr); } .cfg-nav { display: none; } .cfg-cols { --col-min: 290; } }
-@container tab (max-width: 640px) { .cfg-row { gap: 8px; } .cfg-search { flex-basis: 100%; } }
+@container tab (max-width: 1199px) { .cfg-body { grid-template-columns: minmax(0, 1fr); } .cfg-nav { display: none; } .cfg-cols { --col-min: 360; } }
+/* a narrower value column keeps long names (e.g. "% increased effect of map mods") whole at 1280 */
+@container tab (max-width: 999px) { .cfg-body { --ctl-col: 184px; } }
+@container tab (max-width: 640px) { .cfg-row { gap: var(--s-4); } }
+/* toolbar one row; when tight: Manage goes icon-only, then the set picker and search shrink. Under 760 it may wrap (body top follows, responsive.css). */
+@container tab (max-width: 999px) { .cfg-tb .cfg-bt { display: none; } .cfg-tb .cfg-btn { padding: 0 var(--s-5); } }
 .cfg-root input:focus-visible, .cfg-root textarea:focus-visible { outline: none; box-shadow: none; }
 
 /* Manage: rows can be dragged into a new order. */

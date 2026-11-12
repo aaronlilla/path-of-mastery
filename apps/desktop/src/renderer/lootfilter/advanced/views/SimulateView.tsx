@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import type { FilterSetup, Rule } from '../../../../shared/lootfilter/types.js';
 import type { CatalogItem } from '../../../../shared/lootfilter/catalog.js';
 import { evaluateItem, type EvalResult } from '../../../../shared/lootfilter/evaluate.js';
@@ -13,6 +13,7 @@ import { playAlertTone } from '../../audio';
 import type { LfNav } from '../../LootFilterArea';
 import { ExplainPanel } from '../sim/ExplainPanel';
 import { ChipOnGround, TogglePill, fmtAgo } from '../sim/kit';
+import { FloatMenu } from '../shell/FloatMenu';
 import { buildItem, parseItemText, type SimItem } from '../sim/parseItem';
 import { useDrops } from '../../useDrops';
 import { ACT3_LEVEL, T16_LEVEL, act3Pile, lastDrops, rng, t16Pile } from '../sim/piles';
@@ -46,6 +47,11 @@ export function SimulateView({ nav }: { nav: LfNav }) {
   const [showHidden, setShowHidden] = useState(false);
   const [replay, setReplay] = useState(false);
   const [builder, setBuilder] = useState(false);
+  const [menu, setMenu] = useState<{ k: 'ex' | 'opt'; at: { x: number; y: number } } | null>(null);
+  const openMenu = (k: 'ex' | 'opt') => (e: ReactMouseEvent<HTMLElement>): void => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setMenu({ k, at: { x: r.left, y: r.bottom + 4 } });
+  };
   const [bld, setBld] = useState<{ base: string; rar: Rarity; il: number; links: number }>({ base: '', rar: 'Rare', il: 84, links: 0 });
   const [paste, setPaste] = useState('');
   const [extra, setExtra] = useState<SimItem | null>(null);
@@ -232,23 +238,23 @@ export function SimulateView({ nav }: { nav: LfNav }) {
                 doPaste(t);
               }
             }}
-            style={{ flex: 1, resize: 'none', paddingTop: 8, lineHeight: '18px', overflow: 'hidden' }}
+            style={{ flex: 1, resize: 'none', paddingTop: 6, lineHeight: '18px', overflow: 'hidden' }}
           />
-          <button type="button" className="btn sm" style={{ height: 36 }} onClick={() => doPaste(SAMPLE_DIVINE)}>
+          <button type="button" className="adv-sh-btn" aria-haspopup="menu" onClick={openMenu('ex')}>
             <Icon name="orb" size={14} />
-            {tr('lootfilter_advanced_views_SimulateView.try_a_divine_orb')}
+            {tr('lootfilter_advanced_views_SimulateView.examples')}
           </button>
-          <button type="button" className="btn sm" style={{ height: 36 }} onClick={tryNoRule}>
-            <Icon name="search" size={14} />
-            {tr('lootfilter_advanced_views_SimulateView.try_an_item_no_rule')}
-          </button>
-          <button type="button" className="btn sm" style={{ height: 36 }} aria-pressed={builder} onClick={() => setBuilder((b) => !b)}>
+          <button type="button" className="adv-sh-btn" aria-pressed={builder} onClick={() => setBuilder((b) => !b)}>
             <Icon name="anvil" size={14} />
             {tr('lootfilter_advanced_views_SimulateView.build_an_item')}
           </button>
+          <button type="button" className="adv-sh-btn" aria-haspopup="menu" onClick={openMenu('opt')}>
+            <Icon name="sliders" size={14} />
+            {tr('lootfilter_advanced_views_SimulateView.options')}
+          </button>
         </div>
-        <div className="adv-v-row" style={{ gap: 10, flexWrap: 'wrap' }}>
-          <div className="seg" data-lg="tile" role="group" aria-label={tr('lootfilter_advanced_views_SimulateView.item_pile')}>
+        <div className="adv-v-row" style={{ gap: 10 }}>
+          <div className="adv-sh-seg" role="group" aria-label={tr('lootfilter_advanced_views_SimulateView.item_pile')}>
             {PILE_NAMES.map((n, i) => {
               const none = i === 2 && !!drops && lastN.items.length === 0;
               return (
@@ -274,16 +280,9 @@ export function SimulateView({ nav }: { nav: LfNav }) {
             {tr('lootfilter_advanced_views_SimulateView.area_level')}
             <input className="adv-v-in" aria-label={tr('lootfilter_advanced_views_SimulateView.area_level')} type="number" min={1} max={86} value={areaLevel} onChange={(e) => setAreaLevel(Math.max(1, Math.min(86, Number(e.target.value) || 1)))} style={{ width: 62, height: 30 }} />
           </label>
-          <TogglePill on={sound} onChange={setSound} icon="volume" label={tr('lootfilter_advanced_views_SimulateView.sound')} title={tr('lootfilter_advanced_views_SimulateView.play_the_sound_the_filter')} />
           <TogglePill on={showHidden} onChange={setShowHidden} icon="eye" label={tr('lootfilter_advanced_views_SimulateView.show_hidden_items')} />
-          <TogglePill on={replay} onChange={setReplay} icon="play" label={tr('lootfilter_advanced_views_SimulateView.replay_last_change')} title={tr('lootfilter_advanced_views_SimulateView.run_this_pile_through_the')} />
           <span className="adv-v-spacer" />
-          <span className="adv-v-muted">{tr('lootfilter_advanced_views_SimulateView.shown_shown_hiddenn_hidden', { shown, hiddenN })}</span>
-          {!!drops && lastN.items.length === 0 && (
-            <span className="adv-v-muted" style={{ flexBasis: '100%' }}>
-              {tr('lootfilter_advanced_views_SimulateView.my_last_50_drops_is')}
-            </span>
-          )}
+          <span className="adv-v-muted adv-v-ellip" style={{ minWidth: 0 }}>{tr('lootfilter_advanced_views_SimulateView.shown_shown_hiddenn_hidden', { shown, hiddenN })}</span>
         </div>
         {builder && (
           <div className="adv-sim-builder">
@@ -310,8 +309,7 @@ export function SimulateView({ nav }: { nav: LfNav }) {
             </label>
             <button
               type="button"
-              className="btn gold sm"
-              style={{ height: 32 }}
+              className="adv-sh-btn gold"
               disabled={!bld.base.trim()}
               onClick={() => {
                 addMine(buildItem({ base: bld.base.trim(), rarity: bld.rar, itemLevel: bld.il, links: bld.links }, bases));
@@ -386,8 +384,30 @@ export function SimulateView({ nav }: { nav: LfNav }) {
             );
           })}
         </div>
-        <span className="adv-sim-hint">{tr('lootfilter_advanced_views_SimulateView.hover_a_label_for_its')}</span>
       </div>
+
+      {menu?.k === 'ex' && (
+        <FloatMenu at={menu.at} onClose={() => setMenu(null)} width={220} label={tr('lootfilter_advanced_views_SimulateView.examples')}>
+          <button type="button" role="menuitem" className="adv-sh-level" style={{ gridTemplateColumns: '1fr' }} onClick={() => { setMenu(null); doPaste(SAMPLE_DIVINE); }}>
+            <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_SimulateView.divine_orb')}</span>
+          </button>
+          <button type="button" role="menuitem" className="adv-sh-level" style={{ gridTemplateColumns: '1fr' }} onClick={() => { setMenu(null); tryNoRule(); }}>
+            <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_SimulateView.item_no_rule_matches')}</span>
+          </button>
+        </FloatMenu>
+      )}
+      {menu?.k === 'opt' && (
+        <FloatMenu at={menu.at} onClose={() => setMenu(null)} width={260} label={tr('lootfilter_advanced_views_SimulateView.options')}>
+          <button type="button" role="menuitemcheckbox" aria-checked={sound} className="adv-sh-level" title={tr('lootfilter_advanced_views_SimulateView.play_the_sound_the_filter')} onClick={() => { setMenu(null); setSound(!sound); }}>
+            <span className="adv-sh-radio" data-on={sound} />
+            <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_SimulateView.sound')}</span>
+          </button>
+          <button type="button" role="menuitemcheckbox" aria-checked={replay} className="adv-sh-level" title={tr('lootfilter_advanced_views_SimulateView.run_this_pile_through_the')} onClick={() => { setMenu(null); setReplay(!replay); }}>
+            <span className="adv-sh-radio" data-on={replay} />
+            <span style={{ color: 'var(--text-strong)', font: '500 13px Geist' }}>{tr('lootfilter_advanced_views_SimulateView.replay_last_change')}</span>
+          </button>
+        </FloatMenu>
+      )}
 
       {replay && (
         <div className="lf-card adv-sim-replay">

@@ -135,6 +135,8 @@ export function QueryOptionsDialog(p: QueryOptionsProps) {
     ringSlot: p.initial.ringSlot && p.ringSlots.some((s) => s.name === p.initial.ringSlot) ? p.initial.ringSlot : p.ringSlots[0]?.name ?? null,
   }));
   const set = (patch: Partial<QueryOpts>) => setO((c) => ({ ...c, ...patch }));
+  // The extra options stay folded away unless one of them is not at its default.
+  const [more, setMore] = useState(() => (['includeMirrored', 'includeScourge', 'includeTalisman', 'eldritch', 'copyEnchant', 'maxLevel', 'sockets', 'links'] as const).some((k) => o[k] !== DEFAULT_OPTS[k]));
   const { menu, open, close } = useMenu();
   const [data, setData] = useState<QueryMods | null>(null);
   useEffect(() => {
@@ -219,21 +221,6 @@ export function QueryOptionsDialog(p: QueryOptionsProps) {
               <PickButton small value={nameOf(p.ringSlots, o.ringSlot)} disabled={!p.ringSlots.length} onOpen={(el) => open(el, p.ringSlots.map((s) => ({ key: s.name, label: s.label, on: s.name === o.ringSlot, run: () => set({ ringSlot: s.name }) })), 160)} />
             </div>
           )}
-          {!p.unique && <Check on={o.includeMirrored} onChange={(v) => set({ includeMirrored: v })} label={tr('items_trader_QueryOptions.mirrored_items')} />}
-          {showScourge && <Check on={o.includeScourge} onChange={(v) => set({ includeScourge: v })} label={tr('items_trader_QueryOptions.scourge_mods')} />}
-          {p.slotName === 'Amulet' && <Check on={o.includeTalisman} onChange={(v) => set({ includeTalisman: v })} label={tr('items_trader_QueryOptions.talisman_mods')} tip={tr('items_trader_QueryOptions.whether_talisman_enchant_mods_should')} />}
-          {eldritch && !p.unique && (
-            <div className="tr-qo-row" title={ELDRITCH_TIP}>
-              <span className="k">{tr('items_trader_QueryOptions.eldritch_mods')}</span>
-              <PickButton small value={qw(o.eldritch)} onOpen={(el) => open(el, ['Copy Current', 'Keep regular', 'Keep regular+presence', 'Remove'].map((v) => ({ key: v, label: qw(v), on: v === o.eldritch, run: () => set({ eldritch: v }) })), 190)} />
-            </div>
-          )}
-          {(isWeapon || p.slotName === 'Amulet' || p.slotName === 'Belt') && !p.unique && (
-            <div className="tr-qo-row" title={[tr(isWeapon ? 'h_c_It.tip_keep_enchants' : 'h_c_It.tip_keep_anoints'), tr(isWeapon ? 'h_c_It.tip_copy_enchants' : 'h_c_It.tip_copy_anoints'), tr(isWeapon ? 'h_c_It.tip_remove_enchants' : 'h_c_It.tip_remove_anoints')].join('\n')}>
-              <span className="k">{isWeapon ? tr('items_trader_QueryOptions.enchant_behaviour') : tr('items_trader_QueryOptions.anoint_behaviour')}</span>
-              <PickButton small value={qw(o.copyEnchant)} onOpen={(el) => open(el, ['Keep', 'Copy Current', 'Remove'].map((v) => ({ key: v, label: qw(v), on: v === o.copyEnchant, run: () => set({ copyEnchant: v }) })), 160)} />
-            </div>
-          )}
           {p.isJewel && !p.unique && (
             <div className="tr-qo-row">
               <span className="k">{tr('items_trader_QueryOptions.jewel_type')}</span>
@@ -247,9 +234,6 @@ export function QueryOptionsDialog(p: QueryOptionsProps) {
               <PickButton small value={CURRENCIES[o.maxPriceType]?.name} onOpen={(el) => open(el, CURRENCIES.map((c, i) => ({ key: c.name, label: c.name, on: i === o.maxPriceType, run: () => set({ maxPriceType: i }) })), 200)} />
             </span>
           </div>
-          <Num label={tr('items_trader_QueryOptions.max_level')} value={o.maxLevel} onChange={(v) => set({ maxLevel: v })} />
-          {showSockets && <Num label={tr('items_trader_QueryOptions.of_empty_sockets')} value={o.sockets} onChange={(v) => set({ sockets: v })} width={70} />}
-          {showLinks && <Num label={tr('items_trader_QueryOptions.of_links')} value={o.links} onChange={(v) => set({ links: v })} width={70} />}
           <div className="tr-qo-row" title={tr('items_trader_QueryOptions.sorts_the_weights_by_the')}>
             <span className="k">{tr('items_trader_QueryOptions.stat_to_sort_by')}</span>
             <span className="tr-qo-stats">
@@ -269,6 +253,29 @@ export function QueryOptionsDialog(p: QueryOptionsProps) {
               {modRows('blocked', tr('items_trader_QueryOptions_2.blocked_stats'), tr('items_trader_QueryOptions_2.add_blocked_stat'))}
             </>
           )}
+          <details className="tr-more" open={more} onToggle={(e) => setMore(e.currentTarget.open)}>
+            <summary>{tr('items_trader_QueryOptions.more_options')}</summary>
+            <div className="tr-qo" style={{ marginTop: 8 }}>
+              {!p.unique && <Check on={o.includeMirrored} onChange={(v) => set({ includeMirrored: v })} label={tr('items_trader_QueryOptions.mirrored_items')} />}
+              {showScourge && <Check on={o.includeScourge} onChange={(v) => set({ includeScourge: v })} label={tr('items_trader_QueryOptions.scourge_mods')} />}
+              {p.slotName === 'Amulet' && <Check on={o.includeTalisman} onChange={(v) => set({ includeTalisman: v })} label={tr('items_trader_QueryOptions.talisman_mods')} tip={tr('items_trader_QueryOptions.whether_talisman_enchant_mods_should')} />}
+              {eldritch && !p.unique && (
+                <div className="tr-qo-row" title={ELDRITCH_TIP}>
+                  <span className="k">{tr('items_trader_QueryOptions.eldritch_mods')}</span>
+                  <PickButton small value={qw(o.eldritch)} onOpen={(el) => open(el, ['Copy Current', 'Keep regular', 'Keep regular+presence', 'Remove'].map((v) => ({ key: v, label: qw(v), on: v === o.eldritch, run: () => set({ eldritch: v }) })), 190)} />
+                </div>
+              )}
+              {(isWeapon || p.slotName === 'Amulet' || p.slotName === 'Belt') && !p.unique && (
+                <div className="tr-qo-row" title={[tr(isWeapon ? 'h_c_It.tip_keep_enchants' : 'h_c_It.tip_keep_anoints'), tr(isWeapon ? 'h_c_It.tip_copy_enchants' : 'h_c_It.tip_copy_anoints'), tr(isWeapon ? 'h_c_It.tip_remove_enchants' : 'h_c_It.tip_remove_anoints')].join('\n')}>
+                  <span className="k">{isWeapon ? tr('items_trader_QueryOptions.enchant_behaviour') : tr('items_trader_QueryOptions.anoint_behaviour')}</span>
+                  <PickButton small value={qw(o.copyEnchant)} onOpen={(el) => open(el, ['Keep', 'Copy Current', 'Remove'].map((v) => ({ key: v, label: qw(v), on: v === o.copyEnchant, run: () => set({ copyEnchant: v }) })), 160)} />
+                </div>
+              )}
+              <Num label={tr('items_trader_QueryOptions.max_level')} value={o.maxLevel} onChange={(v) => set({ maxLevel: v })} />
+              {showSockets && <Num label={tr('items_trader_QueryOptions.of_empty_sockets')} value={o.sockets} onChange={(v) => set({ sockets: v })} width={70} />}
+              {showLinks && <Num label={tr('items_trader_QueryOptions.of_links')} value={o.links} onChange={(v) => set({ links: v })} width={70} />}
+            </div>
+          </details>
         </div>
       </Dialog>
       <MenuHost menu={menu} close={close} onTip={() => undefined} offTip={() => undefined} />

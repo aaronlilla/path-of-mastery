@@ -134,11 +134,6 @@ export function ExportView({ nav }: { nav: LfNav }) {
     else nav.setAdvancedView('advanced');
   };
 
-  const proof: { l: string; s: string; on: boolean }[] = [
-    { l: tr('lootfilter_advanced_views_ExportView_2.written'), s: ex === 'verified' || ex === 'unwritten' ? `${doc.written ? tr('lootfilter_advanced_views_ExportView_2.last_written') : ''}${wroteAt ? ` ${fmtClock(wroteAt)}` : ''}${ex === 'unwritten' ? tr('lootfilter_advanced_views_ExportView_2.with_newer_changes_waiting') : ''}`.trim() : tr('lootfilter_advanced_views_ExportView.waiting_for_a_write'), on: ex === 'verified' },
-    { l: tr('lootfilter_advanced_views_ExportView.seen_in_game'), s: tr('lootfilter_advanced_views_ExportView.after_reloaditemfilter_in_game'), on: false },
-  ];
-
   const mkBtn = (label: string, icon: string, go: () => void, off = false) => (
     <button type="button" className="btn sm" style={{ height: 34 }} disabled={off} onClick={go} key={label}>
       <Icon name={icon} size={14} />
@@ -150,18 +145,16 @@ export function ExportView({ nav }: { nav: LfNav }) {
     <div className="adv-v-page" style={{ position: 'relative' }}>
       <div className="adv-v-head">
         <span className="adv-v-title">{tr('lootfilter_advanced_views_ExportView.export')}</span>
-        <span className="adv-v-sub">{tr('lootfilter_advanced_views_ExportView.the_game_folder_is_all')}</span>
       </div>
       <div className="adv-ex-grid">
         <div className="lf-card adv-v-panel accent">
           <div className="adv-v-row">
             <Eyebrow>{tr('lootfilter_advanced_views_ExportView.game_folder')}</Eyebrow>
-            <span style={{ font: '600 10px Geist', letterSpacing: '.06em', padding: '2px 6px', borderRadius: 5, background: 'rgba(var(--accent-rgb),.14)', color: 'var(--gold-text)' }}>{tr('lootfilter_advanced_views_ExportView.recommended')}</span>
           </div>
           <div className="adv-ex-folder">
             <span className="adv-v-muted">{tr('lootfilter_advanced_views_ExportView.folder')}</span>
-            <span ref={folderRef} className="adv-v-mono adv-v-ellip" title={folder} style={{ color: ex === 'notfound' ? 'var(--negative-text)' : 'var(--text-2)' }}>
-              {ex === 'notfound' ? tr('lootfilter_advanced_views_ExportView.folder_not_found', { folder }) : folder || tr('lootfilter_advanced_views_ExportView.not_set')}
+            <span ref={folderRef} className="adv-v-mono" title={folder} style={{ color: 'var(--text-2)', overflowWrap: 'anywhere' }}>
+              {folder || tr('lootfilter_advanced_views_ExportView.not_set')}
             </span>
             <button type="button" className="btn sm" style={{ height: 28 }} onClick={() => void lf.chooseFolder()}>
               <Icon name="edit" size={13} />
@@ -176,7 +169,7 @@ export function ExportView({ nav }: { nav: LfNav }) {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {(ex === 'confirm-foreign' || ex === 'confirm-changed') && (
               <>
-                <button type="button" className="btn gold sm" style={{ height: 34 }} disabled={busy} onClick={() => void doWrite(ex === 'confirm-foreign' ? 'foreign' : 'changed')}>
+                <button type="button" className="adv-sh-btn" disabled={busy} onClick={() => void doWrite(ex === 'confirm-foreign' ? 'foreign' : 'changed')}>
                   <Icon name="save" size={14} />
                   {tr('lootfilter_advanced_views_ExportView.overwrite')}
                 </button>
@@ -189,14 +182,13 @@ export function ExportView({ nav }: { nav: LfNav }) {
               </>
             )}
             {ex !== 'confirm-foreign' && ex !== 'confirm-changed' && (
-              <button type="button" className="btn gold sm" style={{ height: 34, padding: '0 14px', fontSize: 13 }} disabled={busy || !gen || ex === 'notfound'} onClick={() => void doWrite()}>
+              <button type="button" className="adv-sh-btn" disabled={busy || !gen || ex === 'notfound'} onClick={() => void doWrite()}>
                 <Icon name={busy ? 'loader' : 'gamepad'} size={14} spin={busy} />
                 {busy ? tr('lootfilter_advanced_views_ExportView.saving') : tr('lootfilter_advanced_views_ExportView.save_to_path_of_exile')}
-                {!busy && <span className="adv-sh-k on-gold">{tr('lootfilter_advanced_views_ExportView.ctrl_s')}</span>}
               </button>
             )}
             {ex === 'verified' && mkBtn(tr('h_lootB_Export.copy_cmd', { cmd: '/reloaditemfilter' }), 'copy', () => void copyCmd())}
-            {(ex === 'notfound' || (ex === 'failed' && outcome?.kind === 'error' && outcome.code === 'folder-missing')) && mkBtn(tr('lootfilter_advanced_views_ExportView.choose_folder'), 'folder-open', () => void lf.chooseFolder())}
+            {ex === 'failed' && outcome?.kind === 'error' && outcome.code === 'folder-missing' && mkBtn(tr('lootfilter_advanced_views_ExportView.choose_folder'), 'folder-open', () => void lf.chooseFolder())}
             {ex === 'outside' && target?.state === 'changed' && (
               <>
                 {mkBtn(tr('lootfilter_advanced_views_ExportView.keep_theirs'), 'cloud', () => {
@@ -212,35 +204,19 @@ export function ExportView({ nav }: { nav: LfNav }) {
             {ex === 'failed' && outcome?.kind === 'error' && outcome.code !== 'folder-missing' && mkBtn(tr('lootfilter_advanced_views_ExportView.choose_folder'), 'folder-open', () => void lf.chooseFolder())}
           </div>
           <TogglePlain on={lf.settings.autoWrite} onChange={(v) => lf.setSettings({ autoWrite: v })} label={tr('lootfilter_advanced_views_ExportView.write_automatically_after_each_chang')} />
-          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: 4 }}>
-            {proof.map((p, i) => (
-              <div key={p.l} className="adv-ex-proof">
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span className="adv-ex-mk" style={{ border: `1.5px solid ${p.on ? 'var(--sync-ok)' : 'rgba(var(--line-rgb),.3)'}`, background: p.on ? 'var(--sync-ok)' : 'transparent' }}>{p.on ? '✓' : i + 1}</span>
-                  {i < proof.length - 1 && <span style={{ flex: 1, width: 1.5, minHeight: 10, background: 'rgba(var(--line-rgb),.14)' }} />}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 1, paddingBottom: 10 }}>
-                  <span style={{ color: p.on ? 'var(--text-strong)' : 'var(--text-muted)', fontWeight: 500 }}>{p.l}</span>
-                  <span className="adv-v-muted" style={{ fontSize: 12 }}>{p.s}</span>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-
-        <FolderImportCard nav={nav} />
 
         <div className="lf-card adv-v-panel tight">
           <Eyebrow>{tr('lootfilter_advanced_views_ExportView.file_2')}</Eyebrow>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--s-3)', marginTop: 'var(--s-2)' }}>
             {fileActs.map((a) => (
-              <button key={a.label} type="button" className="adv-ex-act" disabled={a.off} onClick={a.go}>
+              <button key={a.label} type="button" className="adv-ex-act" title={a.sub} disabled={a.off} onClick={a.go}>
                 <Icon name={a.icon} size={16} style={{ gridRow: '1 / span 2', alignSelf: 'center', color: 'var(--text-muted)' }} />
                 <span style={{ display: 'block', color: 'var(--text-strong)', font: '500 14px/1.3 Geist' }}>{a.label}</span>
-                <span style={{ display: 'block', color: 'var(--text-muted)', font: '400 12px/1.35 Geist' }}>{a.sub}</span>
               </button>
             ))}
           </div>
+          <FolderImportCard nav={nav} />
         </div>
       </div>
 

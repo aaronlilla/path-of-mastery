@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { ProviderId } from '../../shared/assistant/types.js';
 import { PROVIDER_LABEL } from '../../shared/assistant/types.js';
 import { Icon, useDismiss } from '../ui';
@@ -29,6 +29,22 @@ export function SearchPalette({ docs, assistant, onClose }: SearchPaletteProps) 
   const boxRef = useRef<HTMLDivElement>(null);
   useDismiss(boxRef, true, onClose, true);
   useEffect(() => input.current?.focus(), []);
+  // The palette opens from the title-bar search field: it grows out of that field (right edges meet, at least 720 wide so the help line stays one line) instead of sitting in the window's centre.
+  const [place, setPlace] = useState<CSSProperties | undefined>();
+  useLayoutEffect(() => {
+    const fit = () => {
+      const host = boxRef.current?.offsetParent;
+      const field = document.querySelector<HTMLElement>('.titlebar .search-pill, .titlebar .tb-find');
+      if (!host || !field) return setPlace(undefined);
+      const h = host.getBoundingClientRect();
+      const r = field.getBoundingClientRect();
+      const width = Math.min(Math.max(r.width, 720), h.width - 32);
+      setPlace({ left: Math.max(16, r.right - h.left - width), width, top: 6, transform: 'none' });
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
   const smart = assistant.ready !== null;
   const out = useMemo(() => search(q, docs), [q, docs]);
   const askable = smart && q.trim().split(/\s+/).filter(Boolean).length >= 2;
@@ -82,34 +98,19 @@ export function SearchPalette({ docs, assistant, onClose }: SearchPaletteProps) 
   return (
     <>
       <div className="search-scrim" onPointerDown={onClose} />
-      <div ref={boxRef} className="search-box" data-lg="pop" data-solid="" role="dialog" aria-label={tr('h_search_SearchPalette.search')} onKeyDown={onKey}>
+      <div ref={boxRef} className="search-box" data-lg="pop" data-solid="" style={place} role="dialog" aria-label={tr('h_search_SearchPalette.search')} onKeyDown={onKey}>
         <div className="search-head">
           <Icon name="search" size={20} style={{ flex: 'none', color: '#e9c887' }} />
           <input ref={input} value={q} onChange={(e) => { setQ(e.target.value); setSel(0); }} placeholder={smart ? tr('h_search_SearchPalette.ph_smart') : tr('h_search_SearchPalette.ph_basic')} spellCheck={false} aria-label={tr('h_search_SearchPalette.search')} />
           <button type="button" className="kbd" style={{ cursor: 'pointer', background: 'none' }} onClick={onClose}>Esc</button>
         </div>
         <div className="search-list">
-          {!smart && !typed && (
-            <div className="search-ask">
-              <span className="ic"><Icon name="sparkle-fill" size={18} /></span>
-              <span className="tx">
-                <span className="h">{tr('h_search_SearchPalette.ask_h')}</span>
-                <span className="p">{tr('h_search_SearchPalette.ask_p')}</span>
-              </span>
-              <button type="button" className="btn gold sm" onClick={connect}>
-                <Icon name="link" size={14} />
-                
-                {tr('h_search_SearchPalette.connect')}
-              </button>
-            </div>
-          )}
           {!typed && (
             <div className="search-try">
               <span className="search-group" style={{ padding: 0 }}>{smart ? tr('h_search_SearchPalette.try_asking') : tr('h_search_SearchPalette.try_searching')}</span>
               <div className="chips">
                 {(smart ? ['am I res capped?', 'biggest hit I can take', 'weak points', 'freeze', 'cyclone gems', 'bandit'] : BASIC_SUGGESTIONS).map((s) => (
                   <button key={s} type="button" onClick={() => { setQ(s); setSel(0); input.current?.focus(); }}>
-                    {(s === 'flask' || s === 'configuration') && <pom-icon auto={s} size="14" />}
                     {s}
                   </button>
                 ))}
@@ -119,6 +120,19 @@ export function SearchPalette({ docs, assistant, onClose }: SearchPaletteProps) 
                   ? tr('h_search_SearchPalette.note_smart')
                   : tr('h_search_SearchPalette.note_basic')}
               </span>
+            </div>
+          )}
+          {!smart && !typed && (
+            <div className="search-ask promo" title={tr('h_search_SearchPalette.ask_p')}>
+              <span className="ic"><Icon name="sparkle-fill" size={14} /></span>
+              <span className="tx">
+                <span className="h">{tr('h_search_SearchPalette.ask_h')}</span>
+              </span>
+              <button type="button" className="btn sm" onClick={connect}>
+                <Icon name="link" size={14} />
+                
+                {tr('h_search_SearchPalette.connect')}
+              </button>
             </div>
           )}
           {!smart && typed && out.locked && (
@@ -195,7 +209,6 @@ export function SearchPalette({ docs, assistant, onClose }: SearchPaletteProps) 
           <span className="mode"><i data-on={smart} />{smart ? tr('h_search_SearchPalette.smart_search', { askName: askName }) : tr('h_search_SearchPalette.basic_search')}</span>
           <span><b>↑ ↓</b>  {tr('h_search_SearchPalette.f_move')}</span>
           <span><b>↵</b>  {tr('h_search_SearchPalette.f_open')}</span>
-          <span><b>Esc</b>  {tr('h_search_SearchPalette.f_close')}</span>
           <span style={{ marginLeft: 'auto' }}>{typed ? (n ? tr(n === 1 ? 'h_search_SearchPalette.one_result' : 'h_search_SearchPalette.n_results', { n }) : tr('h_search_SearchPalette.no_results')) : tr('h_search_SearchPalette.everything')}</span>
         </div>
       </div>

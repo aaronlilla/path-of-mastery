@@ -15,6 +15,7 @@ export interface BuildMoreMenuProps {
   onNewBuild: () => void;
   onSaveAs: () => void;
   onShare: () => void;
+  onSimilar: () => void;
   onCompare: () => void;
   onHistory: () => void;
   /** Opens the Loot Filter on the Build Filter for this build. The item is left out when the host does not pass it. */
@@ -38,29 +39,28 @@ export function BuildMoreMenu(p: BuildMoreMenuProps) {
   );
   return (
     <div ref={wrap} style={{ position: 'relative', flex: 'none' }} onClick={(e) => e.stopPropagation()}>
-      <button ref={p.btnRef} type="button" className="btn icon" data-lg="control" title={p.stage < 2 ? tr('BuildMoreMenu.share_link_save_as_compare') : tr('BuildMoreMenu.more_new_build_save_as')} aria-label={tr('BuildMoreMenu.more')} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        <Icon name={p.stage < 2 ? 'link' : 'more'} size={p.stage < 2 ? 15 : 14} />
+      <button ref={p.btnRef} type="button" className="btn icon" data-lg="control" title={tr('BuildMoreMenu.more_new_build_save_as')} aria-label={tr('BuildMoreMenu.more')} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <Icon name="more" size={14} />
       </button>
       <PortalMenu anchor={p.btnRef} open={open} onClose={close} align="left" label={tr('BuildMoreMenu.more')} minWidth={300} className="bw-more">
         {item(tr('BuildMoreMenu.new_build'), 'plus', p.onNewBuild, { kbd: 'Ctrl N' })}
         {item(tr('BuildMoreMenu.save_as'), 'file-plus', p.onSaveAs, { kbd: 'Ctrl Shift S' })}
-        {item(tr('BuildMoreMenu.copy_share_link'), 'link', p.onShare)}
-        {item(tr('BuildMoreMenu.compare_with'), 'compare', p.onCompare)}
-        {p.onLootFilter && item(tr('BuildMoreMenu.make_a_loot_filter_for'), 'filter', p.onLootFilter)}
-        {p.onPublish && item(tr('BuildMoreMenu.publish_to_community'), 'share', p.onPublish)}
         {item(tr('BuildMoreMenu.version_history'), 'history', p.onHistory, p.signedIn ? { kbd: 'Ctrl H' } : { title: tr('BuildMoreMenu.version_history_is_kept_for') })}
-        {p.stage >= 2 && (
-          <>
-            <div className="menu-sep" />
-            <div className="bw-more-row">
-              <span>{tr('BuildMoreMenu.passive_points')}</span>
-              <div className="seg" data-lg="tile" role="group" aria-label={tr('BuildMoreMenu.character_level_mode')} title={tr('BuildMoreMenu.passive_point_allocation')}>
-                <button type="button" aria-pressed={p.auto} onClick={() => p.onAuto(true)}>{tr('BuildMoreMenu.auto')}</button>
-                <button type="button" aria-pressed={!p.auto} onClick={() => p.onAuto(false)}>{tr('BuildMoreMenu.manual')}</button>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="menu-sep" />
+        {item(tr('BuildMoreMenu.copy_share_link'), 'link', p.onShare)}
+        {p.onPublish && item(tr('BuildMoreMenu.publish_to_community'), 'share', p.onPublish)}
+        <div className="menu-sep" />
+        {item(tr('BuildMoreMenu.compare_with'), 'compare', p.onCompare)}
+        {item(tr('BuildWorkspace.similar_builds'), 'search', p.onSimilar, { title: tr('BuildWorkspace.community_builds_with_the_same') })}
+        {p.onLootFilter && item(tr('BuildMoreMenu.make_a_loot_filter_for'), 'filter', p.onLootFilter)}
+        <div className="menu-sep" />
+        <div className="bw-more-row">
+          <span>{tr('BuildMoreMenu.passive_points')}</span>
+          <div className="seg" data-lg="tile" role="group" aria-label={tr('BuildMoreMenu.character_level_mode')} title={tr('BuildMoreMenu.passive_point_allocation')}>
+            <button type="button" aria-pressed={p.auto} onClick={() => p.onAuto(true)}>{tr('BuildMoreMenu.auto')}</button>
+            <button type="button" aria-pressed={!p.auto} onClick={() => p.onAuto(false)}>{tr('BuildMoreMenu.manual')}</button>
+          </div>
+        </div>
       </PortalMenu>
     </div>
   );

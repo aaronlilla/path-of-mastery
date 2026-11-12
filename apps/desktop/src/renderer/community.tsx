@@ -97,12 +97,12 @@ export function SimilarBuildsDialog({ xml, onOpen, onClose }: { xml: string; onO
   );
   const what = [info.ascendClassName && info.ascendClassName !== 'None' ? info.ascendClassName : info.className, info.mainSkill].filter(Boolean).join(' · ');
   return (
-    <Dialog icon="share" size="medium" title={tr('community.similar_builds')} subtitle={what ? tr('community.community_builds_with_the_same', { what }) : tr('community.this_build_has_no_class')} cancelLabel={tr('community.close')} confirmLabel={null} onCancel={onClose}>
+    <Dialog icon="share" size={s.state === 'error' ? 'small' : 'medium'} title={tr('community.similar_builds')} subtitle={what ? tr('community.community_builds_with_the_same', { what }) : tr('community.this_build_has_no_class')} cancelLabel={null} confirmLabel={null} onCancel={onClose}>
       <div className="com-list" aria-live="polite">
         {s.state === 'loading' && <div className="com-empty">{tr('community.looking_for_similar_builds')}</div>}
         {s.state === 'error' && (
-          <div className="com-empty bad" role="alert">
-            {tr('community.could_not_load_similar_builds', { error: s.error, value: ' ' })}
+          <div className="com-empty bad" role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--s-4)' }}>
+            <span>{tr('community.could_not_load_similar_builds', { error: s.error, value: ' ' })}</span>
             <button type="button" className="btn sm" onClick={retry}>{tr('community.try_again')}</button>
           </div>
         )}

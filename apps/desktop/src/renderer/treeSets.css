@@ -61,6 +61,7 @@
 .ts-fld pom-icon[name="chevron-down"] { flex: none; color: var(--text-muted); transition: transform var(--dur-quick) var(--ease); }
 .ts-fld[aria-expanded="true"] pom-icon[name="chevron-down"] { transform: rotate(180deg); }
 .ts-lvl { height: 40px; display: flex; justify-content: space-between; align-items: center; border-radius: 10px; background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); border: 1px solid rgba(var(--line-rgb), .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); }
+.ts-lvl:focus-within { border-color: rgba(var(--accent-rgb), .5); }
 .ts-lvl button { flex: none; width: 30px; height: 34px; border: 0; background: transparent; color: var(--text-3); cursor: pointer; }
 .ts-lvl button:first-child { border-radius: 9px 0 0 9px; } .ts-lvl button:last-child { border-radius: 0 9px 9px 0; }
 .ts-lvl button:hover { background: rgba(var(--line-rgb), .05); color: var(--text-strong); }

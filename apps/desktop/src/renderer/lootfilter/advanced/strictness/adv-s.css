@@ -65,15 +65,17 @@
 .adv-s-cmp .dot.hid { border-color: rgba(var(--line-rgb), .35); background: transparent; }
 
 /* Themes */
-.adv-s-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 12px; }
-.adv-s-card { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.adv-s-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@container area (min-width: 1360px) { .adv-s-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.adv-s-card { padding: var(--s-7); display: flex; flex-direction: column; gap: 12px; }
 .adv-s-cardname { flex: 1; font: 600 20px 'Cormorant Garamond', serif; color: var(--text-display); }
+.adv-s-sample.flat { padding-inline: 0; }
 .adv-s-sample { padding: 16px 12px; border-radius: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 
 /* Raw */
 .adv-s-page.fill { display: flex; flex-direction: column; }
 .adv-s-page.fill > * { flex: none; }
-.adv-s-page.fill > .adv-s-raw { flex: 0 1 auto; }
+.adv-s-page.fill > .adv-s-raw { flex: 1 1 auto; }
 /* The code card is as tall as its lines (down to the room there is), with Diagnostics right under it, as the prototype draws it. */
 .adv-s-raw { flex: 0 1 auto; min-height: 420px; display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: minmax(0, auto) auto; align-content: start; gap: 12px; }
 .adv-s-outline { grid-row: 1 / 3; padding: 12px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; min-height: 0; }
@@ -99,7 +101,7 @@
 .adv-s-ln.static { pointer-events: none; }
 .adv-s-editbox { position: relative; }
 .adv-s-edit { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0 0 0 56px; margin: 0; border: 0; outline: none; resize: none; background: transparent; color: transparent; caret-color: var(--text-strong); font: 500 12.5px/22px 'Geist Mono', monospace; white-space: pre; overflow: hidden; }
-.adv-s-diag { padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; max-height: 190px; overflow: auto; }
+.adv-s-diag { padding: var(--s-5) var(--s-7); display: flex; flex-direction: column; gap: 2px; max-height: 190px; overflow: auto; }
 .adv-s-dg { display: grid; grid-template-columns: 8px 56px minmax(0, 1fr); gap: 10px; align-items: center; padding: 6px 4px; border: 0; border-radius: 7px; background: transparent; cursor: pointer; text-align: left; font: 400 12.5px Geist, sans-serif; color: var(--text-2); }
 .adv-s-dg:hover { background: rgba(var(--line-rgb), .05); }
 .adv-s-dg i { width: 6px; height: 6px; border-radius: 3px; }

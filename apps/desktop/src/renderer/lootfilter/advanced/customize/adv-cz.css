@@ -2,7 +2,7 @@
 .adv-cz { flex: 1; min-height: 0; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 12px; }
 .adv-cz * { box-sizing: border-box; }
 .adv-cz-tree, .adv-cz-main { display: flex; flex-direction: column; overflow: hidden; min-width: 0; min-height: 0; }
-.adv-cz-treelist { flex: 1; min-height: 0; padding: 0 6px 8px; }
+.adv-cz-treelist { flex: 1; min-height: 0; padding: 0 var(--s-6) var(--s-6); }
 .adv-cz-filter { flex: 1; min-width: 0; height: 26px; border-radius: 7px; border: 1px solid rgba(var(--line-rgb), .1); background: transparent; color: var(--text-muted); font: 500 12px Geist, sans-serif; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adv-cz-filter[aria-pressed="true"] { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .12); color: var(--text-strong); }
 .adv-cz-ghead { padding: 8px 8px 4px; font: 600 10.5px Geist, sans-serif; letter-spacing: .1em; color: var(--text-faint); text-transform: uppercase; }
@@ -12,9 +12,17 @@
 .adv-cz-sec:hover { color: var(--text-strong); }
 .adv-cz-sec[aria-current="true"] { background: rgba(var(--accent-rgb), .12); color: var(--text-strong); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .3); }
 .adv-cz-badge { flex: none; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font: 600 10.5px Geist, sans-serif; color: var(--gold-text); background: rgba(var(--accent-rgb), .14); }
-.adv-cz-mhead { flex: none; padding: 12px 14px 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(var(--line-rgb), .06); flex-wrap: wrap; }
+.adv-cz-mhead { flex: none; padding: var(--s-6) var(--s-6) var(--s-5); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(var(--line-rgb), .06); flex-wrap: nowrap; }
+.adv-cz-mhead > :not(:first-child) { flex: none; }
+/* Longer languages: the title keeps 160 px; the buttons drop to a second line (right-aligned) rather than squeezing it to a few dots. */
+.adv-cz-mhead { flex-wrap: wrap; }
+.adv-cz-mhead > :first-child { min-width: 160px; }
+.adv-cz-mhead > :nth-child(2) { margin-left: auto; }
+/* R6: when Inspector or Ask squeeze the head, the count line wraps instead of being cut while the title above has room. */
+.adv-cz-mhead > :first-child > span:last-child { white-space: normal; overflow: visible; text-overflow: clip; }
 .adv-cz-mbody { flex: 1; min-height: 0; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
 .adv-cz-tier { flex: none; border-radius: 11px; border: 1px solid; transition: border-color .1s, background .1s; }
+.adv-cz-tier:not(:last-child) { box-shadow: 0 1px 0 rgba(var(--line-rgb), .07); }
 .adv-cz-thead { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 6px; }
 .adv-cz-tname { min-width: 0; flex: 0 1 auto; border: 0; background: transparent; padding: 0; color: var(--text-strong); font: 600 14px Geist, sans-serif; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adv-cz-aa { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 22px; font: 400 13px/1 'Fontin SmallCaps', 'Cormorant SC', Georgia, serif; font-variant-ligatures: none; cursor: pointer; }
@@ -28,6 +36,7 @@
 .adv-cz-prio { border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .12); background: var(--glass-strong); padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
 
 @container area (max-width: 1000px) {
+  .adv-cz-mhead .adv-cz-lbl { display: none; }
   .adv-cz { grid-template-columns: 210px minmax(0, 1fr); }
   .adv-cz-nrrow { grid-template-columns: 130px 110px minmax(0, 1fr) 32px; }
   .adv-cz-sug { padding-left: 0; }

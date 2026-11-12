@@ -180,8 +180,8 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="adv-sh-scrim" onClick={onClose} style={{ zIndex: 95 }}>
       <div className="adv-sh-settings" data-lg="pop" role="dialog" aria-modal="true" aria-label={tr('lootfilter_advanced_shell_Dialogs.loot_filter_settings')} onClick={(e) => e.stopPropagation()}>
-        <div style={{ padding: '16px 10px', display: 'flex', flexDirection: 'column', gap: 2, borderRight: '1px solid rgba(var(--line-rgb),.08)' }}>
-          <span style={{ padding: '0 8px 10px', font: "600 22px 'Cormorant Garamond',serif", color: 'var(--text-display)' }}>{tr('lootfilter_advanced_shell_Dialogs.settings')}</span>
+        <div style={{ padding: 'var(--s-8) var(--s-6)', display: 'flex', flexDirection: 'column', gap: 2, borderRight: '1px solid rgba(var(--line-rgb),.08)' }}>
+          <span style={{ padding: '0 var(--s-6) var(--s-6)', font: "600 22px 'Cormorant Garamond',serif", color: 'var(--text-display)' }}>{tr('lootfilter_advanced_shell_Dialogs.settings')}</span>
           {SECTIONS.map((x, i) => (
             <button key={x.name} type="button" className="adv-sh-setnav" aria-current={i === sec} onClick={() => setSec(i)}>
               <Icon name={x.icon} size={14} style={{ opacity: 0.85 }} />
@@ -190,13 +190,13 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           ))}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <div style={{ padding: '16px 20px 8px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ padding: 'var(--s-8) var(--s-9) var(--s-6)', display: 'flex', alignItems: 'center' }}>
             <span className="lf-eyebrow" style={{ flex: 1 }}>{cur.name.toUpperCase()}</span>
             <button type="button" className="adv-sh-ib sm" aria-label={tr('lootfilter_advanced_shell_Dialogs.close')} onClick={onClose}>
               <Icon name="x" size={14} />
             </button>
           </div>
-          <div className="lf-scroll" style={{ flex: 1, padding: '0 20px 16px', display: 'flex', flexDirection: 'column' }}>
+          <div className="lf-scroll" style={{ flex: 1, padding: '0 var(--s-9) var(--s-7)', display: 'flex', flexDirection: 'column' }}>
             {cur.rows.map((r, i) => {
               if (r.k === 'path')
                 return (
@@ -246,7 +246,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               );
             })}
           </div>
-          <div style={{ padding: '10px 20px', borderTop: '1px solid rgba(var(--line-rgb),.08)', color: 'var(--text-faint)', fontSize: 12 }}>{tr('lootfilter_advanced_shell_Dialogs.changes_save_as_you_make')}</div>
+          <div style={{ padding: 'var(--s-6) var(--s-9)', borderTop: '1px solid rgba(var(--line-rgb),.08)', color: 'var(--text-faint)', fontSize: 12 }}>{tr('lootfilter_advanced_shell_Dialogs.changes_save_as_you_make')}</div>
         </div>
       </div>
     </div>

@@ -52,11 +52,11 @@ export function ArchivePanel({ area, current, rows, emptyText, note, onCopy, onC
       {error && <p role="alert">{error}</p>}
     </Dialog>;
   }
-  return <Dialog title={tr('documents_ArchivePanel.archive_area', { area })} subtitle={tr('documents_ArchivePanel.items_saved_for_a_league', { current })} confirmLabel={null} cancelLabel={tr('documents_ArchivePanel.close')} onCancel={onClose}>
+  return <Dialog title={tr('documents_ArchivePanel.archive_area', { area })} subtitle={tr('documents_ArchivePanel.items_saved_for_a_league', { current })} confirmLabel={null} cancelLabel={null} onCancel={onClose}>
     {rows.length === 0 && <p className="mastery-archive-empty">{emptyText}</p>}
     {rows.map((row) => <div className="mastery-trash-row mastery-archive-row" key={row.id}>
-      <div><strong>{row.title}</strong><p>{tr('documents_ArchivePanel.saved_for_stamp', { stamp: row.stamp })}</p></div>
-      {onCopy && <button type="button" className="btn" onClick={() => { setCopying(row); setName(`${row.title} - ${current}`); }}>{tr('documents_ArchivePanel.copy_to_current', { current })}</button>}
+      <div><strong>{row.title}</strong><span>{tr('documents_ArchivePanel.saved_for_stamp', { stamp: row.stamp })}</span></div>
+      {onCopy && <button type="button" className="btn sm" title={tr('documents_ArchivePanel.copy_to_current', { current })} aria-label={`${tr('documents_ArchivePanel.copy_to_current', { current })}: ${row.title}`} onClick={() => { setCopying(row); setName(`${row.title} - ${current}`); }}>{tr('documents_ArchivePanel.copy')}</button>}
     </div>)}
     {note && <p className="mastery-safe-note">{note}</p>}
   </Dialog>;

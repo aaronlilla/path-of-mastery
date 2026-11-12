@@ -86,6 +86,9 @@
   --control-h: 36px;       /* default control height */
   --control-h-sm: 30px;
   --control-h-xs: 28px;
+  --tab-tb-h: 48px;        /* tab toolbar height */
+  --ctl-col: 200px;        /* shared value column in label/control lists */
+  --measure: 68ch;         /* prose cap */
   --row-h: 20px;           /* stat list rows */
   --row-h-list: 28px;      /* list/table rows */
   --sidebar-w: 320px;

@@ -14,12 +14,11 @@ import { agoText, baseLook, currentLook, customNames, customTierOfItem, itemRule
 import { useAdvShell, type InspectorTab } from './selection';
 import { tr } from '../../../i18n';
 import { lfBuild } from '../../mainText';
-import { colourName, shapeName, sizeName } from '../../names';
 
 const TABS: { id: InspectorTab; label: string; icon?: string }[] = [
   { id: 'style', label: tr('lootfilter_advanced_shell_Inspector.style'), icon: 'palette' },
   { id: 'items', label: tr('lootfilter_advanced_shell_Inspector.items'), icon: 'body-armour' },
-  { id: 'conditions', label: tr('lootfilter_advanced_shell_Inspector.conditions') },
+  { id: 'conditions', label: tr('lootfilter_advanced_shell_Inspector.conditions'), icon: 'filter' },
   { id: 'history', label: tr('lootfilter_advanced_shell_Inspector.history'), icon: 'history' },
 ];
 
@@ -112,12 +111,6 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
     why = picked.rule.why ? lfBuild(picked.rule.why) : undefined;
   }
   const hiddenNow = picked?.kind === 'item' ? (lf.evaluateCatalogItem(picked.item)?.visible === false) : picked?.kind === 'tier' ? tierHidden(lf.doc.rules, picked.tier) : false;
-
-  const fx: string[] = [
-    look.sound ? tr('lootfilter_advanced_shell_Inspector_2.sound', { sound: soundText(look.sound) }) : tr('lootfilter_advanced_shell_Inspector_2.no_sound'),
-    look.icon ? `${sizeName(look.icon.size)} ${colourName(look.icon.colour)} ${shapeName(look.icon.shape)}` : tr('lootfilter_advanced_shell_Inspector_2.no_icon'),
-    look.beam ? tr(look.beam.temp ? 'h_lootB_Names.beam_colour_temp' : 'h_lootB_Names.beam_colour', { colour: colourName(look.beam.colour) }) : tr('lootfilter_advanced_shell_Inspector_2.no_beam'),
-  ];
 
   // Contrast the way the design measures it: the text against its label, and the label against the ground it is drawn on.
   const ground: Color = bright ? [200, 194, 180] : [22, 18, 13];
@@ -216,9 +209,8 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
         ) : (
           <span style={{ color: gt, fontSize: 12.5 }}>{tr('lootfilter_advanced_shell_Inspector.select_an_item_or_tier')}</span>
         )}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', fontSize: 11.5, color: gt }}>{fx.map((f) => <span key={f} style={{ whiteSpace: 'nowrap' }}>{f}</span>)}</div>
       </div>
-      <div style={{ padding: '10px 14px 0', display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+      <div style={{ padding: 'var(--s-5) var(--s-6) 0', display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
         <span className="ellipsis" style={{ color: 'var(--text-strong)', fontSize: 15, fontWeight: 500 }} title={title}>
           {title}
         </span>
@@ -242,7 +234,7 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
           {TABS.map((t) => (
             <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} aria-pressed={tab === t.id} onClick={() => { sh.setInspectorTab(t.id); setPicker(null); }}>
               {t.icon && <Icon name={t.icon} size={14} style={{ opacity: 0.85 }} />}
-              {t.label}
+              <span>{t.label}</span>
             </button>
           ))}
         </span>
@@ -254,6 +246,7 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
               <span style={{ color: 'var(--text-muted)', fontSize: 12.5, lineHeight: 1.5 }}>{tr('lootfilter_advanced_shell_Inspector.nothing_is_selected_click_a')}</span>
             ) : (
               <>
+                <div className="adv-sh-grp">
                 <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.45 }}>{scope}</span>
                 {crRows.map((r) => {
                   const c = look[r.field];
@@ -270,12 +263,16 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
                     </div>
                   );
                 })}
+                </div>
+                <div className="adv-sh-grp">
                 <div style={{ display: 'grid', gridTemplateColumns: '82px minmax(0,1fr) 30px', gap: 8, alignItems: 'center', minHeight: 32 }}>
                   <span style={{ color: 'var(--text-2)' }}>{tr('lootfilter_advanced_shell_Inspector.font_size')}</span>
                   <RangeInput value={look.fs ?? 32} min={1} max={45} label={tr('lootfilter_advanced_shell_Inspector.font_size')} onCommit={(v) => apply({ fs: v }, tr('lootfilter_advanced_shell_Inspector.changed_font_size'))} />
                   <span style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-strong)' }}>{look.fs ?? '-'}</span>
                 </div>
                 <span style={{ marginTop: -6, color: look.fs !== undefined && look.fs < 18 ? 'var(--warning-text)' : 'var(--text-muted)', fontSize: 12 }}>{look.fs !== undefined && look.fs < 18 ? tr('lootfilter_advanced_shell_Inspector.the_game_draws_sizes_below') : tr('lootfilter_advanced_shell_Inspector.game_range_18_to_45')}</span>
+                </div>
+                <div className="adv-sh-grp">
                 <div className="adv-sh-fx3">
                   {fxBtns.map((b) => (
                     <button key={b.k} type="button" title={b.tip} onClick={() => setPicker(picker === b.kind ? null : b.kind)} className="adv-sh-fxbtn" style={{ borderColor: picker === b.kind ? 'var(--gold-400)' : 'rgba(var(--line-rgb),.12)', background: picker === b.kind ? 'rgba(var(--accent-rgb),.1)' : 'rgba(var(--line-rgb),.04)' }}>
@@ -300,24 +297,27 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
                   </div>
                   <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.4 }}>{dropNote}</span>
                 </div>
-                <div className="adv-sh-ins-two" style={{ padding: '2px 0 0' }}>
-                  <button type="button" className="adv-sh-btn sm" title={tr('lootfilter_advanced_shell_Inspector.copy_this_look')} onClick={() => { lf.setUi('advClip', look); toast({ text: tr('lootfilter_advanced_shell_Inspector.look_copied'), kind: 'ok' }); }}>
+                </div>
+                <div className="adv-sh-grp adv-sh-acts">
+                  <button type="button" className="adv-sh-btn sm text" title={tr('lootfilter_advanced_shell_Inspector.copy_this_look')} onClick={() => { lf.setUi('advClip', look); toast({ text: tr('lootfilter_advanced_shell_Inspector.look_copied'), kind: 'ok' }); }}>
                     <Icon name="copy" size={14} />
                     {tr('lootfilter_advanced_shell_Inspector.copy')}
                   </button>
-                  <button type="button" className="adv-sh-btn sm" title={tr('lootfilter_advanced_shell_Inspector.paste_the_copied_look')} onClick={() => { if (!clip) { toast({ text: tr('lootfilter_advanced_shell_Inspector.copy_a_look_first'), kind: 'ok' }); return; } if (target && clip) { writeLook(lf, target, clip, tr('lootfilter_advanced_shell_Inspector.pasted_a_look')); sh.toastUndo(tr('lootfilter_advanced_shell_Inspector.pasted_the_look_onto_cat', { cat: targetName(target, cat) })); } }}>
+                  <button type="button" className="adv-sh-btn sm text" title={tr('lootfilter_advanced_shell_Inspector.paste_the_copied_look')} onClick={() => { if (!clip) { toast({ text: tr('lootfilter_advanced_shell_Inspector.copy_a_look_first'), kind: 'ok' }); return; } if (target && clip) { writeLook(lf, target, clip, tr('lootfilter_advanced_shell_Inspector.pasted_a_look')); sh.toastUndo(tr('lootfilter_advanced_shell_Inspector.pasted_the_look_onto_cat', { cat: targetName(target, cat) })); } }}>
                     <Icon name="paste" size={14} />
                     {tr('lootfilter_advanced_shell_Inspector.paste')}
                   </button>
-                  <button type="button" className="adv-sh-btn sm" title={tr('lootfilter_advanced_shell_Inspector.back_to_neversink_s_look')} onClick={() => { if (target) { resetTarget(lf, target, tr('lootfilter_advanced_shell_Inspector.reset_cat', { cat: targetName(target, cat) })); sh.toastUndo(tr('lootfilter_advanced_shell_Inspector.reset_cat_to_neversink', { cat: targetName(target, cat) })); } }}>
+                  <button type="button" className="adv-sh-btn sm text" title={tr('lootfilter_advanced_shell_Inspector.back_to_neversink_s_look')} onClick={() => { if (target) { resetTarget(lf, target, tr('lootfilter_advanced_shell_Inspector.reset_cat', { cat: targetName(target, cat) })); sh.toastUndo(tr('lootfilter_advanced_shell_Inspector.reset_cat_to_neversink', { cat: targetName(target, cat) })); } }}>
                     <Icon name="reset" size={14} />
                     {tr('lootfilter_advanced_shell_Inspector.reset')}
                   </button>
-                  <button type="button" className="adv-sh-btn sm" title={tr('lootfilter_advanced_shell_Inspector.save_this_look_to_reuse')} onClick={savePreset}>
+                  <button type="button" className="adv-sh-btn sm text" title={tr('lootfilter_advanced_shell_Inspector.save_this_look_to_reuse')} onClick={savePreset}>
                     <Icon name="save" size={14} />
                     {tr('lootfilter_advanced_shell_Inspector.save_as_preset')}
                   </button>
                 </div>
+                {(presets.length > 0 || (target && baseLook(target) && JSON.stringify(baseLook(target)) !== JSON.stringify(look))) && (
+                <div className="adv-sh-grp">
                 {presets.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <span className="lf-eyebrow" style={{ fontSize: 10, letterSpacing: '.1em' }}>{tr('lootfilter_advanced_shell_Inspector.saved_looks')}</span>
@@ -332,6 +332,8 @@ export function Inspector({ drawer, right = 12, picker, setPicker, nav }: { draw
                   </div>
                 )}
                 {target && baseLook(target) && JSON.stringify(baseLook(target)) !== JSON.stringify(look) && <span style={{ color: 'var(--gold-text)', fontSize: 12 }}>{tr('lootfilter_advanced_shell_Inspector.differs_from_neversink_reset_puts')}</span>}
+                </div>
+                )}
               </>
             )}
           </>

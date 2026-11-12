@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import type { LabelStyle } from '../../shared/lootfilter/types.js';
 import { COLOUR_HEX, ICON_PX, SHAPE_PATH, gameLabelPx, rgba } from '../../shared/lootfilter/styles.js';
 import { Icon } from '../ui';
@@ -14,6 +14,16 @@ import { colourName, shapeName, sizeName } from './names';
 export const GROUND_DARK = 'radial-gradient(120% 90% at 50% 40%,#2a2419,#0d0b08)';
 export const GROUND_BRIGHT = 'radial-gradient(120% 90% at 50% 40%,#d8d2c4,#a9a292)';
 export const GROUND_DESERT = `linear-gradient(rgba(12,10,8,.5),rgba(12,10,8,.6)),url(${groundUrl}) center/cover,#1a1712`;
+
+/** Chips inside one FitGroup (a card) share one fitted text size: the smallest step any of them needed. */
+const FitCtx = createContext<{ v: number; up: (n: number) => void; reset: () => void } | null>(null);
+export function FitGroup({ children }: { children: ReactNode }) {
+  const [v, setV] = useState(0);
+  const up = useCallback((n: number) => setV((x) => (n > x ? n : x)), []);
+  const reset = useCallback(() => setV(0), []);
+  const val = useMemo(() => ({ v, up, reset }), [v, up, reset]);
+  return <FitCtx.Provider value={val}>{children}</FitCtx.Provider>;
+}
 
 export function groundFor(kind: 'dark' | 'bright' | 'desert'): string {
   return kind === 'bright' ? GROUND_BRIGHT : kind === 'desert' ? GROUND_DESERT : GROUND_DARK;
@@ -85,17 +95,23 @@ const NO_LIGATURES = { fontVariantLigatures: 'none', fontFeatureSettings: '"liga
 export function LabelChip(p: LabelChipProps) {
   const s = p.style;
   const [shrink, setShrink] = useState(0);
+  const [, bump] = useState(0);
+  const grp = useContext(FitCtx);
   const nameRef = useRef<HTMLSpanElement>(null);
   const fs0 = p.fontPx ?? (p.scale ? Math.max(10, Math.round(Math.max(18, Math.min(45, s.fs ?? 32)) * p.scale)) : gameLabelPx(s.fs));
-  const fs = shrink ? Math.max(14, fs0 - shrink) : fs0;
+  const search = useRef<{ lo: number; hi: number } | null>(null);
+  // While its own search runs a chip measures at its own step; the group's shared step applies only once it is done.
+  const eff = search.current ? shrink : Math.max(shrink, grp?.v ?? 0);
+  const fs = eff ? Math.max(14, fs0 - eff) : fs0;
   // The text shrinks 2px at a time until the name fits or reaches 14px; the answer is the smallest such step. Stepping one
   // render at a time took up to 15 renders and page layouts per chip (the Loot Filter's Full view spent 130 ms on it), so
   // the step is found by halving the range instead: the same answer, since a smaller font never fits worse.
-  const search = useRef<{ lo: number; hi: number } | null>(null);
   useLayoutEffect(() => {
     if (!p.autoFit) return;
     const el = nameRef.current;
     if (!el) return;
+    // A group reset by another chip learns this chip's step again.
+    if (!search.current && grp && shrink > grp.v) grp.up(shrink);
     const done = !(el.scrollWidth > el.clientWidth + 1) || fs <= 14;
     if (!search.current) {
       if (done) return;
@@ -105,7 +121,10 @@ export function LabelChip(p: LabelChipProps) {
     else search.current.lo = shrink;
     const { lo, hi } = search.current;
     if (hi - lo <= 2) {
+      search.current = null;
       if (shrink !== hi) setShrink(hi);
+      else if (grp && grp.v > hi) bump((x) => x + 1); // render once more at the group's larger step
+      grp?.up(hi);
       return;
     }
     setShrink(lo + Math.max(2, Math.floor((hi - lo) / 4) * 2));
@@ -113,6 +132,8 @@ export function LabelChip(p: LabelChipProps) {
   useLayoutEffect(() => {
     search.current = null;
     setShrink(0);
+    grp?.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.name, fs0, p.style.fs]);
   // The room a chip has changes with the window, the inspector and the section; measure again whenever its container's width changes.
   useLayoutEffect(() => {
@@ -125,6 +146,7 @@ export function LabelChip(p: LabelChipProps) {
       w = box.clientWidth;
       search.current = null;
       setShrink(0);
+      grp?.reset();
     });
     ro.observe(box);
     return () => ro.disconnect();

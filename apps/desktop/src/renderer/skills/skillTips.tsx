@@ -244,7 +244,7 @@ function TipPortal({ spec, rect, loaded, pv }: { spec: SkillTip; rect: DOMRect; 
           {hintIn === 'compare' && hint}
         </div>
       )}
-      {hintIn === 'none' && hint && <div className="it-tt sk-tt-alt" data-lg="pop" data-solid="">{hint}</div>}
+      {hintIn === 'none' && hint && spec.gem && <div className="it-tt sk-tt-alt" data-lg="pop" data-solid="">{hint}</div>}
     </>
   );
   return portal(

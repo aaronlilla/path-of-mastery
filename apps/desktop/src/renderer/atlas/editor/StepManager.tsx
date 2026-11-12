@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { dataLabel } from '../canvas/model.js';
 import type { AtlasPlan, StepId } from '@pom/mastery-contracts';
 import { Dialog, Segmented, Select } from '../../ui.js';
 import { NumberField } from './PracticalPanel.js';
@@ -33,10 +32,11 @@ export function StepManager({ plan, selected, edit, select, id, readOnly, close,
     if (to < 0 || to >= order.length) return;
     order.splice(from, 1); order.splice(to, 0, positionId); edit({ kind: 'reorder', positionIds: order });
   };
-  return <Dialog title={tr('atlas_editor_StepManager.steps')} size="large" confirmLabel={tr('atlas_editor_StepManager.done')} cancelLabel={null} onCancel={close} onConfirm={close}>
+  return <Dialog title={tr('atlas_editor_StepManager.steps')} size="large" confirmLabel={tr('atlas_editor_StepManager.done')} cancelLabel={null} onCancel={close} onConfirm={close} note={<span className="atlas-foot-actions"><button type="button" className="btn sm" disabled={readOnly} onClick={() => edit({ kind: 'add', sourceId: selected, newId: id() })}>{tr('atlas_editor_StepManager.add_step')}</button>
+      <Select width={150} ariaLabel={tr('atlas_editor_StepManager.preset')} value={preset} options={[{ value: '', label: tr('atlas_editor_StepManager.preset') }, ...(['Single step', 'Early / Mid / Late', 'By points'] as const).map(value => ({ value, label: inLanguage('h_atlasA_L', value) }))]} onChange={v => { setReplace(false); setPreset(v); }} up />
+      <span className="atlas-foot-hint">{tr('atlas_editor_StepManager.changes_are_saved_as_you')}</span></span>}>
     <div ref={body}>
     <Segmented ariaLabel={tr('atlas_editor_StepManager_2.step_structure')} value={mode} onChange={value => { if (value !== 'Sequence' && chosen.length > 1) setGroupReview(true); else setMode(value); }} options={(['Sequence', 'Alternatives at selected position'] as const).map(value => ({ value, label: value === 'Sequence' ? tr('atlas_editor_StepManager.sequence') : inLanguage('h_atlasA_L', value) }))} />
-    <p>{tr('atlas_editor_StepManager.source_data_datasetid', { datasetId: dataLabel(plan.dataset.datasetId) })}</p>
     {plan.sequencePositions.map((position, index) => {
       const ids = position.kind === 'step' ? [position.stepId] : position.optionStepIds;
       if (mode !== 'Sequence' && !ids.includes(selected)) return null;
@@ -51,21 +51,18 @@ export function StepManager({ plan, selected, edit, select, id, readOnly, close,
           if (!readOnly && !text && e.key === 'Delete') { e.preventDefault(); edit({ kind: 'remove', stepId }); }
           if (e.key === 'F2') { e.preventDefault(); e.currentTarget.querySelector<HTMLInputElement>('input[aria-label="Name"]')?.focus(); }
         }}>
-          {position.kind === 'alternatives' && <label><input type="radio" name={`default-${position.positionId}`} aria-label={tr('atlas_editor_StepManager.use_title_in_run', { title: step.title })} disabled={readOnly} checked={position.defaultStepId === stepId} onChange={() => edit({ kind: 'default', positionId: position.positionId, stepId })} />{tr('atlas_editor_StepManager.use_in_run')}</label>}
-          {position.kind === 'step' && <label><input type="checkbox" aria-label={tr('atlas_editor_StepManager.select_title_for_alternatives', { title: step.title })} disabled={readOnly} checked={chosen.includes(stepId)} onChange={e => setChosen(old => e.target.checked ? [...old, stepId] : old.filter(id => id !== stepId))} />{tr('atlas_editor_StepManager.choose')}</label>}
+          {position.kind === 'alternatives' ? <label><input type="radio" name={`default-${position.positionId}`} aria-label={tr('atlas_editor_StepManager.use_title_in_run', { title: step.title })} disabled={readOnly} checked={position.defaultStepId === stepId} onChange={() => edit({ kind: 'default', positionId: position.positionId, stepId })} />{tr('atlas_editor_StepManager.use_in_run')}</label> : stepIds(plan).length > 1 ? <label><input type="checkbox" aria-label={tr('atlas_editor_StepManager.select_title_for_alternatives', { title: step.title })} disabled={readOnly} checked={chosen.includes(stepId)} onChange={e => setChosen(old => e.target.checked ? [...old, stepId] : old.filter(id => id !== stepId))} />{tr('atlas_editor_StepManager.choose')}</label> : <span />}
+          <span className="atlas-step-index-chip" aria-hidden="true">{index + 1}</span>
           <label className="atlas-field">{tr('atlas_editor_StepManager.name')}<input className="field" aria-label={tr('atlas_editor_StepManager.name')} value={step.title} disabled={readOnly} onFocus={() => select(stepId)} onChange={e => edit({ kind: 'step', stepId, field: 'title', value: e.target.value }, true)} /></label>
           <NumberField label={tr('atlas_editor_StepManager.point_target')} value={step.pointTarget} disabled={readOnly} onChange={value => edit({ kind: 'step', stepId, field: 'pointTarget', value })} />
-          <div className="atlas-row-actions"><button type="button" className="btn" disabled={readOnly} onClick={() => edit({ kind: 'add', sourceId: stepId, newId: id() })}>{tr('atlas_editor_StepManager.duplicate')}</button>
-            <button type="button" className="btn" disabled={readOnly || stepIds(plan).length === 1} title={stepIds(plan).length === 1 ? tr('atlas_editor_StepManager.a_plan_needs_one_step') : undefined} onClick={() => edit({ kind: 'remove', stepId })}>{tr('atlas_editor_StepManager.remove')}</button></div>
+          <div className="atlas-row-actions"><button type="button" className="btn ghost" disabled={readOnly} onClick={() => edit({ kind: 'add', sourceId: stepId, newId: id() })}>{tr('atlas_editor_StepManager.duplicate')}</button>
+            <button type="button" className="btn ghost" disabled={readOnly || stepIds(plan).length === 1} title={stepIds(plan).length === 1 ? tr('atlas_editor_StepManager.a_plan_needs_one_step') : undefined} onClick={() => edit({ kind: 'remove', stepId })}>{tr('atlas_editor_StepManager.remove')}</button></div>
         </div>; })}
-        <div className="atlas-row-actions"><button type="button" className="btn" disabled={readOnly || index === 0} onClick={() => move(position.positionId, -1)}>{tr('atlas_editor_StepManager.move_up')}</button><button type="button" className="btn" disabled={readOnly || index === plan.sequencePositions.length - 1} onClick={() => move(position.positionId, 1)}>{tr('atlas_editor_StepManager.move_down')}</button>
-          <button type="button" className="btn" disabled={readOnly} onClick={() => edit({ kind: 'alternative', sourceId: ids.includes(selected) ? selected : ids[0]!, newId: id(), groupId: `alternatives:${id()}` })}>{tr('atlas_editor_StepManager.add_alternative')}</button></div>
+        <div className="atlas-row-actions"><button type="button" className="btn ghost" disabled={readOnly || index === 0} onClick={() => move(position.positionId, -1)}>{tr('atlas_editor_StepManager.move_up')}</button><button type="button" className="btn ghost" disabled={readOnly || index === plan.sequencePositions.length - 1} onClick={() => move(position.positionId, 1)}>{tr('atlas_editor_StepManager.move_down')}</button>
+          <button type="button" className="btn ghost" disabled={readOnly} onClick={() => edit({ kind: 'alternative', sourceId: ids.includes(selected) ? selected : ids[0]!, newId: id(), groupId: `alternatives:${id()}` })}>{tr('atlas_editor_StepManager.add_alternative')}</button></div>
         {position.kind === 'alternatives' && <p>{tr('atlas_editor_StepManager.run_default_title', { title: stepTitle(plan.stepsById[position.defaultStepId]!.title) })}</p>}
       </fieldset>;
     })}
-    <div className="atlas-row-actions"><button type="button" className="btn" disabled={readOnly} onClick={() => edit({ kind: 'add', sourceId: selected, newId: id() })}>{tr('atlas_editor_StepManager.add_step')}</button>
-      <Select ariaLabel={tr('atlas_editor_StepManager.preset')} value={preset} options={[{ value: '', label: tr('atlas_editor_StepManager.preset') }, ...(['Single step', 'Early / Mid / Late', 'By points'] as const).map(value => ({ value, label: inLanguage('h_atlasA_L', value) }))]} onChange={v => { setReplace(false); setPreset(v); }} /></div>
-    <p>{tr('atlas_editor_StepManager.changes_are_saved_as_you')}</p>
     {groupReview && <Dialog title={tr('atlas_editor_StepManager.alternatives_at_selected_position')} onCancel={() => setGroupReview(false)} confirmLabel={tr('atlas_editor_StepManager.choose')} onConfirm={() => { edit({ kind: 'group', stepIds: chosen, defaultStepId: chosen.includes(selected) ? selected : chosen[0]!, groupId: `alternatives:${id()}` }); setChosen([]); setGroupReview(false); setMode('Alternatives at selected position'); }}>
       <p>{tr('atlas_editor_StepManager.move_length_sequence_steps_into', { count: chosen.length })}</p><ul>{chosen.map(id => <li key={id}>{stepTitle(plan.stepsById[id]?.title ?? '')}</li>)}</ul>
     </Dialog>}

@@ -1,6 +1,6 @@
 .bf-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .bf-steps { display: flex; gap: 4px; }
-.bf-steps button { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
+.bf-steps button { display: inline-flex; align-items: center; gap: 8px; height: var(--control-h-sm); padding: 0 12px; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
 .bf-steps button[aria-selected='true'] { color: var(--text-strong); border-color: rgba(var(--area-filter-rgb), .6); background: rgba(var(--area-filter-rgb), .12); }
 .bf-num { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 11px; background: rgba(var(--line-rgb), .14); color: var(--text-strong); }
 .bf-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
@@ -9,6 +9,7 @@
 .bf-group-name { color: var(--text-strong); font-weight: 600; font-size: 13.5px; }
 .bf-n { font: 600 11px Geist, sans-serif; color: var(--text-muted); background: rgba(var(--line-rgb), .12); border-radius: 9px; padding: 1px 7px; }
 .bf-why { color: var(--text-muted); font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bf-group .bf-why { -webkit-line-clamp: 2; }
 .bf-col .bf-why, .bf-test .bf-why { -webkit-line-clamp: unset; display: block; }
 .bf-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
 .bf-stage { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--line-rgb), .03); color: var(--text-2); cursor: pointer; font: 400 12px Geist, sans-serif; }

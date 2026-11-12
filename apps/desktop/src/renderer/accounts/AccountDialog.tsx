@@ -25,7 +25,7 @@ export function AccountDialog({ localOnly, onClose }: { localOnly: number; onClo
   const user = auth && (auth.state === 'signedIn' || auth.state === 'restoring') ? auth.user : null;
   if (!user) return null;
   return (
-    <Dialog size="small" icon="user" title={tr('accounts_AccountDialog.account')} subtitle={tr('accounts_AccountDialog.signed_in_on_this_pc')} cancelLabel={tr('accounts_AccountDialog.close')} confirmLabel={tr('accounts_AccountDialog.sign_out')} confirmIcon="log-out" onCancel={onClose} onConfirm={() => void call(a.api.signOut()).then(onClose)}>
+    <Dialog size="small" icon="user" title={tr('accounts_AccountDialog.account')} subtitle={tr('accounts_AccountDialog.signed_in_on_device', { device: a.view?.deviceName ?? '' })} cancelLabel={tr('accounts_AccountDialog.close')} confirmLabel={tr('accounts_AccountDialog.sign_out')} confirmIcon="log-out" onCancel={onClose} onConfirm={() => void call(a.api.signOut()).then(onClose)}>
       <div className="acct-dlg">
         <div className="who">
           <Avatar user={user} size={48} />
@@ -34,9 +34,7 @@ export function AccountDialog({ localOnly, onClose }: { localOnly: number; onClo
             <span className="em">{user.email}</span>
           </span>
         </div>
-        <div className="kv"><span>{tr('accounts_AccountDialog.this_device')}</span><b>{a.view?.deviceName}</b></div>
-        <div className="kv"><span>{tr('accounts_AccountDialog.cloud_builds')}</span><b>{a.sync?.cloudCount ?? 0}</b></div>
-        <div className="kv"><span>{tr('accounts_AccountDialog.local_only_builds')}</span><b>{localOnly}</b></div>
+        <div className="kv"><span>{tr('accounts_AccountDialog.n_cloud_m_local_only', { cloud: a.sync?.cloudCount ?? 0, local: localOnly })}</span></div>
         {localOnly > 0 && (
           <button
             type="button"

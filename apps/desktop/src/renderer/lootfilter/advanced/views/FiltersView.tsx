@@ -135,8 +135,8 @@ export function FiltersView({ nav }: { nav: LfNav }) {
     >
       <div className="adv-fl-wrap">
         <div className="adv-v-head">
-          <span className="adv-v-title big">{tr('lootfilter_advanced_views_FiltersView.my_filters')}</span>
-          <span className="adv-v-sub" style={{ fontSize: 14 }}>{tr('lootfilter_advanced_views_FiltersView.no_account_needed_filters_live')}</span>
+          <span className="adv-v-title">{tr('lootfilter_advanced_views_FiltersView.my_filters')}</span>
+          <span className="adv-v-sub">{tr('lootfilter_advanced_views_FiltersView.no_account_needed_filters_live')}</span>
         </div>
         <div className="adv-fl-top">
           <button type="button" className="adv-fl-card hero lf-card" onClick={forBuild} disabled={!build} style={!build ? { opacity: 0.85, cursor: 'default' } : undefined}>
@@ -163,7 +163,7 @@ export function FiltersView({ nav }: { nav: LfNav }) {
           {actions.map((a) => (
             <button key={a.title} type="button" className={'adv-fl-card lf-card' + (a.dashed ? ' dashed' : '')} onClick={a.go}>
               <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{a.title}</span>
-              <span className="adv-v-muted adv-v-ellip" style={{ lineHeight: 1.4 }} title={a.sub}>{a.sub}</span>
+              <span className="adv-v-muted" style={{ lineHeight: 1.4 }} title={a.sub}>{a.sub}</span>
             </button>
           ))}
         </div>

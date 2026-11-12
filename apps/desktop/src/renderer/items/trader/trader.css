@@ -10,6 +10,12 @@
 .tr-realm .it-pick { width: 100%; }
 .tr-sortline { display: inline-flex; align-items: center; gap: 8px; }
 .tr-sortline .it-pick { width: 190px; }
+.tr-more > summary { cursor: pointer; width: max-content; padding: 2px 4px; color: var(--text-muted); font-size: 12.5px; list-style: none; }
+.tr-more > summary::-webkit-details-marker { display: none; }
+.tr-more > summary::before { content: '›'; display: inline-block; width: 12px; transition: transform .15s; }
+.tr-more[open] > summary::before { transform: rotate(90deg); }
+.tr-more > summary:hover { color: var(--text-strong); }
+.tr-more-body { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 8px; }
 .tr-auth { width: 100%; justify-content: center; }
 .tr-auth.ok { color: var(--positive-text); }
 .tr-auth.warn { color: var(--warning-text, var(--gold-text)); }

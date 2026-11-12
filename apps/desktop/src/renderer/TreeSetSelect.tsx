@@ -94,7 +94,7 @@ export function TreeSetSelect({ eng, xml, level, width, fmt, onManage }: { eng: 
     setHover({ row: r, top: rect.top, menuLeft: menu?.left ?? rect.left, menuRight: menu?.right ?? rect.right });
   };
 
-  const label = cur ? cur.short : tr('TreeSetSelect_2.default');
+  const label = cur ? cur.dockTitle : tr('TreeSetSelect_2.default');
   return (
     <div style={{ position: 'relative', flex: 'none', width }}>
       <button
@@ -184,8 +184,8 @@ function HoverCard({ hover, cur, rows, level, lines, data }: { hover: Hover; cur
   return createPortal(
     <div ref={ref} className="ts-tip" role="tooltip" style={{ left: pos?.left ?? 0, top: pos?.top ?? 0, visibility: pos ? 'visible' : 'hidden' }} data-lg="pop" data-solid="">
       <div className="a">
-        <span>{tr('TreeSetSelect.class')} <b style={{ color: classColour(r.className) }}>{r.className || tr('TreeSetSelect.none')}</b>{r.ascName ? <> {tr('TreeSetSelect.ascendancy')} <b>{r.ascName}</b></> : null}</span>
-        <span>{tr('TreeSetSelect.points_used')} <b>{r.counts ? r.counts.used : '…'}</b>{r.counts && r.counts.sockets > 0 ? <> {tr('TreeSetSelect.jewel_sockets')} <b>{r.counts.sockets}</b></> : null}</span>
+        <span><b style={{ color: classColour(r.className) }}>{r.className || tr('TreeSetSelect.none')}</b>{r.ascName ? <> · <b>{r.ascName}</b></> : null}</span>
+        <span><b>{r.counts ? r.counts.used : '…'}</b> {tr('TreeSetSelect.pts')}{r.counts && r.counts.sockets > 0 ? <> · <b>{r.counts.sockets}</b> {tr('TreeSetSelect.jewel_sockets')}</> : null}</span>
       </div>
       {!r.active && (
         <div className="cmp">

@@ -11,6 +11,8 @@ export interface SpecRow extends SpecSummary {
   label: string;
   /** The tree select's wording (the design's): `Title (3.24)` when the tree is not on the latest version. */
   short: string;
+  /** Title alone, for the dock trigger that sits beside the version select. */
+  dockTitle: string;
   versionDisplay: string;
   className: string;
   ascName: string;
@@ -54,6 +56,7 @@ export function useSpecData(xml: string): SpecData {
         ...s,
         label: (s.treeVersion !== LATEST ? `[${display(s.treeVersion)}] ` : '') + (s.title || tr('treeSetsData.default')),
         short: (s.title || tr('treeSetsData.default')) + (s.treeVersion !== LATEST ? ` (${display(s.treeVersion)})` : ''),
+        dockTitle: s.title || tr('treeSetsData.default'),
         versionDisplay: display(s.treeVersion),
         className,
         ascName,

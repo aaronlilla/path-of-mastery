@@ -552,7 +552,7 @@ export function CalcsTab({ build, engine, fmt }: CalcsTabProps) {
 
   return (
     <div className="tabroot calc-root" data-screen-label="Calcs / Tab / Content" ref={root} data-density="compact">
-      <div className="calc-tb" data-lg="panel" data-r="tab-tb">
+      <div className="calc-tb tab-tb" data-lg="panel" data-r="tab-tb">
         <CalcSelect
           caption={tr('calcs_CalcsTab.socket_group')}
           ariaLabel={tr('calcs_CalcsTab.socket_group_2')}
@@ -655,17 +655,13 @@ export function CalcsTab({ build, engine, fmt }: CalcsTabProps) {
             onChange={(v) => setGem('skillMinionSkillCalcs', Number(v))}
           />
         )}
-        {!ctl.part && (
-          <div className="calc-ghost" aria-disabled="true" title={view ? tr('calcs_CalcsTab.skillname_has_a_single_part', { skillName: view.skillName }) : tr('calcs_CalcsTab.no_active_skill')}>
-            <span className="tx"><span className="k">{tr('calcs_CalcsTab.skill_part')}</span><span className="v">{'—'}</span></span>
-            <Icon name="chevron-down" size={12} />
-          </div>
+        {ctl.showMinion && (
+          <span className="calc-sw" title={tr('calcs_CalcsTab.show_stats_for_the_minion')}>
+            <Switch checked={!!view?.showMinion} onChange={(v) => editInput('showMinion', { boolean: v })} label={tr('calcs_CalcsTab.show_minion_stats')} />
+            <span onClick={() => editInput('showMinion', { boolean: !view?.showMinion })}>{tr('calcs_CalcsTab.show_minion_stats')}</span>
+          </span>
         )}
-        <span className={'calc-sw' + (ctl.showMinion ? '' : ' off')} title={ctl.showMinion ? tr('calcs_CalcsTab.show_stats_for_the_minion') : tr('calcs_CalcsTab.no_minion_skills_in_this')}>
-          <Switch checked={!!view?.showMinion} onChange={(v) => ctl.showMinion && editInput('showMinion', { boolean: v })} label={tr('calcs_CalcsTab.show_minion_stats')} disabled={!ctl.showMinion} />
-          <span onClick={() => ctl.showMinion && editInput('showMinion', { boolean: !view?.showMinion })}>{tr('calcs_CalcsTab.show_minion_stats')}</span>
-        </span>
-        <span className="sp" />
+        <div className="right">
         <label className="calc-search" title={tr('calcs_CalcsTab.shows_only_the_rows_and')}>
           <Icon name="search" size={14} />
           <input ref={searchBox} value={search} placeholder={tr('calcs_CalcsTab.search')} maxLength={100} spellCheck={false} aria-label={tr('calcs_CalcsTab.search')} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {
@@ -678,15 +674,18 @@ export function CalcsTab({ build, engine, fmt }: CalcsTabProps) {
             </button>
           )}
         </label>
-        <div className="calc-modewrap">
-          <span className="calc-mlbl" title={MODE_NOTE}>{tr('calcs_CalcsTab.calculation_mode')}</span>
-          <div className="calc-mode" data-lg="tile" role="radiogroup" aria-label={tr('calcs_CalcsTab.calculation_mode')}>
-            {MODES.map((m) => (
-              <button key={m.value} type="button" role="radio" aria-checked={inputs.buffMode === m.value} title={`${m.tip}\n\n${MODE_NOTE}`} onClick={() => editInput('misc_buffMode', { string: m.value })}>
-                {m.label}
-              </button>
-            ))}
-          </div>
+        <CalcSelect
+          caption={tr('calcs_CalcsTab.mode_caption')}
+          ariaLabel={tr('calcs_CalcsTab.calculation_mode')}
+          grow={0}
+          basis={150}
+          align="right"
+          title={MODE_NOTE}
+          value={inputs.buffMode}
+          valueNode={MODES.find((m) => m.value === inputs.buffMode)?.label ?? ''}
+          options={MODES.map((m) => ({ value: m.value, node: <span title={m.tip}>{m.label}</span> }))}
+          onChange={(v) => editInput('misc_buffMode', { string: v })}
+        />
         </div>
       </div>
 
@@ -712,8 +711,7 @@ export function CalcsTab({ build, engine, fmt }: CalcsTabProps) {
         <div className="calc-chips" role="navigation" aria-label={tr('calcs_CalcsTab.sections')}>
           {shownSecs.map((s) => (
             <button key={s.id} type="button" onClick={() => jump(s.id)} title={tr('calcs_CalcsTab.jump_to_v1', { value: lbl(sectionTitle(s)) })}>
-              <Icon name={lookOf(s.id).icon} size={13} style={{ color: 'var(--text-muted)' }} />
-              {lbl(sectionTitle(s))}
+              {cap(lbl(sectionTitle(s)))}
             </button>
           ))}
         </div>
@@ -788,6 +786,7 @@ const SectionCard = memo(function SectionCard({ s, keep, live, q, pop, onToggle,
         const rowKeep = keep?.get(i) ?? null;
         const open = !sub.collapsed;
         const subHit = searchMatch(sub.label, q);
+        const span = Math.max(1, columnTitles(sub)?.length ?? 1, ...sub.rows.map((r) => r.cols));
         return (
           <div key={i} className={'calc-sub' + (i === 0 ? ' calc-first' : '')} data-sub={i}>
             <div
@@ -806,7 +805,7 @@ const SectionCard = memo(function SectionCard({ s, keep, live, q, pop, onToggle,
             >
               <Icon name="chevron-down" size={13} style={{ color: 'var(--gold-label)', transform: open ? 'none' : 'rotate(-90deg)', transition: 'transform var(--dur-quick,160ms)' }} />
               {i === 0 && <Icon name={look.icon} size={15} style={{ color: `var(${look.tone})` }} />}
-              <span className={'t' + (subHit ? ' calc-hit' : '')}>{lbl(sub.label)}</span>
+              <span className={'t' + (subHit ? ' calc-hit' : '')}>{cap(lbl(sub.label))}</span>
               {sub.extra && (
                 <span className="extra" title={stripCodes(sub.extra)}>
                   <ColorText text={sub.extra} />
@@ -833,7 +832,7 @@ const SectionCard = memo(function SectionCard({ s, keep, live, q, pop, onToggle,
               <div className="calc-rows">
                 <ColumnTitles titles={columnTitles(sub)} />
                 {sub.rows.map((r, ri) => (rowKeep && !rowKeep.includes(ri) ? null : (
-                  <RowView key={ri} r={r} lr={sameRow(live?.subSections[i]?.rows[ri], r)} sid={s.id} subi={i} ri={ri} q={q} pop={pop} onEnter={onEnter} onLeave={onLeave} onPin={onPin} />
+                  <RowView key={ri} span={span} r={r} lr={sameRow(live?.subSections[i]?.rows[ri], r)} sid={s.id} subi={i} ri={ri} q={q} pop={pop} onEnter={onEnter} onLeave={onLeave} onPin={onPin} />
                 )))}
               </div>
             )}
@@ -853,7 +852,7 @@ function ColumnTitles({ titles }: { titles: string[] | null }) {
       <span className="cells" style={{ gridTemplateColumns: `repeat(${titles.length}, minmax(min-content, 1fr))` }}>
         {titles.map((t, i) => (
           <span key={i} className="c h" style={{ gridColumn: i + 1 }}>
-            <ColorText text={t} />
+            <ColorText text={tlHead(t)} />
           </span>
         ))}
       </span>
@@ -862,8 +861,10 @@ function ColumnTitles({ titles }: { titles: string[] | null }) {
 }
 
 /** The live row at the same place, when it is the same row (same label). */
+/** An all-capitals word of five or more letters ("ATTRIBUTES") reads as Title Case like the other section names; short acronyms stay. */
+const cap = (t: string): string => t.replace(/\b[A-Z]{5,}\b/g, (w) => w[0] + w.slice(1).toLowerCase());
 // Column headings keep their colour codes: translate only the words between them.
-const tlHead = (t: string): string => { const m = /^((?:\^x[0-9A-Fa-f]{6}|\^\d)*)(.*?)(:?)\s*$/.exec(t); return m && m[2] ? m[1] + lbl(m[2]) + m[3] : t; };
+const tlHead = (t: string): string => { const m = /^((?:\^x[0-9A-Fa-f]{6}|\^\d)*)(.*?):?\s*$/.exec(t); return m && m[2] ? m[1] + lbl(m[2]) : t; };
 const sameRow = (lr: CalcViewRow | undefined, r: CalcViewRow) => (lr && lr.label === r.label ? lr : undefined);
 
 /** The last number in a cell ("9,575 to 96,034" -> 96034). */
@@ -885,18 +886,19 @@ function PvCell({ now, was }: { now: string; was: string | null | undefined }) {
   );
 }
 
-const RowView = memo(function RowView({ r, lr, sid, subi, ri, q, pop, onEnter, onLeave, onPin }: { r: CalcViewRow; lr?: CalcViewRow; sid: string; subi: number; ri: number; q: string; pop: PopupTarget | null; onEnter: (k: string) => void; onLeave: () => void; onPin: (k: string) => void }) {
+const RowView = memo(function RowView({ r, span, lr, sid, subi, ri, q, pop, onEnter, onLeave, onPin }: { r: CalcViewRow; /** Columns in the sub-section: a single value sits in the first one, under its title, not at the far edge. */ span: number; lr?: CalcViewRow; sid: string; subi: number; ri: number; q: string; pop: PopupTarget | null; onEnter: (k: string) => void; onLeave: () => void; onPin: (k: string) => void }) {
   const head = isHeaderRow(r);
   const label = r.label;
   const hit = !!label && searchMatch(label, q);
   const bg = hexOf(r.bgCol, 0.5);
   const multi = r.cols > 1;
+  const one = !multi && !head && span > 1;
   const rl = head ? null : rowLook(sid, label);
   const on = pop && pop.key.startsWith(`${sid}:${subi}:${ri}:`);
   const hl = useHighlight();
   const hlStat = hl?.tab === 'calcs' ? hl.stat : undefined;
   return (
-    <div className={'calc-row' + (head ? ' head' : '') + (multi ? ' multi' : '') + (on ? ' on' : '')} style={{ background: bg }}>
+    <div className={'calc-row' + (head ? ' head' : '') + (multi || one ? ' multi' : '') + (one ? ' one' : '') + (on ? ' on' : '')} style={{ background: bg }}>
       {label !== null && (
         <span className={'l' + (hit ? ' calc-hit' : '')} title={lbl(label)} style={{ color: hexOf(r.color) }}>
           {rl && <Icon name={rl.icon} size={12} style={{ color: `var(${rl.tone})`, marginRight: 7, verticalAlign: '-2px' }} />}
@@ -904,7 +906,7 @@ const RowView = memo(function RowView({ r, lr, sid, subi, ri, q, pop, onEnter, o
         </span>
       )}
       {label === null && <span className="l" />}
-      <span className="cells" style={multi ? { gridTemplateColumns: `repeat(${r.cols}, minmax(min-content, 1fr))` } : undefined}>
+      <span className="cells" style={multi || one ? { gridTemplateColumns: `repeat(${multi ? r.cols : span}, minmax(min-content, 1fr))` } : undefined}>
         {r.cells.map((c, ci) => {
           const key = `${sid}:${subi}:${ri}:${ci}`;
           const has = (r.cellDetails[ci]?.length ?? 0) > 0;
@@ -913,7 +915,7 @@ const RowView = memo(function RowView({ r, lr, sid, subi, ri, q, pop, onEnter, o
           const marked = hlStat && has && cellIsStat(r.cellDetails[ci], hlStat) ? hlStat : undefined;
           if (head || !has) {
             return (
-              <span key={ci} className={'c' + (head ? ' h' : '')} style={multi ? { gridColumn: (r.cellIdx[ci] ?? ci) + 1 } : undefined} title={stripCodes(c)}>
+              <span key={ci} className={'c' + (head ? ' h' : '')} style={multi ? { gridColumn: (r.cellIdx[ci] ?? ci) + 1 } : one ? { gridColumn: 1 } : undefined} title={stripCodes(c)}>
                 <ColorText text={head ? tlHead(text) : text} />
                 {!head && <PvCell now={c} was={lr?.cells[ci]} />}
               </span>
@@ -928,7 +930,7 @@ const RowView = memo(function RowView({ r, lr, sid, subi, ri, q, pop, onEnter, o
               data-sec={sid}
               data-assistant-highlight={marked}
               aria-pressed={on1 && pop?.pinned}
-              style={multi ? { gridColumn: (r.cellIdx[ci] ?? ci) + 1 } : undefined}
+              style={multi ? { gridColumn: (r.cellIdx[ci] ?? ci) + 1 } : one ? { gridColumn: 1 } : undefined}
               title={stripCodes(c)}
               onMouseEnter={() => onEnter(key)}
               onMouseLeave={onLeave}
@@ -1003,7 +1005,7 @@ function PopWindow({ s, index, pos, rootRef, onMove, onClose, children }: { s: C
         onPointerUp={() => (drag.current = null)}
       >
         <Icon name="grip" size={13} style={{ color: 'var(--text-faint)' }} />
-        <span className="t">{sectionTitle(s)}</span>
+        <span className="t">{cap(sectionTitle(s))}</span>
         <button type="button" className="x" aria-label={tr('calcs_CalcsTab.put_v1_back_in_the', { value: lbl(sectionTitle(s)) })} title={tr('calcs_CalcsTab.put_this_section_back_in')} onClick={onClose}>
           <Icon name="x" size={13} />
         </button>

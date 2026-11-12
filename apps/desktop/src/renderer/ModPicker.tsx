@@ -65,13 +65,12 @@ export function ModPicker({ onPick, onClose }: { onPick: (line: string) => void;
       size="medium"
       icon="import"
       title={tr('ModPicker.mod_browser')}
-      subtitle={tr('ModPicker.supported_modifier_lines_from_passiv')}
       confirmLabel={tr('ModPicker.add')}
       confirmIcon="plus"
       confirmDisabled={!cur}
       onConfirm={() => pick(cur)}
       onCancel={onClose}
-      note={tr('ModPicker.this_is_only_a_limited')}
+      note={<span title={tr('ModPicker.this_is_only_a_limited')}>{tr('ModPicker.limited_list')}</span>}
     >
       <div className="cfg-modpick">
         <label className="search">

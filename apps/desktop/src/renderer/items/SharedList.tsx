@@ -58,8 +58,7 @@ export function SharedList({ env, shared, tip, tipFor, onOpen, onCtrl, dragRef }
     <>
       <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
         <span className="it-sub" style={{ flex: 1, whiteSpace: 'normal', lineHeight: 1.4 }}>
-          {tr('items_SharedList.items_kept_here_are_in')}
-          {signedIn && <> <span className="tag" data-shared-sync>{tr('items_SharedList.synced_to_your_account')}</span></>}
+          {signedIn && <span className="tag" data-shared-sync>{tr('items_SharedList.synced_to_your_account')}</span>}
         </span>
         <button type="button" className="it-btn xs" disabled={sel === null} title={tr('items_SharedList.remove_the_selected_item_from')} onClick={() => sel !== null && setConfirm(sel)}>
           <Icon name="trash" size={14} />

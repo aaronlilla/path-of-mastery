@@ -49,10 +49,10 @@ const NodeListRow = memo(function NodeListRow({ row, index, pressed, disabled, a
         if (event.key === ' ') { event.preventDefault(); c().activate(row.nodeId); }
         if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); c().focusRow(index, event.key === 'ArrowDown' ? 1 : -1); }
       }}>
-      <Art art={art} name={row.name} /><span><strong>{row.name}</strong><small>{row.isRoot ? tr('atlas_canvas_AtlasCanvasView.start') : row.allocated ? tr('atlas_canvas_AtlasCanvasView.allocated') : label(row.type)} · {points(row.cost)}</small>
+      <Art art={art} name={row.name} /><span><strong>{row.name}</strong><small>{row.isRoot ? tr('atlas_canvas_AtlasCanvasView.start') : row.allocated ? tr('atlas_canvas_AtlasCanvasView.allocated') : row.type === 'Type unverified' ? tr('atlas_canvas_AtlasCanvasView.small_passive') : label(row.type)} · {points(row.cost)}</small>
                 {row.repair && <small>{tr('atlas_canvas_AtlasCanvasView.needs_repair')}</small>}{!row.position && <small>{tr('atlas_canvas_AtlasCanvasView.geometry_unverified')}</small>}{row.delta && <small className={`atlas-delta-${row.delta}`}>{row.delta === 'added' ? tr('atlas_canvas_AtlasCanvasView.added') : row.delta === 'removed' ? tr('atlas_canvas_AtlasCanvasView.removed') : tr('atlas_canvas_AtlasCanvasView_2.unchanged')}</small>}</span>
     </button>
-    {!row.isRoot && <button type="button" className="btn" disabled={disabled} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) c().setFocused(row.nodeId); }} onClick={() => c().activate(row.nodeId)}>{row.allocated ? tr('atlas_canvas_AtlasCanvasView.unallocate') : tr('atlas_canvas_AtlasCanvasView.allocate_path')}</button>}
+    {!row.isRoot && <button type="button" className="btn sm" disabled={disabled} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) c().setFocused(row.nodeId); }} onClick={() => c().activate(row.nodeId)}>{row.allocated ? tr('atlas_canvas_AtlasCanvasView.unallocate') : tr('atlas_canvas_AtlasCanvasView.allocate_path')}</button>}
   </li>;
 });
 
@@ -176,9 +176,9 @@ export function AtlasCanvasView(props: AtlasCanvasViewProps) {
         onChange={event => { setQuery(event.target.value); setPinned(null); setFocused(null); }} onKeyDown={event => {
           if (event.key === 'Enter' && matches.length) { event.preventDefault(); selectResult(matches[0]!.nodeId); requestAnimationFrame(() => resultButtons.current.get(matches[0]!.nodeId)?.focus()); }
         }} /></label>
-      {!!query.trim() && <><button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.previous_search_result')} disabled={!matches.length} onClick={() => cycleResult(-1)}>{tr('atlas_canvas_AtlasCanvasView.previous')}</button>
+      {!!query.trim() && <><button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.previous_search_result')} disabled={!matches.length} title={tr('atlas_canvas_AtlasCanvasView.previous_search_result')} onClick={() => cycleResult(-1)}>‹</button>
         <span role="status" className="atlas-canvas-count">{matches.length ? tr('h_atlasA_M.n_of_total', { n: Math.max(0, matches.findIndex(row => row.nodeId === focused)) + 1, total: matches.length }) : tr('atlas_canvas_AtlasCanvasView.no_nodes_match_this_search')}</span>
-        <button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.next_search_result')} disabled={!matches.length} onClick={() => cycleResult(1)}>{tr('atlas_canvas_AtlasCanvasView.next')}</button></>}
+        <button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.next_search_result')} disabled={!matches.length} title={tr('atlas_canvas_AtlasCanvasView.next_search_result')} onClick={() => cycleResult(1)}>›</button></>}
       <span className="atlas-canvas-tools">
         <button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.zoom_out')} title={tr('atlas_canvas_AtlasCanvasView.zoom_out_2')} onClick={() => renderer.current?.zoom(1 / 1.25)}>−</button>
         <button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.zoom_in')} title={tr('atlas_canvas_AtlasCanvasView.zoom_in_2')} onClick={() => renderer.current?.zoom(1.25)}>+</button>
@@ -186,17 +186,16 @@ export function AtlasCanvasView(props: AtlasCanvasViewProps) {
         <button ref={listButton} className="btn ghost" type="button" aria-expanded={listOpen} aria-controls={`${id}-nodes`} onClick={() => setListOpen(value => !value)}>{tr('atlas_canvas_AtlasCanvasView.nodes_list')}</button>
       </span>
     </div>
-    {props.readOnlyReason && <p role="status" className="atlas-canvas-note">{props.readOnlyReason}</p>}
     {model.geometryWarnings.length > 0 && <p role="status" className="atlas-canvas-note">{tr('atlas_canvas_AtlasCanvasView.geometry_unverified_for_length_nodes', { count: model.geometryWarnings.length })}</p>}
     {unavailableOverlayCount > 0 && <p role="status" className="atlas-canvas-note">{tr('atlas_canvas_AtlasCanvasView.different_tree_data_unavailableoverl', { unavailableOverlayCount })}</p>}
     {status !== 'ready' && <p role="status" className="atlas-canvas-note">{tr('atlas_canvas_AtlasCanvasView.tree_display_is_unavailable_nodes')}</p>}
     <div className="atlas-canvas-body">
       <div className="atlas-canvas-stage">
+        {props.readOnlyReason && <p role="status" className="atlas-canvas-note atlas-canvas-chip">{props.readOnlyReason}</p>}
         <canvas ref={canvas} tabIndex={0} aria-label={tr('atlas_canvas_AtlasCanvasView.atlas_canvas_f_fits_plus')} aria-describedby={`${id}-help`} data-webgl-status={status} />
         <div className="atlas-points" data-over={spent !== null && spent > budget ? 'true' : undefined} aria-label={tr('atlas_canvas_AtlasCanvasView.points_used')}><strong>{spent ?? tr('atlas_canvas_AtlasCanvasView.unknown')}</strong> {tr('atlas_canvas_AtlasCanvasView.budget_points', { budget })}</div>
         {overlay && <div className="atlas-canvas-legend" aria-label={tr('atlas_canvas_AtlasCanvasView.tree_overlay_legend')}><strong>{overlay.kind === 'diff' ? tr('atlas_canvas_AtlasCanvasView.diff') : tr('atlas_canvas_AtlasCanvasView.preview_only')}</strong>
           <span className="atlas-delta-added">{tr('atlas_canvas_AtlasCanvasView.added_size', { size: overlay.added.size })}</span><span className="atlas-delta-removed">{tr('atlas_canvas_AtlasCanvasView.removed_size', { size: overlay.removed.size })}</span><span>{tr('atlas_canvas_AtlasCanvasView.unchanged_size', { size: overlay.unchanged.size })}</span></div>}
-        <p className="atlas-canvas-source">{dataLabel(props.sourceLabel)} · {fromMain('ml_atlas_status', props.compatibilityLabel)}</p>
         {tipNode && tipAt && <div ref={tipRef} className="atlas-tip" role="tooltip" data-node-id={tipNode.nodeId} data-side={tipAt.x > (canvas.current?.clientWidth ?? 0) - 380 ? 'left' : 'right'} style={tipAt.x > (canvas.current?.clientWidth ?? 0) - 380 ? { right: (canvas.current?.clientWidth ?? 0) - tipAt.x + tipAt.r + 14, top: Math.max(8, tipAt.y - 24) } : { left: tipAt.x + tipAt.r + 14, top: Math.max(8, tipAt.y - 24) }}>
           <div className="atlas-tip-head"><Art art={artFor(tipNode.nodeId)} name={tipNode.name} /><span><strong>{tipNode.name}</strong><small>{tipNode.isRoot ? tr('atlas_canvas_AtlasCanvasView.start') : tipNode.type === 'Type unverified' ? tr('atlas_canvas_AtlasCanvasView.small_passive') : label(tipNode.type)}</small></span></div>
           {tipNode.lines.filter(line => !isRawStatId(line)).slice(0, 8).map((line, index) => <p key={index}>{line}</p>)}
@@ -209,7 +208,7 @@ export function AtlasCanvasView(props: AtlasCanvasViewProps) {
         </div>}
       </div>
       {showDetails && <aside className="atlas-canvas-panel" aria-label={listOpen ? tr('atlas_canvas_AtlasCanvasView.nodes') : tr('atlas_canvas_AtlasCanvasView.node_details')}>
-        {listOpen && <><div className="atlas-canvas-panel-header"><strong>{tr('atlas_canvas_AtlasCanvasView.nodes')}</strong><button className="btn" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.close_nodes_list')} onClick={() => { setListOpen(false); setPinned(null); setFocused(null); listButton.current?.focus(); }}>{tr('atlas_canvas_AtlasCanvasView.close')}</button></div>
+        {listOpen && <><div className="atlas-canvas-panel-header"><strong>{tr('atlas_canvas_AtlasCanvasView.nodes')}</strong><button className="btn ghost" type="button" aria-label={tr('atlas_canvas_AtlasCanvasView.close_nodes_list')} onClick={() => { setListOpen(false); setPinned(null); setFocused(null); listButton.current?.focus(); }}>{tr('atlas_canvas_AtlasCanvasView.close')}</button></div>
           <Segmented value={filter} onChange={setFilter} ariaLabel={tr('atlas_canvas_AtlasCanvasView.node_filter')} options={[{ value: 'all', label: tr('atlas_canvas_AtlasCanvasView.all') }, { value: 'allocated', label: tr('atlas_canvas_AtlasCanvasView.allocated') }, { value: 'matches', label: tr('atlas_canvas_AtlasCanvasView.search_matches') }]} />
           <ul id={`${id}-nodes`} className="atlas-node-list" aria-label={tr('atlas_canvas_AtlasCanvasView.atlas_nodes')}>{shown.map((row, index) => <NodeListRow key={row.nodeId} row={row} index={index} pressed={pinned === row.nodeId} disabled={!editable || !rowActionAvailable(model, reachable, allocatedIds, row.nodeId)} art={artFor(row.nodeId)} ctl={listCtl} />)}</ul>{!rows.length && <p>{query.trim() ? tr('atlas_canvas_AtlasCanvasView.no_nodes_match_this_search') : filter === 'allocated' ? tr('atlas_canvas_AtlasCanvasView.no_allocated_nodes') : tr('atlas_canvas_AtlasCanvasView.search_nodes_to_show_matches')}</p>}</>}
         {detail && <div className="atlas-node-detail" aria-label={tr('atlas_canvas_AtlasCanvasView.node_details')}>

@@ -25,7 +25,7 @@
   color: var(--text-strong); font: 13px Geist, sans-serif; outline: none;
 }
 .adv-v-in:focus { border-color: rgba(var(--accent-rgb), .6); }
-.adv-v-in.paste { height: 36px; border-radius: 9px; border: 1px dashed rgba(var(--accent-rgb), .4); padding: 0 12px; }
+.adv-v-in.paste { height: 32px; border-radius: 9px; border: 1px dashed rgba(var(--accent-rgb), .4); padding: 0 12px; }
 .adv-v-in[type=number] { font-variant-numeric: tabular-nums; }
 
 .adv-v-tog { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px; border-radius: 9px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--line-rgb), .04); color: var(--text-2); font: 500 12.5px Geist, sans-serif; cursor: pointer; white-space: nowrap; }
@@ -47,7 +47,15 @@
 
 /* Simulate */
 .adv-sim { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
-.adv-sim-bar { flex: none; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+.adv-sim-bar { flex: none; padding: var(--s-6); display: flex; flex-direction: column; gap: 10px; position: relative; }
+/* One row (R2): only the count text gives way when the bar is narrow. */
+.adv-sim-bar > .adv-v-row > :not(.adv-v-ellip):not(.adv-v-spacer) { flex-shrink: 0; }
+/* R6: the count wraps to two short lines (same height as the controls) instead of being cut with an ellipsis. */
+.adv-sim-bar > .adv-v-row > .adv-v-ellip { white-space: normal; overflow: visible; text-overflow: clip; text-align: right; line-height: 1.25; }
+/* Longer languages: the row wraps instead of running under the inspector; the count takes the free space (the spacer is not needed) and drops to its own line below 120 px. */
+.adv-sim-bar > .adv-v-row { flex-wrap: wrap; }
+.adv-sim-bar > .adv-v-row > .adv-v-spacer { display: none; }
+.adv-sim-bar > .adv-v-row > .adv-v-ellip { flex: 1 1 0; min-width: 120px; }
 .adv-sim-builder { display: grid; grid-template-columns: minmax(0, 1.4fr) auto 110px 130px auto; gap: 10px; align-items: end; padding: 12px; border-radius: 10px; border: 1px solid rgba(var(--accent-rgb), .3); background: rgba(var(--accent-rgb), .05); }
 .adv-sim-scene { flex: 1; min-height: 240px; position: relative; border-radius: 14px; overflow: hidden; border: 1px solid rgba(var(--line-rgb), .09); background: radial-gradient(60% 50% at 45% 40%, #3a3226, transparent 70%), radial-gradient(40% 40% at 75% 70%, #2a2a26, transparent 70%), radial-gradient(120% 100% at 50% 50%, #1c1813, #080705 100%); background-color: #0c0a08; box-shadow: inset 0 0 120px rgba(0, 0, 0, .8); }
 .adv-sim-scene > .adv-sim-tex { position: absolute; inset: 0; opacity: .35; mix-blend-mode: overlay; pointer-events: none; }
@@ -75,14 +83,15 @@
 .adv-ex-kind.hide { background: rgba(239, 70, 86, .14); color: var(--negative-text); }
 
 /* Export */
-.adv-ex-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, .8fr); gap: 12px; align-items: start; }
+.adv-ex-import { display: flex; flex-direction: column; gap: var(--s-4); margin-top: var(--s-4); padding-top: var(--s-6); border-top: 1px solid rgba(var(--line-rgb), .07); }
+.adv-ex-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
 .adv-ex-folder { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; }
 .adv-ex-proof { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
 .adv-ex-mk { width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font: 600 11px Geist, sans-serif; color: var(--text-on-accent); }
 .adv-ex-act { flex: none; display: grid; grid-template-columns: 22px minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; column-gap: 10px; row-gap: 2px; min-height: 56px; box-sizing: border-box; padding: 9px 12px; border-radius: 9px; border: 1px solid rgba(var(--line-rgb), .08); background: rgba(var(--shadow-rgb), calc(.2 * var(--shadow-k))); cursor: pointer; text-align: left; white-space: normal; font: inherit; }
 .adv-ex-act:hover:not([disabled]) { border-color: rgba(var(--accent-rgb), .45); }
 .adv-ex-act[disabled] { opacity: .55; cursor: not-allowed; }
-.adv-ex-pf { display: grid; grid-template-columns: 24px 220px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 42px; padding: 6px 16px; border-top: 1px solid rgba(var(--line-rgb), .05); }
+.adv-ex-pf { display: grid; grid-template-columns: 24px 120px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 42px; padding: 6px 16px; border-top: 1px solid rgba(var(--line-rgb), .05); }
 .adv-ex-ic { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 11px Geist, sans-serif; }
 .adv-ex-diff { font: 12px/1.45 'Geist Mono', monospace; max-height: 52vh; overflow: auto; border-radius: 8px; border: 1px solid rgba(var(--line-rgb), .1); background: rgba(var(--shadow-rgb), calc(.3 * var(--shadow-k))); }
 .adv-ex-diff div { white-space: pre; padding: 0 10px; min-width: max-content; }
@@ -91,7 +100,7 @@
 .adv-ex-diff .gap { color: var(--text-faint); text-align: center; background: rgba(var(--line-rgb), .04); }
 
 /* My Filters */
-.adv-fl-wrap { max-width: 1240px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding: 6px 4px 12px; }
+.adv-fl-wrap { max-width: 1240px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding: 0 0 var(--s-6); }
 .adv-fl-top { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 12px; }
 .adv-fl-card { text-align: left; cursor: pointer; border-radius: 14px; border: 1px solid rgba(var(--line-rgb), .14); display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; color: inherit; font: inherit; min-width: 0; background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .45), rgba(var(--glass-rgb), .86)); }
 .adv-fl-card:hover:not([disabled]) { border-color: rgba(var(--accent-rgb), .5); }
@@ -106,7 +115,7 @@
 .adv-fl-drop { position: absolute; inset: 0; border-radius: 14px; border: 2px dashed var(--gold-400); background: rgba(var(--void-rgb), .75); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; pointer-events: none; z-index: 10; }
 
 /* Start */
-.adv-st { max-width: 1180px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 14px; padding: 6px 4px 12px; }
+.adv-st { max-width: 1180px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 14px; padding: 0 0 var(--s-6); }
 .adv-st-chip { height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid rgba(var(--line-rgb), .12); background: transparent; color: var(--text-3); font: 500 12.5px Geist, sans-serif; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
 .adv-st-chip[aria-pressed="true"] { border-color: rgba(var(--accent-rgb), .55); background: rgba(var(--accent-rgb), .12); color: var(--text-strong); }
 .adv-st-levels { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }

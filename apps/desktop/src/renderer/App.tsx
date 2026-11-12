@@ -166,6 +166,8 @@ function AppInner() {
   // exists, and again whenever the Library's League starts button asks for it.
   const finishSetup = useCallback(() => { try { localStorage.setItem('pom-setup-complete', '1'); } catch { /* per-viewer convenience only */ } }, []);
   const [startOpen, setStartOpen] = useState(false);
+  // The build header drops its folder line at narrow widths; the title bar crumb carries it then (and only then).
+  const [pathHidden, setPathHidden] = useState(false);
   const [startArchive, setStartArchive] = useState(false);
   const entitlement = useEntitlement();
   const [lfCtx, setLfCtx] = useState<HTMLElement | null>(null);
@@ -1240,10 +1242,10 @@ function AppInner() {
   describeRef.current = () => {
     void createBuild('Scion', tr('App.new_build')).then(() => window.setTimeout(() => openAssistant({ text: DESCRIBE_EXAMPLE }), 400));
   };
-  // The title slot only says something the screen does not: the open build's name, or Wealth's league. Start and
-  // the Library carry their own heading, and the other areas their own header.
-  const title = area === 'wealth' ? (wealth.w?.sync.league ? `${wealth.w.sync.league}${/Standard|Hardcore|HC|SSF|Ruthless|Solo/i.test(wealth.w.sync.league) ? '' : ' SC'}` : '') : area === 'builds' && open ? open.name : '';
-  const subtitle = area === 'wealth' && wealth.w?.sync.sample ? tr('h_rA_app.sample') : area === 'builds' && open ? (freshId === open.id ? tr('App.not_saved_yet') : `${tr('areaGate.builds')}${open.folder ? ' / ' + folderLabel(open.folder) : ''}`) : undefined;
+  // The title slot only says something the screen does not: Wealth's league. The open build's header carries its own name
+  // (the crumb keeps only the folder while the header hides it), Start and the Library their own heading, the other areas their own header.
+  const title = area === 'wealth' ? (wealth.w?.sync.league ? `${wealth.w.sync.league}${/Standard|Hardcore|HC|SSF|Ruthless|Solo/i.test(wealth.w.sync.league) ? '' : ' SC'}` : '') : '';
+  const subtitle = area === 'wealth' && wealth.w?.sync.sample ? tr('h_rA_app.sample') : area === 'builds' && open && pathHidden ? (freshId === open.id ? tr('App.not_saved_yet') : `${tr('areaGate.builds')}${open.folder ? ' / ' + folderLabel(open.folder) : ''}`) : undefined;
   const version = info?.version ?? '0.1.0';
 
   return (
@@ -1277,7 +1279,7 @@ function AppInner() {
         searchDocs={searchDocs}
         assistant={{ ready: assistantReady, onConnect: () => openAssistant(), onAsk: (q) => openAssistant({ text: q, send: true }) }}
         searchOpen={searchOpen}
-        lfSlots={{ setCtx: setLfCtx, setSearch: setLfSearch }}
+        lfSlots={{ setCtx: lfMode === 'advanced' ? undefined : setLfCtx, setSearch: setLfSearch }}
         setSearchOpen={setSearchOpen}
       />
       <main className="stage" {...(area === 'atlas' || area === 'timelines' || area === 'marketplace' || startView ? { 'data-sky': '' } : {})}>
@@ -1354,6 +1356,7 @@ function AppInner() {
           <ErrorBoundary scope="area" label={tr('App.this_build')} resetKey={open.id} back={{ label: tr('App.back_to_the_library'), run: closeBuild }}>
           <BuildWorkspace
             build={open}
+            onPathHidden={setPathHidden}
             onNewBuild={openNewBuild}
             engine={engineHandle}
             tab={tab}

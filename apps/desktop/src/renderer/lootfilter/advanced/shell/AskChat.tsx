@@ -217,7 +217,7 @@ export function AskPanel({ onClose, drawer, nav }: { onClose: () => void; drawer
 
   return (
     <aside className={'adv-sh-ask lf-card' + (drawer ? ' drawer' : '')} data-lg="panel" aria-label={tr('lootfilter_advanced_shell_AskChat.ask')} style={drawer ? { position: 'absolute' } : undefined}>
-      <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(var(--line-rgb),.06)' }}>
+      <div style={{ padding: 'var(--s-6)', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(var(--line-rgb),.06)' }}>
         <Icon name="sparkle-fill" size={16} style={{ color: 'var(--gold-400)' }} />
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{tr('lootfilter_advanced_shell_AskChat.ask')}</span>
@@ -236,7 +236,7 @@ export function AskPanel({ onClose, drawer, nav }: { onClose: () => void; drawer
           <Icon name="x" size={14} />
         </button>
       </div>
-      <div ref={listRef} className="lf-scroll" style={{ flex: 1, minHeight: 0, padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div ref={listRef} className="lf-scroll" style={{ flex: 1, minHeight: 0, padding: 'var(--s-6)', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {!aiOpen && <AiAccessLock variant="lootfilter" what={tr('h_lootB_Ask.lock_what')} />}
         {aiOpen && providers && !ready && (
           <div style={{ padding: '12px 14px', borderRadius: 12, border: '1px dashed rgba(var(--accent-rgb),.4)', background: 'rgba(var(--accent-rgb),.05)', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -263,6 +263,15 @@ export function AskPanel({ onClose, drawer, nav }: { onClose: () => void; drawer
           <span style={{ color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.5 }}>
             {tr(lf.doc.rules.length === 1 ? 'h_lootB_Ask.hint_one' : 'h_lootB_Ask.hint_other', { name: guidedName(Math.min(4, lf.doc.setup.strictness)), n: lf.doc.rules.length })}
           </span>
+        )}
+        {!msgs.length && (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {HINTS.map((h) => (
+              <button key={h} type="button" disabled={!ready || !!turn} className="adv-sh-hint" onClick={() => void send(h)}>
+                {h}
+              </button>
+            ))}
+          </div>
         )}
         {msgs.map((m) => (
           <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: m.role === 'user' ? 'flex-end' : 'stretch' }}>
@@ -304,15 +313,6 @@ export function AskPanel({ onClose, drawer, nav }: { onClose: () => void; drawer
         )}
       </div>
       <div style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(var(--line-rgb),.06)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {!msgs.length && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {HINTS.map((h) => (
-              <button key={h} type="button" disabled={!ready || !!turn} className="adv-sh-hint" onClick={() => void send(h)}>
-                {h}
-              </button>
-            ))}
-          </div>
-        )}
         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
           <textarea
             rows={2}

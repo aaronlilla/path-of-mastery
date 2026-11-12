@@ -101,7 +101,8 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
   const fmtLife = (t: string) => (t ? formatNumSep(t, nf) : '');
   const stale = avg && !same(avg.setup, setup);
   const status = busy ? (busy === 'dice' ? tr('h_f_Fight.running_n', { n: RUNS }) : tr('h_f_Fight.running')) : stale ? tr('h_f_Fight.stale') : dice && same(dice.setup, setup) ? tr('h_f_Fight.last_n', { n: RUNS }) : avg ? tr('h_f_Fight.last_avg') : '';
-  const go = (runs: number) => void run(runs, setup);
+  // A 500-run on a changed setup refreshes the average fight first: the range only shows beside an average of the same setup.
+  const go = (runs: number) => void (runs && stale ? run(0, setup).then(() => run(runs, setup)) : run(runs, setup));
   const onKey = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       (e.target as HTMLInputElement).blur();
@@ -111,7 +112,7 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
 
   return (
     <div className="tabroot calc-root fight-root" data-screen-label="Fight / Tab / Content" data-density="compact">
-      <div className="calc-tb" data-lg="panel" role="group" aria-label={tr('h_f_Fight.setup_aria')}>
+      <div className="calc-tb tab-tb" data-lg="panel" role="group" aria-label={tr('h_f_Fight.setup_aria')}>
         <CalcSelect
           caption={tr('h_f_Fight.boss_cap')}
           ariaLabel={tr('h_f_Fight.boss_aria')}
@@ -133,7 +134,7 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
           <span className="k">{tr('h_f_Fight.cap_label')}</span>
           <input value={capText} inputMode="numeric" aria-label={tr('h_f_Fight.cap_aria')} onChange={(e) => setCapText(e.target.value.replace(/\D/g, '').slice(0, 3))} onKeyDown={onKey} />
         </label>
-        <div className="sp" />
+        <div className="right">
         <span className="status" role="status">{status}</span>
         <button type="button" className="btn" disabled={!!busy} onClick={() => go(RUNS)}>
           <Icon name="play" size={13} /> {tr('h_f_Fight.run_n', { n: RUNS })}
@@ -141,6 +142,7 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
         <button type="button" className="btn gold" disabled={!!busy} onClick={() => go(0)}>
           <Icon name="play" size={13} />  {tr('h_f_Fight.run_one')}
         </button>
+        </div>
       </div>
       <div className="calc-body" aria-busy={!!busy}>
         <div className="f-body">
@@ -153,8 +155,8 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
           ) : (
             <>
               {error && <div className="f-empty" role="alert"><span><b>{tr('h_f_Fight.last_failed')}</b> {error}</span></div>}
-              <Tiles avg={avg.r} dice={dice && same(dice.setup, avg.setup) ? dice.r : null} cap={avg.setup.cap} busy={busy} onRange={() => go(RUNS)} />
-              <Chart avg={avg.r} dice={dice && same(dice.setup, avg.setup) ? dice.r : null} cap={avg.setup.cap} />
+              <Tiles avg={avg.r} dice={dice && same(dice.setup, avg.setup) ? dice.r : null} cap={avg.setup.cap} />
+              <Chart avg={avg.r} dice={dice && same(dice.setup, avg.setup) ? dice.r : null} />
               <div className="f-bottom">
                 <Events r={avg.r} />
                 <Spread dice={dice && same(dice.setup, avg.setup) ? dice.r : null} />
@@ -169,7 +171,7 @@ export function FightTab({ build, engine, fmt }: FightTabProps) {
 
 const refLabel = (r: FightResult) => (r.steady.stat === 'FullDPS' ? tr('h_f_Fight.ref_full') : tr('h_f_Fight.ref_combined'));
 
-function Tiles({ avg, dice, cap, busy, onRange }: { avg: FightResult; dice: FightResult | null; cap: number; busy: string | null; onRange: () => void }) {
+function Tiles({ avg, dice, cap }: { avg: FightResult; dice: FightResult | null; cap: number }) {
   const T = avg.ttk.seconds;
   const refDps = avg.steady.dps;
   const diceT = dice?.ttk.median ?? null;
@@ -191,15 +193,10 @@ function Tiles({ avg, dice, cap, busy, onRange }: { avg: FightResult; dice: Figh
         ) : (
           <>
             <div className="v">{fmtS(T)}<small>s</small></div>
-            <div className="sub">{tr('h_f_Fight.killed_sub', { boss: bossTxt, cap })}{culled}{rolled}</div>
+            {(culled || rolled) && <div className="sub">{(culled + rolled).trim()}</div>}
           </>
         )}
-        {dice ? <Range r={dice} /> : (
-          <div className="rng empty">
-            <div className="tx"><b>{tr('h_f_Fight.range_empty_head')}</b> {tr('h_f_Fight.range_empty_body', { n: RUNS })}</div>
-            <button type="button" className="btn sm" disabled={!!busy} onClick={onRange}>{tr('h_f_Fight.run_n', { n: RUNS })}</button>
-          </div>
-        )}
+        {dice && <Range r={dice} />}
       </div>
       <div className="f-tile plain" role="group" aria-label={tr('h_f_Fight.avg_aria')}>
         <div className="k">{tr('h_f_Fight.avg_k')}</div>
@@ -207,10 +204,10 @@ function Tiles({ avg, dice, cap, busy, onRange }: { avg: FightResult; dice: Figh
         <div className="sub">{culled ? tr('h_f_Fight.avg_sub_cull', { dealt: fmtM(dealt), t: fmtS(fightEnd(avg)), pct: +cull.toFixed(1) }) : tr('h_f_Fight.avg_sub', { dealt: fmtM(dealt), t: fmtS(fightEnd(avg)) })}</div>
         <div className="cmp" aria-hidden="true"><i style={{ width: `${refDps > 0 ? Math.min(100, Math.round((avg.avgDps / refDps) * 100)) : 0}%` }} /></div>
       </div>
-      <div className="f-tile plain" role="group" aria-label={refLabel(avg)}>
+      <div className="f-tile plain" role="group" aria-label={refLabel(avg)} title={tr('h_f_Fight.steady')}>
         <div className="k">{refLabel(avg).toUpperCase()}</div>
         <div className="v">{fmtM(refDps)}</div>
-        <div className="sub"><span className="dl">{avg.avgDps <= refDps ? tr('h_f_Fight.sim_lower', { diff: diff }) : tr('h_f_Fight.sim_higher', { diff: diff })}</span>  {tr('h_f_Fight.steady')}</div>
+        <div className="sub"><span className="dl">{avg.avgDps <= refDps ? tr('h_f_Fight.sim_lower', { diff: diff }) : tr('h_f_Fight.sim_higher', { diff: diff })}</span></div>
         <div className="cmp" aria-hidden="true"><i style={{ width: '100%', background: '#9cc8ff' }} /></div>
       </div>
     </div>
@@ -231,7 +228,7 @@ function Range({ r }: { r: FightResult }) {
       <div className="line">{same ? rich('h_f_Fight.kills_same', { t: <em>{fmtS(median)} s</em> }) : rich('h_f_Fight.kills_range', { range: <em>{tr('h_f_Fight.range_em', { a: fmtS(p10), b: fmtS(p90) })}</em>, m: <em>{fmtS(median)} s</em> })}</div>
       <div className="track" aria-hidden="true"><div className="rail" /><div className="seg" style={{ left: `${pct(p10)}%`, width: `${Math.max(0.5, pct(p90) - pct(p10))}%` }} /><div className="mid" style={{ left: `${pct(median)}%` }} /></div>
       <div className="ticks" aria-hidden="true">{!same && <span style={{ left: `${pct(p10)}%` }}>{fmtS(p10)} s</span>}<span style={{ left: `${pct(median)}%`, color: 'var(--gold-text)' }}>{fmtS(median)} s</span>{!same && <span style={{ left: `${pct(p90)}%` }}>{fmtS(p90)} s</span>}</div>
-      <div className="meta">{[tr('h_f_Fight.meta_from', { n: r.runs }), same ? '' : tr('h_f_Fight.meta_band'), tr('h_f_Fight.meta_fast', { a: fmtS(min), b: fmtS(max) }), miss > 0 ? tr('h_f_Fight.meta_miss', { n: miss }) : ''].filter(Boolean).join(' ')}</div>
+      <div className="meta">{[same ? '' : tr('h_f_Fight.meta_band'), tr('h_f_Fight.meta_fast', { a: fmtS(min), b: fmtS(max) }), miss > 0 ? tr('h_f_Fight.meta_miss', { n: miss }) : ''].filter(Boolean).join(' ')}</div>
     </div>
   );
 }
@@ -251,15 +248,14 @@ function useWidth() {
   return [ref, w] as const;
 }
 
-function Chart({ avg, dice, cap }: { avg: FightResult; dice: FightResult | null; cap: number }) {
+function Chart({ avg, dice }: { avg: FightResult; dice: FightResult | null }) {
   const [ref, w] = useWidth();
   const T = fightEnd(avg);
-  const note = tr(dice ? 'h_f_Fight.cap_note_avg' : 'h_f_Fight.cap_note', { cap });
   return (
     <section className="f-card" aria-label={tr('h_f_Fight.dps_over_time')}>
-      <div className="hd"><span className="t">{tr('h_f_Fight.dps_over_time')}</span><span className="extra">{note}</span></div>
+      <div className="hd"><span className="t">{tr('h_f_Fight.dps_over_time')}</span></div>
       <div className="bd">
-        <div className="f-legend">
+        <div className="f-legend" style={{ paddingLeft: AXIS_L }}>
           <span><i style={{ width: 18, height: 3, background: '#ffd27a' }} />{tr('h_f_Fight.sim_dps')}</span>
           <span><i style={{ width: 18, height: 0, borderTop: '2px dashed #9cc8ff' }} />{refLabel(avg)}</span>
           <span><i style={{ width: 18, height: 0, borderTop: '2px dotted rgba(246,236,218,.7)' }} />{tr('h_f_Fight.avg_aria')}</span>
@@ -271,11 +267,14 @@ function Chart({ avg, dice, cap }: { avg: FightResult; dice: FightResult | null;
   );
 }
 
+/** Left edge of the plot inside the chart; the legend starts at the same x. */
+const AXIS_L = 124;
+
 function ChartSvg({ avg, dice, w }: { avg: FightResult; dice: FightResult | null; w: number }) {
   const T = fightEnd(avg);
   const lanes = lanesOf(avg);
   const nRows = lanes.reduce((n, l) => n + l.rows.length, 0);
-  const L = 124, R = 18, TOP = 14, PH = 210, LANE = 24, AX = 26;
+  const L = AXIS_L, R = 18, TOP = 14, PH = 210, LANE = 24, AX = 26;
   const baseY = TOP + PH + (nRows ? 10 + nRows * LANE : 0);
   const H = baseY + AX - (nRows ? 6 : -4);
   const band = dice && dice.ttk.p10 !== null && dice.ttk.p90 !== null ? { a: dice.ttk.p10, b: dice.ttk.p90 } : null;
@@ -363,8 +362,8 @@ function Events({ r }: { r: FightResult }) {
   const rows = rowsOf(r);
   return (
     <section className="f-card" aria-label={tr('h_f_Fight.events_title')}>
-      <div className="hd"><span className="t">{tr('h_f_Fight.events_title')}</span><span className="extra">{tr('h_f_Fight.moments', { n: rows.length })}</span></div>
-      <div className="bd" style={{ padding: '6px 10px 10px' }}>
+      <div className="hd"><span className="t">{tr('h_f_Fight.events_title')}</span></div>
+      <div className="bd ev">
         {rows.map((e, i) => (
           <div key={i} className={`f-ev${e.kind === 'end' ? ' end' : ''}`} tabIndex={0} title={e.title}>
             <span className="t">{fmtS(e.t)} s</span>
@@ -384,15 +383,15 @@ function Spread({ dice }: { dice: FightResult | null }) {
   if (!dice) {
     return (
       <section className="f-card" aria-label={tr('h_f_Fight.spread_aria')}>
-        <div className="hd"><span className="t">{tr('h_f_Fight.spread_title')}</span><span className="extra">{tr('h_f_Fight.not_run')}</span></div>
-        <div className="bd"><div className="f-empty"><span><b>{tr('h_f_Fight.no_spread_head')}</b> {tr('h_f_Fight.no_spread_body', { n: RUNS })}</span></div></div>
+        <div className="hd"><span className="t">{tr('h_f_Fight.spread_title')}</span></div>
+        <div className="bd"><div className="f-empty"><span>{tr('h_f_Fight.no_spread_body', { n: RUNS })}</span></div></div>
       </section>
     );
   }
   const ttks = dice.ttks ?? [];
   return (
     <section className="f-card" aria-label={tr('h_f_Fight.spread_aria')}>
-      <div className="hd"><span className="t">{tr('h_f_Fight.spread_title')}</span><span className="extra">{tr('h_f_Fight.fights_n', { n: dice.runs })}</span></div>
+      <div className="hd"><span className="t">{tr('h_f_Fight.spread_title')}</span></div>
       <div className="bd">
         {ttks.length === 0 ? <div className="f-empty"><span><b>{tr('h_f_Fight.no_kills_head')}</b> {tr('h_f_Fight.no_kills_body', { n: dice.runs })}</span></div> : <HistBox dice={dice} ttks={ttks} />}
       </div>

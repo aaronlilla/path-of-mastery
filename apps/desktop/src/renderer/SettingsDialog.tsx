@@ -12,8 +12,7 @@ const NAV: { id: Section; label: string; icon: string }[] = [
   { id: 'general', label: tr('SettingsDialog.general'), icon: 'settings' },
   { id: 'appearance', label: tr('SettingsDialog.appearance'), icon: 'palette' },
   { id: 'build-defaults', label: tr('SettingsDialog.build_defaults'), icon: 'tree' },
-  { id: 'numbers', label: tr('SettingsDialog.numbers'), icon: 'hash' },
-  { id: 'network', label: tr('SettingsDialog.network'), icon: 'globe' },
+  { id: 'numbers', label: tr('SettingsDialog.numbers_and_network'), icon: 'hash' },
   { id: 'account', label: tr('SettingsDialog.assistant_and_account'), icon: 'user' },
   { id: 'advanced', label: tr('SettingsDialog.advanced'), icon: 'code' },
 ];
@@ -31,11 +30,11 @@ const POSITIVE = ['#33ff77', '#4fdc7c', '#88ffff', '#e9c887'];
 const NEGATIVE = ['#dd0022', '#ef4656', '#ff8a94', '#ff9922'];
 const HIGHLIGHT = ['#ff4a2e', '#3de2e2', '#e9c887', '#ff66cc'];
 
-function Row({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+function Row({ title, hint, kbd, children }: { title: string; hint?: string; kbd?: string; children: ReactNode }) {
   return (
     <div className="set-row" data-row={title}>
       <span className="l">
-        <span className="a">{title}</span>
+        <span className="a">{title}{kbd && <Kbd>{kbd}</Kbd>}</span>
         {hint && <span className="b">{hint}</span>}
       </span>
       <span className="r">{children}</span>
@@ -109,8 +108,8 @@ function Swatches({ value, colours, onChange, label }: { value: string; colours:
   );
 }
 
-function TextBox({ value, width, onChange, placeholder, label, max }: { value: string; width: number; onChange: (v: string) => void; placeholder?: string; label: string; max?: number }) {
-  return <input className="tiny-input" style={{ width }} value={value} maxLength={max} placeholder={placeholder} aria-label={label} spellCheck={false} onChange={(e) => onChange(e.target.value)} />;
+function TextBox({ value, width, onChange, placeholder, label, max }: { value: string; width: number | 'fill'; onChange: (v: string) => void; placeholder?: string; label: string; max?: number }) {
+  return <input className="tiny-input" style={width === 'fill' ? { flex: '1 1 0', minWidth: 0 } : { width }} value={value} maxLength={max} placeholder={placeholder} aria-label={label} spellCheck={false} onChange={(e) => onChange(e.target.value)} />;
 }
 
 export interface SettingsDialogProps {
@@ -172,6 +171,7 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
   }, [settings]);
   const [current, setCurrent] = useState<Section>('general');
   const body = useRef<HTMLDivElement>(null);
+  const moreLooks = useRef<HTMLDetailsElement>(null);
   const [pickedDir, setPickedDir] = useState<string | null>(null);
   const nextDir = pickedDir ?? info?.nextBuildsDir ?? '';
   const defaultDir = info ? info.userDataDir.replace(/[\\/]+$/, '').replace(/\\/g, '/') + '/Builds' : '';
@@ -253,11 +253,12 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
   const goTo = (section: Section | undefined, rowTitle: string | undefined, again: boolean) => {
     const b = body.current;
     if (!b) return;
+    const row = rowTitle ? b.querySelector<HTMLElement>(`[data-row="${CSS.escape(inLanguage('SettingsDialog', rowTitle))}"]`) : null;
+    if (row && moreLooks.current?.contains(row)) moreLooks.current.open = true;
     const sec = section && section !== 'general' ? b.querySelector<HTMLElement>(`#set-${section}`) : null;
     if (sec) b.scrollTop = topIn(sec);
     else if (again && section === 'general') b.scrollTop = 0;
-    if (section) setCurrent(section);
-    const row = rowTitle ? b.querySelector<HTMLElement>(`[data-row="${CSS.escape(inLanguage('SettingsDialog', rowTitle))}"]`) : null;
+    if (section) setCurrent(section === 'network' ? 'numbers' : section);
     if (row && topIn(row) + row.offsetHeight > b.scrollTop + b.clientHeight - 24) b.scrollTop = topIn(row) - 56;
     setMore(b.scrollTop + b.clientHeight < b.scrollHeight - 4);
   };
@@ -302,7 +303,7 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
             </button>
           ))}
           <span className="sp" />
-          <span className="hint">
+          <span className="hint" title={tr('SettingsDialog.open_settings_anywhere')}>
             <Kbd>Ctrl ,</Kbd>
             <span>{tr('SettingsDialog.open_settings_anywhere')}</span>
           </span>
@@ -314,7 +315,7 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
           <section id="set-general">
             <h3>{tr('SettingsDialog.general')}</h3>
             <Row title={tr('SettingsDialog.language')} hint={tr('SettingsDialog.language_hint')}>
-              <Select ariaLabel={tr('SettingsDialog.language')} width={190} value={draft.language} options={[{ value: 'system', label: tr('SettingsDialog.language_system') }, ...LANGUAGE_CODES.map((c) => ({ value: c, label: LANGUAGE_NAMES[c] }))]} onChange={(v) => set('language', v)} />
+              <Select ariaLabel={tr('SettingsDialog.language')} width="100%" value={draft.language} options={[{ value: 'system', label: tr('SettingsDialog.language_system') }, ...LANGUAGE_CODES.map((c) => ({ value: c, label: LANGUAGE_NAMES[c] }))]} onChange={(v) => set('language', v)} />
             </Row>
             <Row title={tr('SettingsDialog.build_name_in_window_title')} hint={tr('SettingsDialog.shows_the_open_build_s')}><Switch label={tr('SettingsDialog.build_name_in_window_title')} checked={draft.buildNameInTitle} onChange={(v) => set('buildNameInTitle', v)} /></Row>
             <Row title={tr('SettingsDialog.early_updates')} hint={tr('SettingsDialog.get_updates_before_everyone_else')}><Switch label={tr('SettingsDialog.early_updates')} checked={draft.betaBuilds} onChange={(v) => set('betaBuilds', v)} /></Row>
@@ -329,7 +330,7 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
 
           <section id="set-appearance">
             <h3>{tr('SettingsDialog.appearance')}</h3>
-            <Row title={tr('SettingsDialog.theme')} hint={tr('SettingsDialog.the_colours_of_the_whole')}>
+            <Row title={tr('SettingsDialog.theme')} kbd="Alt Shift T" hint={tr('SettingsDialog.the_colours_of_the_whole')}>
               <div className="themes" role="group" aria-label={tr('SettingsDialog.theme')}>
                 {THEMES.map((th) => {
                   const c = lightNow ? th.light : th.dark;
@@ -359,39 +360,42 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
                 })}
               </div>
             </Row>
-            <Row title={tr('SettingsDialog.mode')} hint={tr('SettingsDialog.light_dark_or_follow_windows')}>
+            <Row title={tr('SettingsDialog.mode')} kbd="Alt Shift L">
               <Segmented ariaLabel={tr('SettingsDialog.mode')} value={draft.mode} onChange={(v) => set('mode', v)} options={[{ value: 'light', label: tr('SettingsDialog.light') }, { value: 'dark', label: tr('SettingsDialog.dark') }, { value: 'system', label: tr('SettingsDialog.system') }]} />
             </Row>
+            <Row title={tr('SettingsDialog.density')} hint={tr('SettingsDialog.comfortable_36px_rows_compact_28px')}>
+              <Segmented ariaLabel={tr('SettingsDialog.density')} tall value={draft.density} onChange={(v) => set('density', v)} options={[{ value: 'comfortable', label: tr('SettingsDialog.comfortable') }, { value: 'compact', label: tr('SettingsDialog.compact') }]} />
+            </Row>
+            <Row title={tr('SettingsDialog.ui_scaling_override')}>
+              <Select ariaLabel={tr('SettingsDialog.ui_scaling_override')} width="100%" value={draft.uiScale} options={SCALES} onChange={(v) => set('uiScale', v)} />
+            </Row>
+            <Row title={tr('SettingsDialog.animations')}><Switch label={tr('SettingsDialog.animations')} checked={draft.animations} onChange={(v) => set('animations', v)} /></Row>
+            <Row title={tr('SettingsDialog.styled_tooltips_with_flavour_text')} hint={tr('SettingsDialog.reopen_the_build_after_changing')}><Switch label={tr('SettingsDialog.styled_tooltips_with_flavour_text')} checked={draft.styledTooltips} onChange={(v) => set('styledTooltips', v)} /></Row>
+            <details ref={moreLooks} style={{ marginTop: 6 }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12.5, padding: '6px 0' }}>{tr('SettingsDialog.more')}</summary>
             <Row title={tr('SettingsDialog.glass')} hint={tr('SettingsDialog.how_see_through_the_panels')}>
               <Segmented ariaLabel={tr('SettingsDialog.glass')} value={draft.glass} onChange={(v) => set('glass', v)} options={[{ value: 'liquid', label: tr('SettingsDialog.liquid') }, { value: 'clear', label: tr('SettingsDialog.clear') }, { value: 'frosted', label: tr('SettingsDialog.frosted') }]} />
             </Row>
             <Row title={tr('SettingsDialog.texture')} hint={tr('SettingsDialog.a_stone_grain_behind_the')}>
               <Segmented ariaLabel={tr('SettingsDialog.texture')} value={draft.texture} onChange={(v) => set('texture', v)} options={[{ value: 'off', label: tr('SettingsDialog.off') }, { value: 'subtle', label: tr('SettingsDialog.subtle') }, { value: 'stone', label: tr('SettingsDialog.stone') }]} />
             </Row>
-            <Row title={tr('SettingsDialog.density')} hint={tr('SettingsDialog.comfortable_36px_rows_compact_28px')}>
-              <Segmented ariaLabel={tr('SettingsDialog.density')} tall value={draft.density} onChange={(v) => set('density', v)} options={[{ value: 'comfortable', label: tr('SettingsDialog.comfortable') }, { value: 'compact', label: tr('SettingsDialog.compact') }]} />
-            </Row>
-            <Row title={tr('SettingsDialog.ui_scaling_override')} hint={tr('SettingsDialog.overrides_the_system_display_scaling')}>
-              <Select ariaLabel={tr('SettingsDialog.ui_scaling_override')} width={190} value={draft.uiScale} options={SCALES} onChange={(v) => set('uiScale', v)} />
-            </Row>
-            <Row title={tr('SettingsDialog.animations')} hint={tr('SettingsDialog.turn_off_to_reduce_motion')}><Switch label={tr('SettingsDialog.animations')} checked={draft.animations} onChange={(v) => set('animations', v)} /></Row>
             <Row title={tr('SettingsDialog.starfield')} hint={tr('SettingsDialog.the_star_backdrop_calm_is')}>
               <Segmented ariaLabel={tr('SettingsDialog.starfield')} value={draft.starfield} onChange={(v) => set('starfield', v)} options={[{ value: 'Full', label: tr('SettingsDialog.full') }, { value: 'Calm', label: tr('SettingsDialog.calm') }, { value: 'Off', label: tr('SettingsDialog.off') }]} />
             </Row>
-            <Row title={tr('SettingsDialog.styled_tooltips_with_flavour_text')} hint={tr('SettingsDialog.reopen_the_build_after_changing')}><Switch label={tr('SettingsDialog.styled_tooltips_with_flavour_text')} checked={draft.styledTooltips} onChange={(v) => set('styledTooltips', v)} /></Row>
             <Row title={tr('SettingsDialog.node_power_colours')} hint={tr('SettingsDialog.colour_ramp_for_the_node')}>
               <Segmented ariaLabel={tr('SettingsDialog.node_power_colours')} value={draft.nodePowerColours} onChange={(v) => set('nodePowerColours', v)} options={[{ value: 'red-blue', label: tr('SettingsDialog.red_blue') }, { value: 'red-green', label: tr('SettingsDialog.red_green') }, { value: 'green-blue', label: tr('SettingsDialog.green_blue') }]} />
             </Row>
-            <Row title={tr('SettingsDialog.positive_values')} hint={tr('SettingsDialog.stat_increases_and_good_deltas')}><Swatches label={tr('SettingsDialog.positive_values')} value={draft.positiveColour} colours={POSITIVE} onChange={(c) => set('positiveColour', c)} /></Row>
-            <Row title={tr('SettingsDialog.negative_values')} hint={tr('SettingsDialog.stat_decreases_and_bad_deltas')}><Swatches label={tr('SettingsDialog.negative_values')} value={draft.negativeColour} colours={NEGATIVE} onChange={(c) => set('negativeColour', c)} /></Row>
-            <Row title={tr('SettingsDialog.highlighted_nodes')} hint={tr('SettingsDialog.colour_for_search_matches_on')}><Swatches label={tr('SettingsDialog.highlighted_nodes')} value={draft.highlightColour} colours={HIGHLIGHT} onChange={(c) => set('highlightColour', c)} /></Row>
-            <Row title={tr('SettingsDialog.off_screen_search_markers')} hint={tr('SettingsDialog.points_to_search_matches_that')}><Switch label={tr('SettingsDialog.off_screen_search_markers')} checked={draft.offscreenMarkers} onChange={(v) => set('offscreenMarkers', v)} /></Row>
+            <Row title={tr('SettingsDialog.positive_values')}><Swatches label={tr('SettingsDialog.positive_values')} value={draft.positiveColour} colours={POSITIVE} onChange={(c) => set('positiveColour', c)} /></Row>
+            <Row title={tr('SettingsDialog.negative_values')}><Swatches label={tr('SettingsDialog.negative_values')} value={draft.negativeColour} colours={NEGATIVE} onChange={(c) => set('negativeColour', c)} /></Row>
+            <Row title={tr('SettingsDialog.highlighted_nodes')}><Swatches label={tr('SettingsDialog.highlighted_nodes')} value={draft.highlightColour} colours={HIGHLIGHT} onChange={(c) => set('highlightColour', c)} /></Row>
+            <Row title={tr('SettingsDialog.off_screen_search_markers')}><Switch label={tr('SettingsDialog.off_screen_search_markers')} checked={draft.offscreenMarkers} onChange={(v) => set('offscreenMarkers', v)} /></Row>
+            </details>
           </section>
 
           <section id="set-build-defaults">
             <h3>{tr('SettingsDialog.build_defaults')}</h3>
-            <Row title={tr('SettingsDialog.default_character_level')} hint={tr('SettingsDialog.used_for_new_builds')}><Stepper label={tr('SettingsDialog.level')} value={draft.defaultLevel} min={1} max={100} onChange={(n) => set('defaultLevel', n)} /></Row>
-            <Row title={tr('SettingsDialog.default_gem_quality')} hint={tr('SettingsDialog.used_when_you_add_a')}><Stepper label={tr('SettingsDialog.gem_quality')} value={draft.defaultGemQuality} min={0} max={23} onChange={(n) => set('defaultGemQuality', n)} /></Row>
+            <Row title={tr('SettingsDialog.default_character_level')}><Stepper label={tr('SettingsDialog.level')} value={draft.defaultLevel} min={1} max={100} onChange={(n) => set('defaultLevel', n)} /></Row>
+            <Row title={tr('SettingsDialog.default_gem_quality')}><Stepper label={tr('SettingsDialog.gem_quality')} value={draft.defaultGemQuality} min={0} max={23} onChange={(n) => set('defaultGemQuality', n)} /></Row>
             <Row title={tr('SettingsDialog.default_item_affix_quality')} hint={tr('SettingsDialog.roll_position_for_new_crafted')}>
               <div className="slider">
                 <input type="range" min={0} max={100} value={draft.defaultAffixQuality} aria-label={tr('SettingsDialog.default_item_affix_quality')} style={{ ['--p' as string]: `${draft.defaultAffixQuality}%` }} onChange={(e) => set('defaultAffixQuality', Number(e.target.value))} />
@@ -399,9 +403,8 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
               </div>
             </Row>
             <Row title={tr('SettingsDialog.build_warnings')} hint={tr('SettingsDialog.shows_point_socket_and_requirement')}><Switch label={tr('SettingsDialog.build_warnings')} checked={draft.buildWarnings} onChange={(v) => set('buildWarnings', v)} /></Row>
-            <Row title={tr('SettingsDialog.build_save_path')} hint={moved ? tr('SettingsDialog.takes_effect_after_a_restart') : tr('SettingsDialog.where_local_builds_are_saved')}>
+            <Row title={tr('SettingsDialog.build_save_path')} hint={`${moved ? tr('SettingsDialog.takes_effect_after_a_restart') : tr('SettingsDialog.where_local_builds_are_saved')} ${info ? nextDir.replace(/\\/g, '/') : tr('SettingsDialog.loading')}`}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span className="path-pill" title={nextDir}>{info ? '‎' + nextDir.replace(/\\/g, '/') : tr('SettingsDialog.loading')}</span>
                 <button type="button" className="btn sm" disabled={!info} onClick={() => void pickDir(false)}>{tr('SettingsDialog.choose')}</button>
                 {nextDir.replace(/\\/g, '/') !== defaultDir && <button type="button" className="btn sm" onClick={() => void pickDir(true)}>{tr('SettingsDialog.use_default')}</button>}
                 {moved && <button type="button" className="btn sm" onClick={() => void window.pom.lib.relaunch()}>{tr('SettingsDialog.restart_now')}</button>}
@@ -410,22 +413,21 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
           </section>
 
           <section id="set-numbers">
-            <h3>{tr('SettingsDialog.numbers')}</h3>
-            <Row title={tr('SettingsDialog.thousands_separators')} hint={tr('SettingsDialog.n3_123_221_instead_of')}><Switch label={tr('SettingsDialog.thousands_separators')} checked={draft.thousandsSeparators} onChange={(v) => set('thousandsSeparators', v)} /></Row>
+            <h3>{tr('SettingsDialog.numbers_and_network')}</h3>
+            <Row title={tr('SettingsDialog.thousands_separators')} hint={tr('SettingsDialog.n3_123_221_instead_of')}>
+              <Switch label={tr('SettingsDialog.thousands_separators')} checked={draft.thousandsSeparators} onChange={(v) => set('thousandsSeparators', v)} />
+              <span data-row={tr('SettingsDialog.thousands_separator')}><TextBox label={tr('SettingsDialog.thousands_separator')} width={56} max={1} value={draft.thousandsSeparator} onChange={(v) => set('thousandsSeparator', v)} /></span>
+            </Row>
             <Row title={tr('SettingsDialog.compact_large_numbers')} hint={tr('SettingsDialog.shortens_big_numbers_in_the')}><Switch label={tr('SettingsDialog.compact_large_numbers')} checked={draft.compactNumbers} onChange={(v) => set('compactNumbers', v)} /></Row>
-            <Row title={tr('SettingsDialog.thousands_separator')} hint={tr('SettingsDialog.one_character_shown_between_groups')}><TextBox label={tr('SettingsDialog.thousands_separator')} width={56} max={1} value={draft.thousandsSeparator} onChange={(v) => set('thousandsSeparator', v)} /></Row>
-            <Row title={tr('SettingsDialog.decimal_separator')} hint={tr('SettingsDialog.one_character_shown_before_the')}><TextBox label={tr('SettingsDialog.decimal_separator')} width={56} max={1} value={draft.decimalSeparator} onChange={(v) => set('decimalSeparator', v)} /></Row>
-          </section>
-
-          <section id="set-network">
-            <h3>{tr('SettingsDialog.network')}</h3>
+            <Row title={tr('SettingsDialog.decimal_separator')}><TextBox label={tr('SettingsDialog.decimal_separator')} width={56} max={1} value={draft.decimalSeparator} onChange={(v) => set('decimalSeparator', v)} /></Row>
+            <span id="set-network" />
             <Row title={tr('SettingsDialog.connection_protocol')} hint={tr('SettingsDialog.used_when_downloading_updates_and')}>
               <Segmented ariaLabel={tr('SettingsDialog.connection_protocol')} value={draft.connectionProtocol} onChange={(v) => set('connectionProtocol', v)} options={[{ value: 'auto', label: tr('SettingsDialog.auto') }, { value: 'ipv4', label: tr('SettingsDialog.ipv4') }, { value: 'ipv6', label: tr('SettingsDialog.ipv6') }]} />
             </Row>
             <Row title={tr('SettingsDialog.proxy_server')} hint={tr('SettingsDialog.only_needed_on_networks_that')}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
                 <Select ariaLabel={tr('SettingsDialog.proxy_type')} width={96} value={draft.proxyKind} options={[{ value: 'http', label: tr('SettingsDialog.http') }, { value: 'socks5', label: tr('SettingsDialog.socks5') }]} onChange={(v) => set('proxyKind', v)} />
-                <TextBox label={tr('SettingsDialog.proxy_host_and_port')} width={190} value={draft.proxyHost} placeholder={tr('SettingsDialog.host_port')} onChange={(v) => set('proxyHost', v)} />
+                <TextBox label={tr('SettingsDialog.proxy_host_and_port')} width="fill" value={draft.proxyHost} placeholder={tr('SettingsDialog.host_port')} onChange={(v) => set('proxyHost', v)} />
               </div>
             </Row>
           </section>
@@ -467,12 +469,12 @@ export function SettingsDialog({ initialSection, initialRow, settings, info, ver
         </div>
         <div className="fade" aria-hidden data-on={more || undefined} />
         <div className="foot">
-          {problem ? <span className="note" role="alert" style={{ color: 'var(--negative-text)' }}>{problem}</span> : <span className="note">{tr('SettingsDialog.appearance_previews_now_everything_s')}</span>}
+          {problem ? <span className="note" role="alert" style={{ color: 'var(--negative-text)' }}>{problem}</span> : <span className="note" />}
           <button type="button" className="btn ghost" onClick={cancel}>
             <Icon name="x" size={16} />
             {tr('SettingsDialog.cancel')}
           </button>
-          <button type="button" className="btn gold" onClick={trySave}>
+          <button type="button" className="btn gold" title={tr('SettingsDialog.appearance_previews_now_everything_s')} onClick={trySave}>
             <Icon name="save" size={16} />
             {tr('SettingsDialog.save')}
           </button>

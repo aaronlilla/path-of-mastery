@@ -4,20 +4,8 @@
 
 /* Tab toolbars wrap to a second row instead of clipping. Body panels move down by one row (48px). */
 @container tab (max-width: 819px) {
-  [data-screen-label^="Items"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
+  [data-screen-label^="Items"] [data-r~="tab-tb"] { height: auto !important; min-height: var(--tab-tb-h); flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
   [data-screen-label^="Items"] [data-r~="tab-body"] { top: 116px !important; }
-}
-@container tab (max-width: 1099px) {
-  [data-screen-label^="Calcs"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
-  [data-screen-label^="Calcs"] [data-r~="tab-body"] { top: 116px !important; }
-}
-@container tab (max-width: 1039px) {
-  [data-screen-label^="Configuration"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
-  [data-screen-label^="Configuration"] [data-r~="tab-body"] { top: 116px !important; }
-}
-@container tab (max-width: 999px) {
-  [data-screen-label^="Compare"] [data-r~="tab-tb"] { height: auto !important; min-height: 56px; flex-wrap: wrap !important; padding: 10px !important; row-gap: 8px !important; }
-  [data-screen-label^="Compare"] [data-r~="tab-body"] { top: 116px !important; }
 }
 
 /* Skills: under 1180 the socket group list is a strip across the top and the gem editor sits below it. Both stay on screen:
@@ -44,15 +32,7 @@
   [data-r~="modrow"] { grid-template-columns: 74px minmax(0, 1fr) !important; row-gap: 4px !important; }
   [data-r~="modrow"] > :nth-child(3) { grid-column: 2; }
 }
-/* Gem table: Quality moves into the level hover, then Count goes. */
-@container ske (max-width: 559px) {
-  [data-r~="gemrow"] { grid-template-columns: 28px minmax(0,1fr) 64px 56px 64px !important; }
-  [data-r~="gemrow"] > :nth-child(4) { display: none !important; }
-}
-@container ske (max-width: 459px) {
-  [data-r~="gemrow"] { grid-template-columns: 28px minmax(0,1fr) 64px 56px !important; }
-  [data-r~="gemrow"] > :nth-child(6) { display: none !important; }
-}
+/* Gem table columns in a narrow editor: see skillsTab.css (@container ske). */
 
 /* Items: three columns (slots | all items | editor) down to 1000, with narrower side columns under 1400; under 1000 the
    editor opens as a sheet over the list. */
@@ -75,6 +55,10 @@
   [data-r~="it-slots"], [data-r~="it-editor"] { top: 116px !important; }
   [data-r~="it-list"] { top: 116px !important; }
 }
+/* Narrower than slots + a usable editor (assistant open on a small window): the editor sheet covers the whole tab body. */
+@container tab (max-width: 639px) {
+  [data-r~="it-editor"] { left: 0 !important; }
+}
 
 /* Calcs: section columns auto-fill; the breakdown popover pins inside the tab. */
 @container tab (max-width: 1399px) {
@@ -88,17 +72,24 @@
 
 /* Configuration: one column, max 960px, centred. */
 
-/* Import/Export, Party: two columns become one under 1100. */
+/* Import/Export: two columns become one under 1100. Party: under 900 (at 1030 each column is ~500px and fits its controls). */
 @container tab (max-width: 1099px) {
-  [data-r~="imp-grid"], [data-r~="party-grid"] { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important; grid-auto-rows: max-content !important; align-content: start !important; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: thin; }
-  [data-r~="imp-grid"] > *, [data-r~="party-grid"] > * { grid-column: 1 !important; }
+  [data-r~="imp-grid"] { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important; grid-auto-rows: max-content !important; align-content: start !important; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: thin; }
+  [data-r~="imp-grid"] > * { grid-column: 1 !important; }
+}
+@container tab (max-width: 899px) {
+  [data-r~="party-grid"] { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important; grid-auto-rows: max-content !important; align-content: start !important; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: thin; }
+  [data-r~="party-grid"] > * { grid-column: 1 !important; }
 }
 @container tab (max-width: 759px) {
   [data-r~="imp-2"] { grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important; }
 }
 
+/* Configuration toolbar: one row down to 760; under that it wraps and the body drops to clear up to three rows. */
 @container tab (max-width: 759px) {
-  [data-screen-label^="Configuration"] [data-r~="tab-body"] { top: 150px !important; }
+  [data-screen-label^="Configuration"] .cfg-tb { height: auto; min-height: var(--tab-tb-h); flex-wrap: wrap; padding: var(--s-4) var(--s-5); row-gap: var(--s-4); }
+  [data-screen-label^="Configuration"] .cfg-tb > .right { margin-left: 0; flex-wrap: wrap; }
+  [data-screen-label^="Configuration"] .cfg-body { top: calc(var(--control-h) * 3 + var(--s-4) * 4 + var(--panel-inset)); }
 }
 
 /* Build library */
@@ -164,9 +155,6 @@
   [data-r~="it-gear"] { grid-template-columns: minmax(0, 1fr) 28px !important; row-gap: 3px !important; }
   [data-r~="it-gear"] > span:first-child { grid-column: 1 / -1; text-align: left !important; font-size: 11.5px; color: var(--text-muted) !important; }
   div:has(> [data-r~="it-trade"]) { flex-wrap: wrap !important; row-gap: 6px !important; }
-}
-@container tab (max-width: 480px) {
-  [data-screen-label^="Compare"] [data-r~="tab-body"] { top: 164px !important; }
 }
 @container tab (max-width: 480px) {
   [data-ck] > span:first-child { white-space: normal !important; text-overflow: clip !important; line-height: 1.35; padding: 6px 0; }

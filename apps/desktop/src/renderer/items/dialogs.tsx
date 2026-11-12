@@ -98,7 +98,7 @@ export function CraftPopover({ env, anchor, onClose, onCreate }: { env: ItemsEnv
 
   return (
     <>
-      <PortalMenu anchor={anchor} open onClose={onClose} role="dialog" label={tr('items_dialogs.craft_item')} minWidth={280} className="it-craftpop">
+      <PortalMenu anchor={anchor} open onClose={onClose} align="right" role="dialog" label={tr('items_dialogs.craft_item')} minWidth={280} className="it-craftpop">
         <div className="it-craft-ctl">
           <div className="it-craft-row">
             <div style={{ flex: '0 0 118px' }}>
@@ -113,32 +113,38 @@ export function CraftPopover({ env, anchor, onClose, onCreate }: { env: ItemsEnv
           {craftGroups(shown).map((g) => (
             <div key={g.name} data-group={g.name}>
               <div className="menu-head">{CRAFT_HEAD[g.name] ?? g.name}</div>
-              {g.types.flatMap((t) =>
-                (cat?.bases[t] ?? []).map((b) => (
-                  <button
-                    key={b.name}
-                    type="button"
-                    role="option"
-                    aria-selected={false}
-                    data-base={b.name}
-                    className="menu-item it-menu-item"
-                    disabled={busy}
-                    onMouseEnter={(ev) => {
-                      const el = ev.currentTarget;
-                      tip.hide();
-                      void preview(b.name).then((info) => el.matches(':hover') && tip.show(el, { info })).catch(() => undefined);
-                    }}
-                    onMouseLeave={tip.hide}
-                    onClick={() => void create(b.name)}
-                  >
-                    {art(b.name) && <img src={art(b.name)} alt="" />}
-                    <span className="col">
-                      <span>{b.name}</span>
-                      <span className="sub">{t}</span>
-                    </span>
-                  </button>
-                )),
-              )}
+              {g.types.map((t) => {
+                const bases = cat?.bases[t] ?? [];
+                if (!bases.length) return null;
+                return (
+                  <div key={t} data-type={t}>
+                    <div className="it-craft-type">{t}</div>
+                    {bases.map((b) => (
+                      <button
+                        key={b.name}
+                        type="button"
+                        role="option"
+                        aria-selected={false}
+                        data-base={b.name}
+                        className="menu-item it-menu-item"
+                        disabled={busy}
+                        onMouseEnter={(ev) => {
+                          const el = ev.currentTarget;
+                          tip.hide();
+                          void preview(b.name).then((info) => el.matches(':hover') && tip.show(el, { info })).catch(() => undefined);
+                        }}
+                        onMouseLeave={tip.hide}
+                        onClick={() => void create(b.name)}
+                      >
+                        {art(b.name) && <img src={art(b.name)} alt="" />}
+                        <span className="col">
+                          <span>{b.name}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
@@ -176,21 +182,21 @@ export function TextDialog({ env, initial, editing, onClose, onSave }: { env: It
   // Shown in the place of the item editor (the design edits the text there), not in a dialog.
   return (
     <div className="it-glass it-body it-editor" data-lg="panel" data-motion="off" data-r="tab-body it-editor" role="group" aria-label={editing ? tr('items_dialogs.edit_item_text') : tr('items_dialogs.create_custom_item_from_text')} onKeyDown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } }}>
-      <div className="it-dlg" style={{ minHeight: 0, overflowY: 'auto' }}>
+      <div className="it-dlg" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {!hasRarity(text) && (
           <div>
             <div className="lbl">{tr('items_dialogs.rarity')}</div>
             <PickButton value={RARITY_LIST.find((r) => r.v === rarity)?.label} colour={RARITY_LIST.find((r) => r.v === rarity)?.c} onOpen={(el) => open(el, RARITY_LIST.map((r) => ({ key: r.v, label: r.label, colour: r.c, on: r.v === rarity, run: () => setRarity(r.v) })), 140)} />
           </div>
         )}
-        <textarea value={text} onChange={(e) => setText(e.target.value)} spellCheck={false} aria-label={tr('items_dialogs.item_text')} placeholder={tr('items_dialogs.paste_an_item_copied_from')} autoFocus style={{ height: 190 }} />
+        <textarea value={text} onChange={(e) => setText(e.target.value)} spellCheck={false} aria-label={tr('items_dialogs.item_text')} placeholder={tr('items_dialogs.paste_an_item_copied_from')} autoFocus style={{ flex: '1 1 190px', minHeight: 120 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ flex: 1, color: 'var(--text-muted)', fontSize: 12.5 }}>{tr('items_dialogs.paste_an_item_copied_in')}</span>
+          <span style={{ flex: 1 }} />
           <button type="button" className="it-btn sm ghost" onClick={onClose}>
             <Icon name="x" size={14} />
             {tr('items_dialogs.cancel')}
           </button>
-          <button type="button" className="it-btn gold" disabled={!info?.valid} onClick={save}>
+          <button type="button" className="it-btn sm gold" disabled={!info?.valid} onClick={save}>
             <Icon name={editing ? 'check' : 'plus'} size={15} />
             {editing ? tr('items_dialogs.save') : tr('items_dialogs.add_item')}
           </button>

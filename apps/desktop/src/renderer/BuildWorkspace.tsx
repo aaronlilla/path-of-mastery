@@ -36,7 +36,7 @@ import { FightTab } from './fight/FightTab';
 import { PartyTab } from './PartyTab';
 import type { EditResult, OpenBuild, TabId } from './types';
 import type { BuildEdit } from '@pom/protocol';
-import { Icon, Kbd, Dialog, useToast } from './ui';
+import { Icon, Dialog, useToast } from './ui';
 import { HeaderClassMenu } from './HeaderClassMenu';
 import { BuildOpenGates } from './BuildOpenGates';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -94,6 +94,8 @@ export interface BuildWorkspaceProps {
   onOpenSettings: () => void;
   onOpenAbout: () => void;
   onCheckUpdate: () => void;
+  /** Told whether the header hides its folder line (narrow widths), so the title bar crumb can carry it then. */
+  onPathHidden?: (hidden: boolean) => void;
   settings: AppSettings;
   /** Saves a change to the settings (the sidebar's section order and pinned stats). */
   onPatchSettings: (patch: Partial<AppSettings>) => void;
@@ -178,6 +180,11 @@ export function BuildWorkspace(p: BuildWorkspaceProps) {
   const hs = Math.min(4, headerStage(topW) + squeeze) as 0 | 1 | 2 | 3 | 4;
   // A name too long for the header's line goes on a row of its own; the header is as tall as that row needs (buttons 46, gaps 16).
   const nameRow = nameNeedsRow(build.name, topW);
+  const pathHidden = nameRow || hs >= 2;
+  const pathHiddenRef = useRef(p.onPathHidden);
+  pathHiddenRef.current = p.onPathHidden;
+  useEffect(() => pathHiddenRef.current?.(pathHidden), [pathHidden]);
+  useEffect(() => () => pathHiddenRef.current?.(false), []);
   const nameRef = useRef<HTMLDivElement>(null);
   useEffect(() => setSqueeze(0), [topW, build.name]);
   useLayoutEffect(() => {
@@ -345,23 +352,12 @@ export function BuildWorkspace(p: BuildWorkspaceProps) {
       <div className="bw-bg" />
       <div className="bw-top" data-lg="panel" ref={topRef} data-hs={hs}>
         <div className="grp">
-          <button type="button" className="btn icon" data-lg="control" title={tr('BuildWorkspace.back_ctrl_w')} aria-label={tr('BuildWorkspace.back')} onClick={p.onBack}>
-            <Icon name="chevron-left" size={16} />
+          <button type="button" className="btn icon bw-back" data-lg="control" title={tr('BuildWorkspace.library_ctrl_w')} aria-label={tr('BuildWorkspace.back_to_the_library')} onClick={p.onBack}>
+            <Icon name="grid" size={16} />
           </button>
-          <button type="button" className="btn gold" title={tr('BuildWorkspace.save_ctrl_s')} aria-label={tr('BuildWorkspace.save')} onClick={p.onSave} style={{ gap: 10 }}>
+          <button type="button" className={'btn save' + (p.dirty || p.notSaved ? ' gold' : '')} title={tr('BuildWorkspace.save_ctrl_s')} aria-label={tr('BuildWorkspace.save')} onClick={p.onSave} style={{ gap: 10 }}>
             <Icon name="save" size={15} />
             <span className="t-save">{tr('BuildWorkspace.save')}</span>
-            <Kbd onGold>Ctrl S</Kbd>
-          </button>
-          {hs < 2 && (
-            <button type="button" className="btn" data-lg="control" title={tr('BuildWorkspace.save_as_ctrl_shift_s')} onClick={p.onSaveAs}>
-              <Icon name="file-plus" size={16} />
-              {tr('BuildWorkspace.save_as')}
-            </button>
-          )}
-          <button type="button" className="btn" data-lg="control" title={tr('BuildWorkspace.new_build_ctrl_n')} aria-label={tr('BuildWorkspace.new_build')} onClick={p.onNewBuild}>
-            <Icon name="plus" size={16} />
-            {hs < 1 && tr('BuildWorkspace.new_build')}
           </button>
           <SharePopover anchor={moreBtn} open={shareOpen} onClose={() => setShareOpen(false)} localId={build.id} onCopyCode={p.onCopyCode} />
           {similarOpen && <SimilarBuildsDialog xml={build.xml} onOpen={(b) => { setSimilarOpen(false); p.onOpenCommunity(b); }} onClose={() => setSimilarOpen(false)} />}
@@ -374,21 +370,17 @@ export function BuildWorkspace(p: BuildWorkspaceProps) {
             onNewBuild={p.onNewBuild}
             onSaveAs={p.onSaveAs}
             onShare={() => setShareOpen(true)}
+            onSimilar={() => setSimilarOpen(true)}
             onCompare={() => { setComparePick((k) => k + 1); p.onTab('compare'); }}
             onHistory={p.onHistory}
             onLootFilter={p.onLootFilter}
             onPublish={() => setPublishOpen(true)}
             onAuto={(a) => void eng.editXml((x) => setBuildAttr(x, 'characterLevelAutoMode', a ? 'true' : 'false'))}
           />
-          <button type="button" className="btn" data-lg="control" title={tr('BuildWorkspace.community_builds_with_the_same')} aria-label={tr('BuildWorkspace.similar_builds')} onClick={() => setSimilarOpen(true)}>
-            <Icon name="compare" size={16} />
-            {hs < 1 && tr('BuildWorkspace.similar_builds')}
-          </button>
           <div className="vr" />
           <div className="bw-name" ref={nameRef}>
             <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-              <span className="path ellipsis" title={(p.notSaved ? tr('BuildWorkspace.not_saved_yet') : path) + (credit ? `
-${credit}` : '')}>{tr('BuildWorkspace.current_build')} {p.notSaved ? tr('BuildWorkspace.not_saved_yet') : path}{credit ? ` · ${credit}` : ''}</span>
+              <span className="path ellipsis" title={[p.notSaved ? '' : path, credit].filter(Boolean).join('\n')}>{[p.notSaved ? '' : path, credit].filter(Boolean).join(' · ') || ' '}</span>
               <PreviewTag />
             </span>
             <span className="line">
@@ -428,12 +420,6 @@ ${credit}` : '')}>{tr('BuildWorkspace.current_build')} {p.notSaved ? tr('BuildWo
         {header && (
           <div className="bw-points">
             <HeaderPoints info={shownInfo} />
-            {hs < 2 && (
-              <div className="seg" data-lg="tile" role="group" aria-label={tr('BuildWorkspace.character_level_mode')}>
-                <button type="button" disabled={!eng.ready} aria-pressed={header.auto} title={tr('BuildWorkspace.the_level_follows_the_points')} onClick={() => void eng.editXml((x) => setBuildAttr(x, 'characterLevelAutoMode', 'true'))}>{tr('BuildWorkspace.auto')}</button>
-                <button type="button" disabled={!eng.ready} aria-pressed={!header.auto} title={tr('BuildWorkspace.set_the_level_yourself')} onClick={() => void eng.editXml((x) => setBuildAttr(x, 'characterLevelAutoMode', 'false'))}>{tr('BuildWorkspace.manual')}</button>
-              </div>
-            )}
           </div>
         )}
         <HeaderClassMenu build={build} header={header} eng={eng} xml={build.xml} />
@@ -446,22 +432,18 @@ ${credit}` : '')}>{tr('BuildWorkspace.current_build')} {p.notSaved ? tr('BuildWo
             <span className="lbl">{tabLabel(t.id, t.label)}</span>
           </button>
         ))}
-        <span className="sp" />
-        <PreviewSwitch />
-        <button type="button" className="tb-act" title={tr('BuildWorkspace.import_or_export_this_build')} aria-pressed={p.tab === 'import'} onClick={() => p.onTab('import')}>
-          <Icon name="import" size={14} />
+        <button type="button" className="tab" role="tab" aria-selected={p.tab === 'import'} title={tr('BuildWorkspace.import_or_export_this_build')} aria-label={tr('BuildWorkspace.import')} onClick={() => p.onTab('import')}>
+          <Icon name="import" size={15} />
           <span className="lbl">{tr('BuildWorkspace.import')}</span>
         </button>
+        <span className="sp" />
+        <PreviewSwitch />
         {p.onSendToTimeline && (
           <button type="button" className="tb-act" title={tr('BuildWorkspace.add_this_build_to_a')} aria-label={tr('BuildWorkspace.send_to_timeline')} onClick={p.onSendToTimeline}>
             <span className="full">{tr('BuildWorkspace.send_to_timeline')}</span>
             <span className="short">{tr('BuildWorkspace.timeline')}</span>
           </button>
         )}
-        <button type="button" className="tb-act" title={tr('BuildWorkspace.make_a_loot_filter_for')} aria-label={tr('BuildWorkspace.loot_filter_for_this_build')} onClick={p.onLootFilter}>
-          <span className="full">{tr('BuildWorkspace.loot_filter_for_this_build')}</span>
-          <span className="short">{tr('BuildWorkspace.loot_filter')}</span>
-        </button>
       </nav>
 
       <aside className="bw-side" data-lg="panel" aria-label={tr('BuildWorkspace.build_stats')} data-drawer={drawer ? 'open' : 'closed'}>
@@ -488,23 +470,17 @@ ${credit}` : '')}>{tr('BuildWorkspace.current_build')} {p.notSaved ? tr('BuildWo
           onPatchSettings={p.onPatchSettings}
         />
         </ErrorBoundary>
-        {p.saveStatus && (
-          <div className="save-status" role="status" data-state={p.saveStatus === tr('saveStatus.save_failed') ? 'failed' : undefined}>
-            <span className="dot" />
-            {p.saveStatus}
-          </div>
-        )}
         <div className="foot">
-          <button type="button" onClick={p.onOpenSettings}>
-            <Icon name="settings" size={15} />
-            {tr('BuildWorkspace.options')}
-          </button>
+          <span className="save-status" role="status" data-state={p.saveStatus === tr('saveStatus.save_failed') ? 'failed' : undefined}>
+            {p.saveStatus && (
+              <>
+                <span className="dot" />
+                <span className="t" title={p.saveStatus}>{p.saveStatus}</span>
+              </>
+            )}
+          </span>
           <button type="button" aria-label={tr('BuildWorkspace.about')} title={tr('BuildWorkspace.about')} onClick={p.onOpenAbout}>
             <Icon name="info" size={15} />
-          </button>
-          <button type="button" onClick={p.onCheckUpdate}>
-            <Icon name="cloud-down" size={15} />
-            {tr('BuildWorkspace.check_for_update')}
           </button>
           <span className="ver">{tr('BuildWorkspace.v_version', { version: p.version })}</span>
         </div>

@@ -130,9 +130,8 @@ export function ThemesView({ nav: _nav }: { nav: LfNav }) {
           <div key={s.id} className={'lf-card adv-s-card' + (i === active ? ' active' : '')}>
             <div className="adv-s-row">
               <span className="adv-s-cardname">{styleName(i)}</span>
-              {i === active && <span className="adv-s-tag accent">{tr('lootfilter_advanced_views_ThemesView.active')}</span>}
             </div>
-            <GroundBox kind={ground} className="adv-s-sample" style={ground === 'dark' ? { background: 'transparent' } : undefined}>
+            <GroundBox kind={ground} className={'adv-s-sample' + (ground === 'dark' ? ' flat' : '')} style={ground === 'dark' ? { background: 'transparent' } : undefined}>
               {samples.length === 0 ? (
                 <span className="adv-s-faint" style={{ color: ground === 'bright' ? 'rgba(24,20,14,.72)' : 'rgba(255,240,215,.62)' }}>
                   {lf.baseLoading ? tr('lootfilter_advanced_views_ThemesView.reading_neversink') : tr('lootfilter_advanced_views_ThemesView.no_labels_to_preview')}
@@ -144,7 +143,7 @@ export function ThemesView({ nav: _nav }: { nav: LfNav }) {
             <span className="adv-s-muted" style={{ minHeight: 36 }}>
               {DESC[i] ?? s.blurb}
             </span>
-            <button type="button" className="adv-s-btn" style={{ width: '100%' }} onClick={() => apply(i)}>
+            <button type="button" className="adv-s-btn" style={{ width: '100%' }} disabled={i === active} onClick={() => apply(i)}>
               {i === active ? tr('lootfilter_advanced_views_ThemesView.applied') : tr('lootfilter_advanced_views_ThemesView.apply_to_scope', { scope: SCOPE_NAME[scope] })}
             </button>
           </div>

@@ -28,16 +28,16 @@
 .ap .who { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); min-width: 0; }
 .ap .who i { flex: none; width: 6px; height: 6px; border-radius: 3px; background: var(--positive); }
 .ap .who i.off { background: var(--text-faint); }
-.ap .ib { flex: none; width: 32px; height: 32px; border-radius: 9px; border: 0; background: transparent; color: var(--text-3); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.ap .ib { flex: none; width: var(--control-h-sm); height: var(--control-h-sm); border-radius: 9px; border: 0; background: transparent; color: var(--text-3); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .ap .ib:hover { background: rgba(var(--line-rgb), .06); color: var(--text-strong); }
 .ap .ib[aria-pressed="true"] { background: rgba(var(--accent-rgb), .12); color: var(--gold-text); }
 .ap .ib:disabled { opacity: .4; cursor: default; }
 
-.ap .prov { height: 34px; display: flex; align-items: center; gap: 2px; padding: 3px; box-sizing: border-box; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .06); }
-.ap .prov button { height: 26px; padding: 0 10px; display: flex; align-items: center; gap: 6px; border-radius: 7px; border: 0; background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
+.ap .prov { height: var(--control-h-sm); display: flex; align-items: center; gap: 2px; padding: 3px; box-sizing: border-box; border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .06); }
+.ap .prov button { height: 22px; padding: 0 10px; display: flex; align-items: center; gap: 6px; border-radius: 7px; border: 0; background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
 .ap .prov button:hover { color: var(--text-strong); }
 .ap .prov button[aria-pressed="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); color: var(--text-strong); }
-.ap .prov select { height: 26px; max-width: 235px; padding: 0 4px; border-radius: 7px; border: 0; background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; text-overflow: ellipsis; }
+.ap .prov select { field-sizing: content; height: 22px; max-width: 100%; padding: 0 4px; border-radius: 7px; border: 0; background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; text-overflow: ellipsis; }
 .ap .prov select:hover { color: var(--text-strong); }
 .ap .prov select[data-on="true"] { background: linear-gradient(180deg, var(--surface-5), var(--surface-4)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); color: var(--text-strong); }
 .ap .prov .st { width: 6px; height: 6px; border-radius: 3px; background: var(--text-faint); }
@@ -45,7 +45,7 @@
 .ap .prov .st.bad { background: var(--negative); }
 
 /* Thread */
-.ap .thread { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; overflow-wrap: anywhere; }
+.ap .thread { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; padding: var(--s-7); display: flex; flex-direction: column; gap: 12px; overflow-wrap: anywhere; }
 .ap .me { align-self: flex-end; max-width: 88%; padding: 9px 12px; border-radius: 14px 14px 4px 14px; background: rgba(var(--accent-rgb), .14); border: 1px solid rgba(var(--accent-rgb), .2); color: var(--text-strong); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 .ap .prose { color: var(--text); line-height: 1.55; text-wrap: pretty; }
 .ap .prose p { margin: 0 0 8px; }
@@ -89,20 +89,20 @@
 .ap .psum { color: var(--text-3); font-size: 12.5px; line-height: 1.45; }
 .ap .tag { align-self: flex-start; padding: 1px 8px; border-radius: 10px; font-size: 11px; border: 1px solid rgba(var(--line-rgb), .12); color: var(--text-muted); }
 /* Composer */
-.ap .composer { flex: none; padding: 10px 12px 12px; border-top: 1px solid rgba(var(--line-rgb), .06); }
+.ap .composer { flex: none; padding: var(--s-6); border-top: 1px solid rgba(var(--line-rgb), .06); }
 .ap .cbox { border-radius: 12px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .1); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
 .ap .cbox:focus-within { border-color: rgba(var(--accent-rgb), .5); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .12); }
 .ap .cbox textarea { resize: none; border: 0; background: transparent; color: var(--text-strong); font: 400 13.5px/1.45 Geist, sans-serif; min-height: 20px; max-height: 140px; padding: 0; outline: none; }
 .ap .cbox textarea::placeholder { color: var(--text-faint); }
 .ap .crow { display: flex; align-items: center; gap: 6px; }
-.ap .at { padding: 2px 8px; border-radius: 6px; border: 0; background: rgba(var(--accent-rgb), .1); color: var(--gold-text); font: 400 11.5px Geist, sans-serif; cursor: pointer; }
+.ap .at { height: var(--control-h-xs); padding: 0 var(--s-4); display: inline-flex; align-items: center; border-radius: 6px; border: 0; background: rgba(var(--accent-rgb), .1); color: var(--gold-text); font: 400 11.5px Geist, sans-serif; cursor: pointer; }
 .ap .at:hover { background: rgba(var(--accent-rgb), .2); }
-.ap .cpick { display: flex; gap: 12px; align-items: center; }
-.ap .cpick label { display: flex; align-items: center; gap: 6px; font: 400 11.5px Geist, sans-serif; color: var(--text-3); }
-.ap .cpick select { height: 28px; padding: 0 6px; border-radius: 6px; border: 1px solid rgba(var(--line-rgb), .1); background: transparent; color: var(--text-strong); font: 400 11.5px Geist, sans-serif; cursor: pointer; }
-.ap .cpick select:focus-visible { outline: none; border-color: rgba(var(--accent-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .12); }
-.ap .cpick option { background: #1a1a1f; color: #e8e8ec; }
-.ap .send { width: 30px; height: 30px; border-radius: 9px; border: 0; margin-left: auto; background: linear-gradient(180deg, var(--gold-300), var(--gold-600)); color: var(--text-on-accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.cpick { display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 10px 12px; }
+.cpick label { display: flex; align-items: center; gap: 6px; font: 400 11.5px Geist, sans-serif; color: var(--text-3); }
+.cpick select { height: 28px; padding: 0 6px; border-radius: 6px; border: 1px solid rgba(var(--line-rgb), .1); background: transparent; color: var(--text-strong); font: 400 11.5px Geist, sans-serif; cursor: pointer; }
+.cpick select:focus-visible { outline: none; border-color: rgba(var(--accent-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .12); }
+.cpick option { background: #1a1a1f; color: #e8e8ec; }
+.ap .send { width: var(--control-h-xs); height: var(--control-h-xs); border-radius: 9px; border: 0; margin-left: auto; background: linear-gradient(180deg, var(--gold-300), var(--gold-600)); color: var(--text-on-accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .ap .send:disabled { opacity: .45; cursor: default; }
 .ap .send.stop { width: auto; padding: 0 12px; gap: 6px; font: 600 12.5px Geist, sans-serif; background: linear-gradient(180deg, rgba(var(--glass-hi-rgb), .6), rgba(var(--glass-rgb), .5)); color: var(--text-strong); border: 1px solid rgba(var(--line-rgb), .14); }
 .ap .stopglyph { width: 9px; height: 9px; border-radius: 2px; background: currentColor; }
@@ -212,17 +212,18 @@
 .ap-dialog { color: var(--text); font-size: 13.5px; display: flex; flex-direction: column; }
 .ap-dialog .conn { padding: 0; overflow: visible; }
 /* The panel's empty chat: a heading and a few questions to start from. */
-.ap .thread .starter { display: flex; flex-direction: column; gap: 10px; padding: 8px 2px; }
-.ap .thread .starter .h { font: 600 20px/1.2 'Cormorant Garamond', serif; color: var(--text-display); }
+.ap .thread .starter { display: flex; flex-direction: column; gap: var(--s-1); padding: var(--s-4) 0; margin-top: auto; }
 .ap .thread .starter .p { color: var(--text-muted); line-height: 1.5; text-wrap: pretty; }
-.ap .thread .starter .try { font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); margin-top: 6px; }
-.ap .thread .starter button { text-align: left; border-radius: 12px; border: 1px solid rgba(var(--line-rgb), .1); background: rgba(var(--line-rgb), .04); color: var(--text-2); padding: 10px 12px; cursor: pointer; font: inherit; line-height: 1.4; }
-.ap .thread .starter button:hover { border-color: rgba(var(--accent-rgb), .5); color: var(--text-strong); }
+.ap .thread .starter .try { font: 600 10.5px Geist, sans-serif; letter-spacing: .12em; color: var(--gold-label); margin-top: var(--s-3); }
+.ap .thread .starter button { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); text-align: left; border-radius: var(--r-md); border: 0; background: transparent; color: var(--text-2); padding: var(--s-4) var(--s-5); cursor: pointer; font: inherit; line-height: 1.4; }
+.ap .thread .starter button > pom-icon { flex: none; color: var(--text-faint); }
+.ap .thread .starter button:hover { background: rgba(var(--line-rgb), .06); color: var(--text-strong); }
+.ap .thread .starter button:hover > pom-icon { color: var(--text-muted); }
 
 /* Build solver: the Solve button, the goal form, live results (same slot as the chat) */
-.ap .solvebtn { height: 34px; padding: 0 11px; display: inline-flex; align-items: center; gap: 6px; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .08); background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
-.ap .solvebtn:hover { color: var(--text-strong); border-color: rgba(var(--accent-rgb), .4); }
-.ap .solvebtn[aria-pressed="true"] { background: rgba(var(--accent-rgb), .12); border-color: rgba(var(--accent-rgb), .35); color: var(--gold-text); }
+.ap .solvebtn { height: var(--control-h-sm); padding: 0 var(--s-5); display: inline-flex; align-items: center; gap: var(--s-3); border-radius: 9px; border: 0; background: transparent; color: var(--text-muted); font: 500 13px Geist, sans-serif; cursor: pointer; }
+.ap .solvebtn:hover { color: var(--text-strong); background: rgba(var(--line-rgb), .06); }
+.ap .solvebtn[aria-pressed="true"] { background: rgba(var(--accent-rgb), .12); color: var(--gold-text); }
 .ap .sv { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .ap .sv-body { flex: 1; min-height: 0; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
 .ap .sv-note { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: rgba(var(--accent-rgb), .1); border: 1px solid rgba(var(--accent-rgb), .25); color: var(--text-strong); font-size: 12.5px; }
@@ -321,34 +322,39 @@
 
 /* "Data for patch X" in the panel header. */
 .ap-kbbadge {
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 14px;
-  border: 1px solid var(--border-default, #3a342b);
+  height: 24px;
+  padding: 0;
+  border: 0;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-faint);
   font-size: 12px;
   white-space: nowrap;
   cursor: pointer;
-  /* The header's New chat and Collapse buttons must never be pushed off the panel: the badge is the part that gives way. */
+  margin-left: auto;
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.ap-kbbadge:hover:not(:disabled) { color: var(--text-strong); }
 /* The panel (explicit inline width) is the container, so the header itself can tighten at the default 446px width. */
 .ap { container: ap / inline-size; }
-.ap .hd > :not(.ap-kbbadge):not(.sp) { flex-shrink: 0; }
-/* Nothing in the header may ever leave the panel: it wraps. The account label and Sign in go last, so when the panel is
-   narrow they take a second row and New chat / Collapse stay on the first. */
-.ap .hd { flex-wrap: wrap; height: auto; min-height: 64px; row-gap: 6px; padding-top: 15px; padding-bottom: 15px; box-sizing: border-box; }
-.ap .hd > .who, .ap .hd > .acct, .ap .hd > .abtn { max-width: 100%; }
-.ap .hd > .who { overflow: hidden; white-space: nowrap; }
-@container ap (max-width: 600px) { .ap .hd > .who, .ap .hd > .acct, .ap .hd > .abtn { order: 10; } }
-@container ap (max-width: 560px) { .ap-kbbadge .pre { display: none; } .ap .hd { gap: 4px; padding: 0 8px 0 6px; } .ap-kbbadge { padding: 0 6px; } }
-/* Narrower (the default 446px and down): Solve keeps its icon and title; at the 340px minimum the patch badge steps aside. */
+/* Header: 68px in all, the controls on row 1 and a plain status line (account left, patch data right) on row 2, so the collapse button stays at the top-right corner. */
+.ap .hd > :not(.hd2):not(.sp) { flex-shrink: 0; }
+.ap .hd { flex-wrap: wrap; align-content: center; height: 68px; row-gap: var(--s-2); padding: 0 var(--s-6); box-sizing: border-box; }
+.ap .hd .hd2 { order: 1; flex: 1 0 100%; min-width: 0; height: 24px; display: flex; align-items: center; gap: var(--s-4); padding: 0 var(--s-3); box-sizing: border-box; }
+.ap .hd2 > .who, .ap .hd2 > .acct { max-width: 100%; }
+.ap .hd2 > .who { overflow: hidden; white-space: nowrap; }
+.ap .hd2 button.who { height: 24px; min-width: 0; max-width: 100%; padding: 0 var(--s-3); margin-left: calc(-1 * var(--s-3)); }
+/* The account shows in full while the row has room (R6); only a long address ellipsizes, and the chip's title holds it whole. */
+.ap .hd2 button.who .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ap .hd2 button.who > pom-icon, .ap .hd2 button.who > i { flex: none; }
+.ap .hd2 > .ap-kbbadge { flex-shrink: 0; }
+@container ap (max-width: 560px) { .ap .hd { gap: var(--s-2); } }
+/* Narrower (the default 446px and down): Solve keeps its icon and title. */
 @container ap (max-width: 470px) { .ap .solvebtn .lbl { display: none; } .ap .solvebtn { padding: 0 9px; } }
-@container ap (max-width: 400px) { .ap-kbbadge { display: none; } }
+/* Narrowest panel (340-400px): row 1 would wrap and push the header past its 68px, so the provider logos go and the tiles tighten. */
+@container ap (max-width: 400px) { .ap .hd { padding: 0 var(--s-4); } .ap .prov button { padding: 0 7px; } .ap .prov button > svg { display: none; } }
 .ap-kbbadge[data-tone='behind'] {
   color: #e0b04a;
   border-color: #e0b04a;
@@ -392,6 +398,13 @@
 .ap .acct-pop .mi { height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 8px; border: 0; background: transparent; color: var(--text-2); cursor: pointer; font: 400 13.5px Geist, sans-serif; text-align: left; white-space: nowrap; }
 .ap .acct-pop .mi:hover { background: rgba(var(--line-rgb), .06); color: var(--text-strong); }
 .ap .acct-pop .mi > pom-icon { flex: none; color: var(--text-muted); }
+/* The AI state row above the thread: one 32px line, dot and text, the recovery button at the right. */
+.ap .gate { flex: none; min-height: 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-4); padding: var(--s-2) 16px; border-bottom: 1px solid rgba(var(--line-rgb), .06); font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+.ap .gate::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 3px; background: var(--warning-text); }
+.ap .gate[data-status="ready"]::before { background: var(--positive); }
+.ap .gate strong { font-weight: 500; color: var(--text-2); }
+.ap .gate p { margin: 0; }
+.ap .gate .btn { margin-left: auto; }
 /* A provider's own state under a thread (it replaces the composer): same words, no big logo. */
 .ap .state.compact { flex: none; overflow: visible; justify-content: flex-start; gap: 10px; padding: 16px; border-top: 1px solid rgba(var(--line-rgb), .08); }
 .ap .state.compact h3 { font-size: 17px; }

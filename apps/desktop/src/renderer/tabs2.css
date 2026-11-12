@@ -1,6 +1,12 @@
 /* Party and Compare tabs (Tab - Party.dc.html, Tab - Compare.dc.html). Shared bits first. */
 
 .tabroot.pc { font-family: Geist, sans-serif; font-size: 13.5px; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+:where(.tabroot) .tab-tb {
+  display: flex; align-items: center; flex-wrap: nowrap; min-width: 0; height: var(--tab-tb-h); padding: 0 var(--s-5); gap: var(--s-4); box-sizing: border-box;
+  border-radius: 16px; background: linear-gradient(180deg, rgba(var(--glass-rgb), .56), rgba(var(--glass-rgb), .6)); border: 1px solid rgba(var(--line-rgb), .09);
+  box-shadow: 0 18px 50px rgba(var(--shadow-rgb), calc(.5 * var(--shadow-k))), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+:where(.tabroot) .tab-tb > .right { margin-left: auto; display: flex; align-items: center; gap: var(--s-4); }
 :where(.tabroot) .gl {
   border-radius: 16px; pointer-events: auto;
   background: linear-gradient(180deg, rgba(var(--glass-rgb), .56), rgba(var(--glass-rgb), .6)); border: 1px solid rgba(var(--line-rgb), .09);
@@ -36,10 +42,14 @@
 
 /* ---------- Party ---------- */
 .pty-grid { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(var(--line-rgb), .22) transparent; align-items: stretch; grid-auto-rows: minmax(100%, auto); }
-.pty-col { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+.pty-col { padding: var(--s-7); display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
 .pty-note { color: var(--text-3); line-height: 1.55; white-space: normal; }
 .pty-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-.pty-in { flex: 0 1 360px; min-width: 110px; height: 36px; border-radius: 10px; padding: 0 6px 0 12px; }
+.pty-imp { flex: none; }
+.pty-imp[aria-disabled="true"] { opacity: .5; cursor: default; }
+.pty-in { flex: 1 1 140px; min-width: 110px; height: 36px; border-radius: 10px; padding: 0 var(--s-6); }
+.pty-in:has(.clear), .cmp-in:has(.clear) { padding-right: var(--s-3); }
+.pty-grp { display: flex; align-items: center; gap: var(--s-4); }
 :where(.tabroot) .lib-search.pty-in { background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .16); }
 .pty-line .btn + .sw-row { margin-left: 8px; }
 .pty-in.good { border-color: color-mix(in srgb, var(--positive) 45%, transparent); background: color-mix(in srgb, var(--positive) 5%, transparent); }
@@ -54,6 +64,8 @@
 .pty-sec .h, .pty-raw .h { font-weight: 600; color: var(--text-strong); display: flex; align-items: baseline; gap: 10px; }
 .pty-sec .h .m, .pty-raw .h .m { color: var(--text-muted); font-weight: 400; font-size: 12px; }
 .pty-rows { display: flex; flex-direction: column; gap: 6px; white-space: normal; }
+.pty-rows:empty { display: none; }
+.pty-col > :is(.pty-sec, .pty-raw) ~ :is(.pty-sec, .pty-raw) { margin-top: var(--s-4); }
 .pty-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 10px; border-radius: 9px; background: rgba(var(--line-rgb), .035); }
 .pty-row .body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .pty-row .top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
@@ -68,9 +80,8 @@
 .pty-view { border-radius: 10px; background: rgba(var(--shadow-rgb), calc(.35 * var(--shadow-k))); border: 1px solid rgba(var(--line-rgb), .07); padding: 8px 12px; font: 12.5px/1.6 'Geist Mono', monospace; color: var(--text-3); overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow-y: auto; }
 
 /* ---------- Compare ---------- */
-.cmp-tb { position: absolute; left: 0; right: 0; top: 0; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 10px; overflow: hidden; min-width: 0; box-sizing: border-box; }
-.cmp-tb .capsel { height: 40px; }
-.cmp-in { flex: 0 1 300px; min-width: 110px; height: 36px; border-radius: 10px; padding: 0 6px 0 12px; }
+.cmp-tb { position: relative; flex: none; overflow: visible; pointer-events: auto; }
+.cmp-in { flex: 1 1 200px; max-width: 480px; min-width: 140px; height: 36px; border-radius: 10px; padding: 0 var(--s-6); }
 .cmp-in.good { border-color: color-mix(in srgb, var(--positive) 45%, transparent); background: color-mix(in srgb, var(--positive) 5%, transparent); }
 .cmp-in.bad { border-color: color-mix(in srgb, var(--negative) 45%, transparent); background: color-mix(in srgb, var(--negative) 5%, transparent); }
 .cmp-body { position: absolute; left: 0; right: 0; top: 68px; bottom: 0; display: flex; flex-direction: column; overflow: hidden; }
@@ -145,15 +156,15 @@
 
 /* Compare: the toolbar may wrap onto several rows, so the body flows below it instead of sitting at a fixed offset. */
 .tabroot.cmp-root { display: flex; flex-direction: column; }
-.tabroot.cmp-root .cmp-tb { position: relative !important; flex: none; height: auto !important; min-height: 56px; flex-wrap: nowrap !important; padding: 8px 10px !important; row-gap: 8px !important; overflow: visible; }
-.tabroot.cmp-root .cmp-body { position: relative !important; top: auto !important; bottom: auto !important; flex: 1; min-height: 0; margin-top: 12px; }
+.tabroot.cmp-root .cmp-body { position: relative !important; top: auto !important; bottom: auto !important; flex: 1; min-height: 0; margin-top: var(--panel-inset, 12px); }
 
 /* The power report sits above its footer, so the result is on screen beside the Build button. */
 .cmp-prdrawer { flex: 0 1 44%; min-height: 150px; display: flex; flex-direction: column; padding: 0 14px 10px; box-sizing: border-box; }
 .cmp-prdrawer .cmp-pt { flex: 1; min-height: 0; display: flex; flex-direction: column; background: rgba(var(--shadow-rgb), calc(.28 * var(--shadow-k))); }
 .cmp-pt .rows { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .cmp-pt .th { flex: none; }
-@container tab (max-width: 1239px) { .tabroot.cmp-root .cmp-tb { flex-wrap: wrap !important; } }
+/* One row at 904 and 1030: the view tabs go icon-only below 1100 (text stays in title and aria-label). */
+@container tab (max-width: 1099px) { .cmp-views .lbl { display: none; } }
 
 /* Compare: the compared build's own sets and main skill, shown under the toolbar. */
 .cmp-sets { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid rgba(var(--line-rgb), .06); }

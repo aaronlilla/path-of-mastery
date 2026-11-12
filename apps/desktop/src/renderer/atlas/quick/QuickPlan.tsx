@@ -38,12 +38,16 @@ export function QuickPlan({ showMechanics = true, mechanics, maximum, art, busy,
   const nameOk = name.trim().length > 0 && [...name].length <= 120;
   const toggle = (id: string) => setPicked(old => old.includes(id) ? old.filter(x => x !== id) : [...old, id]);
   const build = () => { if (pointsOk && nameOk && !busy) onBuild({ name: name.trim(), mechanicIds: picked, mechanicNames: pickedNames, support, points, fill }); };
-  return <Dialog title={tr('atlas_quick_QuickPlan.new_atlas_plan')} size="large" onCancel={onCancel} confirmLabel={busy ? tr('atlas_quick_QuickPlan.building') : tr('atlas_quick_QuickPlan.build_tree')} confirmDisabled={!pointsOk || !nameOk || busy} confirmBusy={busy} onConfirm={build}
+  return <Dialog title={tr('atlas_quick_QuickPlan.new_atlas_plan')} size={showMechanics ? 'large' : 'medium'} onCancel={onCancel} confirmLabel={busy ? tr('atlas_quick_QuickPlan.building') : tr('atlas_quick_QuickPlan.build_tree')} confirmDisabled={!pointsOk || !nameOk || busy} confirmBusy={busy} onConfirm={build}
     altLabel={tr('atlas_quick_QuickPlan.blank_tree')} altDisabled={!pointsOk || !nameOk || busy} onAlt={() => onBlank(name.trim(), points)}
     note={<><button type="button" className="btn ghost quick-import" disabled={busy} onClick={onImport}>{tr('atlas_quick_QuickPlan.import_a_tree_link')}</button>
       {onChooseData && <button type="button" className="btn ghost quick-import" disabled={busy} onClick={onChooseData}>{tr('atlas_quick_QuickPlan.choose_tree_data')}</button>}</>}>
     <div className="quick-plan">
-      <label className="quick-field quick-name">{tr('atlas_quick_QuickPlan.name')}<input className="field" aria-label={tr('atlas_quick_QuickPlan.plan_name')} value={name} maxLength={120} onChange={e => setOwnName(e.target.value)} /></label>
+      <div className="quick-row quick-top">
+        <label className="quick-field quick-name">{tr('atlas_quick_QuickPlan.name')}<input className="field" aria-label={tr('atlas_quick_QuickPlan.plan_name')} value={name} maxLength={120} onChange={e => setOwnName(e.target.value)} /></label>
+        <label className="quick-field quick-points">{tr('atlas_quick_QuickPlan.points')}<input className="field" inputMode="numeric" aria-label={tr('atlas_quick_QuickPlan.points')} aria-invalid={!pointsOk || undefined} value={pointsText} onChange={e => setPointsText(e.target.value)} />
+          <small className="quick-help">{pointsOk ? (maximum ? tr('atlas_quick_QuickPlan.maximum_maximum', { maximum }) : '') : maximum ? tr('atlas_quick_QuickPlan_2.enter_1_to', { maximum: maximum }) : tr('atlas_quick_QuickPlan_2.enter_a_whole_number')}</small></label>
+      </div>
       {showMechanics && <div className="quick-field"><span className="quick-label" id="quick-mechanics-label">{tr('atlas_quick_QuickPlan.mechanics')} <small>{picked.length ? tr('atlas_quick_QuickPlan.length_picked_in_this_order', { count: picked.length }) : tr('atlas_quick_QuickPlan.pick_the_ones_you_run')}</small></span>
         <div className="quick-tiles" role="group" aria-labelledby="quick-mechanics-label">
           {mechanics.map(m => {
@@ -60,8 +64,6 @@ export function QuickPlan({ showMechanics = true, mechanics, maximum, art, busy,
         <div className="quick-field"><span className="quick-label">{tr('atlas_quick_QuickPlan.map_support')}</span>
           <Segmented ariaLabel={tr('atlas_quick_QuickPlan.map_support')} value={support} onChange={setSupport} options={[{ value: 'none', label: tr('atlas_quick_QuickPlan.none') }, { value: 'some', label: tr('atlas_quick_QuickPlan.some') }, { value: 'max', label: tr('atlas_quick_QuickPlan.max') }]} />
           <small className="quick-help">{fromMain('ml_atlas_quick', MAP_SUPPORT_TEXT[support])}</small></div>
-        <label className="quick-field quick-points">{tr('atlas_quick_QuickPlan.points')}<input className="field" inputMode="numeric" aria-label={tr('atlas_quick_QuickPlan.points')} aria-invalid={!pointsOk || undefined} value={pointsText} onChange={e => setPointsText(e.target.value)} />
-          <small className="quick-help">{pointsOk ? (maximum ? tr('atlas_quick_QuickPlan.maximum_maximum', { maximum }) : '') : maximum ? tr('atlas_quick_QuickPlan_2.enter_1_to', { maximum: maximum }) : tr('atlas_quick_QuickPlan_2.enter_a_whole_number')}</small></label>
       </div>
       <label className="quick-check"><input type="checkbox" checked={fill} onChange={e => setFill(e.target.checked)} />{tr('atlas_quick_QuickPlan.fill_leftover_points')}<small className="quick-help">{showMechanics ? tr('atlas_quick_QuickPlan.after_your_mechanics_more_of') : tr('atlas_quick_QuickPlan.after_map_support_quantity_rarity')}</small></label>
       {error && <p role="alert">{error}</p>}

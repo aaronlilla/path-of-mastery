@@ -102,8 +102,6 @@ export function NotesTab({ buildId, xml, rev, onNotes }: NotesTabProps) {
   const ed = useRef<HTMLDivElement>(null);
   // The colour codes as raw text (^xRRGGBB, ^7), editable, as upstream's Show Color Codes does.
   const [raw, setRaw] = useState(false);
-  // The legend of colour names is shown until Hide Color Codes is pressed (the design); the codes written out in the text are a switch under it.
-  const [legend, setLegend] = useState(true);
   const rawRef = useRef(false);
   rawRef.current = raw;
   const [empty, setEmpty] = useState(true);
@@ -291,32 +289,19 @@ export function NotesTab({ buildId, xml, rev, onNotes }: NotesTabProps) {
     <div className="panel" data-lg="panel">
       <div className="notes-grid" data-r="notes-grid">
         <aside className="notes-help" aria-label={tr('NotesTab.formatting_help')}>
-          <span className="h"><Icon name="palette" size={13} />{tr('NotesTab.colours_and_zoom')}</span>
+          <span className="h" style={{ cursor: 'help' }} title={tr('NotesTab.colours_and_zoom_tip')}><Icon name="palette" size={13} />{tr('NotesTab.colours_and_zoom')}</span>
           <div className="p">
-            <span>
-              {tr('NotesTab.you_can_use')} <kbd>Ctrl +/-</kbd> {tr('NotesTab.or')} <kbd>Ctrl</kbd>{tr('NotesTab.scroll_to_zoom_in_and')} <kbd>Ctrl 0</kbd> {tr('NotesTab.to_reset')}
-              <br />
-              {tr('NotesTab.this_field_also_supports_different')}
-              <br />
-              {tr('NotesTab.below_are_some_common_color')}
-            </span>
-            {legend && (
-              <div className="codes" onMouseDown={(e) => { if ((e.target as HTMLElement).closest('button')) e.preventDefault(); }}>
-                {NAMED_COLOURS.map((c) => {
-                  const colour = c.token === '--text' ? 'var(--text)' : `var(${c.token})`;
-                  return (
-                    <button key={c.label} type="button" style={{ color: colour }} onClick={() => (raw ? insertCode(c.code) : wrap(c.code))}>
-                      <i style={{ background: colour }} />
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-            <button type="button" className="btn" data-lg="control" style={{ width: '100%' }} aria-pressed={!legend} title={legend ? tr('NotesTab.hide_the_list_of_colour') : tr('NotesTab.show_the_list_of_colour')} onClick={() => setLegend((v) => !v)}>
-              <Icon name="eye" size={16} />
-              {legend ? tr('NotesTab.hide_color_codes') : tr('NotesTab.show_color_codes')}
-            </button>
+            <div className="codes" onMouseDown={(e) => { if ((e.target as HTMLElement).closest('button')) e.preventDefault(); }}>
+              {NAMED_COLOURS.map((c) => {
+                const colour = c.token === '--text' ? 'var(--text)' : `var(${c.token})`;
+                return (
+                  <button key={c.label} type="button" style={{ color: colour }} onClick={() => (raw ? insertCode(c.code) : wrap(c.code))}>
+                    <i style={{ background: colour }} />
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
             <label className="notes-raw" style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} title={tr('NotesTab.write_the_colour_codes_x')}>
               <Switch checked={raw} onChange={toggleRaw} label={tr('NotesTab.show_the_codes_in_the')} />
               <span>{tr('NotesTab.show_the_codes_in_the')}</span>

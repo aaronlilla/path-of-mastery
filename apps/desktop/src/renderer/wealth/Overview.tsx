@@ -71,8 +71,10 @@ export function Overview({ s, build, onUpgrade }: { s: Wealth; build: PremiumBui
     const mn = Math.min(...pts.map((p) => p.nw)) * 0.97;
     const mx = Math.max(...pts.map((p) => p.nw)) * 1.02 || 1;
     const P = pts.map((p, i) => `${i ? 'L' : 'M'}${(((p.t - t0) / (t1 - t0 || 1)) * 900).toFixed(1)} ${(200 - ((p.nw - mn) / (mx - mn || 1)) * 200).toFixed(1)}`).join(' ');
-    return { line: P, area: `${P} L900 200 L0 200Z` };
-  }, [pts]);
+    const day = ui.range >= 2;
+    const at = (t: number) => new Date(t).toLocaleString(undefined, day ? { month: 'short', day: 'numeric' } : { hour: '2-digit', minute: '2-digit' });
+    return { line: P, area: `${P} L900 200 L0 200Z`, from: at(t0), to: at(t1), hi: fmtChaos(mx, w.divine), lo: fmtChaos(mn, w.divine) };
+  }, [pts, ui.range, w.divine]);
   const run = w.running;
   const upgrade = useTopUpgrade(build, w.networth);
 
@@ -144,37 +146,81 @@ export function Overview({ s, build, onUpgrade }: { s: Wealth; build: PremiumBui
 
   return (
     <div className="w-ov">
-        <Panel className="w-s4">
-          <Eyebrow right={<Seg labels={RANGES} active={ui.range} onPick={(i) => patch({ range: i as 0 | 1 | 2 | 3 })} label={tr('wealth_Overview.net_worth_range')} />}>{tr('wealth_Overview.net_worth')}</Eyebrow>
+        <div className="w-col w-s4">
+        <Panel>
+          <Eyebrow right={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {!run && (
+                <button type="button" className="w-btn sm" onClick={() => void window.pom.wealth.startSession(tr('wealth_Overview_2.session'))}>
+                  <Icon name="plus" size={14} />
+                  {tr('wealth_Overview.start_one_now')}
+                </button>
+              )}
+              <Seg labels={RANGES} active={ui.range} onPick={(i) => patch({ range: i as 0 | 1 | 2 | 3 })} label={tr('wealth_Overview.net_worth_range')} />
+            </span>
+          }>{tr('wealth_Overview.net_worth')}</Eyebrow>
           <div className="w-nw">
             <span className="w-nw-big">{noPrices ? tr('wealth_Overview.no_prices') : tr('wealth_Overview.tofixed_div', { value: (w.networth / w.divine).toFixed(1) })}</span>
             {noPrices ? <Chip tone="warning">{lastPriced ? tr('wealth_Overview.last_priced_divine_v2', { divine: fmtChaos(lastPriced.nw, w.divine), value: fmtAgo(w.now - lastPriced.t) }) : tr('wealth_Overview.nothing_to_value_yet')}</Chip> : hasHist ? <Chip tone={delta >= 0 ? 'positive' : 'negative'}>{`${delta >= 0 ? '▲' : '▼'} ${fmtChaos(Math.abs(delta), w.divine)} ${RANGE_WORDS[ui.range]}`}</Chip> : <Chip>{tr('wealth_Overview.history_starts_now')}</Chip>}
-            {!noPrices && <Chip>{tr('wealth_Overview.tolocalestring_chaos', { networth: Math.round(w.networth).toLocaleString() })}</Chip>}
-            {!noPrices && <span className="w-nw-sub w-nw-rate">{tr('wealth_Overview.n1_div_divine_c', { divine: Math.round(w.divine) })}</span>}
+            {!noPrices && <span className="w-nw-rate">{tr('wealth_Overview.tolocalestring_chaos', { networth: Math.round(w.networth).toLocaleString(), divine: Math.round(w.divine) })}</span>}
           </div>
           {chart ? (
-            <svg viewBox="0 0 900 200" preserveAspectRatio="none" width="100%" height="200" className="w-chart" role="img" aria-label={tr('wealth_Overview.net_worth_over_time')}>
-              <path d="M0 0H900M0 66H900M0 133H900M0 200H900" stroke="rgba(var(--line-rgb),.06)" vectorEffect="non-scaling-stroke" />
-              <path d={chart.area} fill="rgba(var(--accent-rgb),.12)" />
-              <path d={chart.line} fill="none" stroke="var(--gold-400)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-            </svg>
+            <div className="w-chart-w">
+              <div className="w-chart-c">
+                <svg viewBox="0 0 900 200" preserveAspectRatio="none" width="100%" height="200" className="w-chart" role="img" aria-label={tr('wealth_Overview.net_worth_over_time')}>
+                  <path d="M0 0H900M0 66H900M0 133H900M0 200H900" stroke="rgba(var(--line-rgb),.06)" vectorEffect="non-scaling-stroke" />
+                  <path d={chart.area} fill="rgba(var(--accent-rgb),.12)" />
+                  <path d={chart.line} fill="none" stroke="var(--gold-400)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                </svg>
+                <div className="w-chart-x" aria-hidden="true"><span>{chart.from}</span><span>{chart.to}</span></div>
+              </div>
+              <div className="w-chart-y" aria-hidden="true"><span>{chart.hi}</span><span>{chart.lo}</span></div>
+            </div>
           ) : (
             <div className="w-chart-none" style={{ height: 200 }}>{noPrices ? tr('wealth_Overview.the_chart_returns_when_prices') : tr('wealth_Overview.history_starts_now_the_chart')}</div>
           )}
         </Panel>
-        {run ? <RunCard run={run} s={s} /> : (
-          <Panel className="w-s2">
-            <Eyebrow>{tr('wealth_Overview.no_session_running')}</Eyebrow>
-            <div className="w-pad">
-              <p className="w-p">{tr('wealth_Overview.a_session_starts_on_its')}</p>
-              <button type="button" className="w-btn" onClick={() => void window.pom.wealth.startSession(tr('wealth_Overview_2.session'))}>
-                <Icon name="plus" size={14} />
-                {tr('wealth_Overview.start_one_now')}
+        <Panel>
+          <Eyebrow>{tr('wealth_Overview.movers_in_your_stash_24h')}</Eyebrow>
+          <div className="w-rows">
+            {movers.map(({ r, c }) => (
+              <button key={r.key} type="button" className="w-tr w-mover" onClick={() => go('market', { mq: r.name, mi: r.name, mcat: 'all' })}>
+                <ItemIcon name={r.art} cat={r.cat} {...(r.artCat ? { artCat: r.artCat } : {})} />
+                <span className="w-name">
+                  {r.name}
+                  <i>×{r.qty.toLocaleString()}</i>
+                </span>
+                <Spark data={r.spark} />
+                <span className="r" style={{ color: Math.abs(c) < 0.005 ? 'var(--text-faint)' : c > 0 ? 'var(--positive-text)' : 'var(--negative-text)' }}>{fmtPct(c)}</span>
               </button>
+            ))}
+            {movers.length === 0 && <div className="w-none">{tr('wealth_Overview.nothing_in_your_stash_has')}</div>}
+          </div>
+        </Panel>
+        <Panel>
+          <Eyebrow>{tr('wealth_Overview.breakdown_click_to_open')}</Eyebrow>
+          <div className="w-pad">
+            <div className="w-stack" aria-hidden="true">
+              {brk.map(([k, v]) => (
+                <span key={k} style={{ width: `${(v / total) * 100}%`, background: k === 'other' ? 'rgba(var(--line-rgb),.3)' : CAT_COLOUR[k as Cat] }} />
+              ))}
             </div>
-          </Panel>
-        )}
-        <Panel className="w-s3">
+          </div>
+          {brk.map(([k, v], bi) => (
+            <button key={k} type="button" className="w-brk" onClick={() => go('stash', { cat: k === 'other' ? 'other' : k, tab: 'all', q: '' })}>
+              <ItemIcon name={CAT_ART[k]?.[0] ?? k} cat={(k === 'other' ? 'other' : k) as Cat} {...(CAT_ART[k]?.[1] ? { artCat: CAT_ART[k]![1] } : {})} />
+              <span className="w-name"><span className="w-swatch" style={{ background: k === 'other' ? 'rgba(var(--line-rgb),.3)' : CAT_COLOUR[k as Cat] }} aria-hidden="true" />{k === 'other' ? tr('wealth_Overview.everything_else') : catName(k as Cat)}</span>
+              <span className="r">{fmt(v)}</span>
+              <span className="r faint">{shares[bi]}%</span>
+              <i className="w-chev">›</i>
+            </button>
+          ))}
+          {brk.length === 0 && <div className="w-none">{tr('wealth_Overview.nothing_is_priced_yet')}</div>}
+        </Panel>
+        </div>
+        <div className="w-col w-s2">
+        {run && <RunCard run={run} s={s} />}
+        <Panel>
           <Eyebrow>{tr('wealth_Overview.rate_by_activity_this_week')}</Eyebrow>
           <div className="w-rows">
             <div className="w-th w-rate">
@@ -196,43 +242,7 @@ export function Overview({ s, build, onUpgrade }: { s: Wealth; build: PremiumBui
             {rates.length === 0 && <div className="w-none">{tr('wealth_Overview.play_a_map_with_the')}</div>}
           </div>
         </Panel>
-        <Panel className="w-s3">
-          <Eyebrow>{tr('wealth_Overview.movers_in_your_stash_24h')}</Eyebrow>
-          <div className="w-rows">
-            {movers.map(({ r, c }) => (
-              <button key={r.key} type="button" className="w-tr w-mover" onClick={() => go('market', { mq: r.name, mi: r.name, mcat: 'all' })}>
-                <ItemIcon name={r.art} cat={r.cat} {...(r.artCat ? { artCat: r.artCat } : {})} />
-                <span className="w-name">
-                  {r.name}
-                  <i>×{r.qty.toLocaleString()}</i>
-                </span>
-                <Spark data={r.spark} />
-                <span className="r" style={{ color: Math.abs(c) < 0.005 ? 'var(--text-faint)' : c > 0 ? 'var(--positive-text)' : 'var(--negative-text)' }}>{fmtPct(c)}</span>
-              </button>
-            ))}
-            {movers.length === 0 && <div className="w-none">{tr('wealth_Overview.nothing_in_your_stash_has')}</div>}
-          </div>
-        </Panel>
-        <Panel className="w-s3">
-          <Eyebrow>{tr('wealth_Overview.breakdown_click_to_open')}</Eyebrow>
-          <div className="w-pad">
-            <div className="w-stack" aria-hidden="true">
-              {brk.map(([k, v]) => (
-                <span key={k} style={{ width: `${(v / total) * 100}%`, background: k === 'other' ? 'rgba(var(--line-rgb),.3)' : CAT_COLOUR[k as Cat] }} />
-              ))}
-            </div>
-          </div>
-          {brk.map(([k, v], bi) => (
-            <button key={k} type="button" className="w-brk" onClick={() => go('stash', { cat: k === 'other' ? 'other' : k, tab: 'all', q: '' })}>
-              <ItemIcon name={CAT_ART[k]?.[0] ?? k} cat={(k === 'other' ? 'other' : k) as Cat} {...(CAT_ART[k]?.[1] ? { artCat: CAT_ART[k]![1] } : {})} />
-              <span className="w-name">{k === 'other' ? tr('wealth_Overview.everything_else') : catName(k as Cat)}</span>
-              <span className="r">{fmt(v)}</span>
-              <span className="r faint">{shares[bi]}%</span>
-            </button>
-          ))}
-          {brk.length === 0 && <div className="w-none">{tr('wealth_Overview.nothing_is_priced_yet')}</div>}
-        </Panel>
-        <Panel className="w-s3">
+        <Panel>
           <Eyebrow>{tr('wealth_Overview.put_it_to_work')}</Eyebrow>
           {work.slice(0, 3).map((a) => (
             <button key={a.text} type="button" className="w-act" onClick={a.go}>
@@ -243,6 +253,7 @@ export function Overview({ s, build, onUpgrade }: { s: Wealth; build: PremiumBui
           ))}
           {work.length === 0 && <div className="w-none">{tr('wealth_Overview.nothing_to_act_on_right')}</div>}
         </Panel>
+        </div>
     </div>
   );
 }

@@ -310,20 +310,18 @@ export function Wizard({ api }: { api: GuidedApi }) {
                 </div>
               )}
               {!q && W.pick === 'home' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
                   {GUIDED_SECTIONS.map((s) => {
                     const n = cat ? (s.id === 'gear' ? null : cat.items.filter((i) => sectionOfType(i.type)?.id === s.id).length) : null;
                     const a = artFor(s.art);
                     return (
                       <button key={s.id} className="gd-tile" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 }} onClick={() => setW({ pick: s.id })}>
-                        {a && <img src={a} alt="" className="gd-art" style={{ width: 40, height: 40 }} />}
-                        <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>
-                            {gsecName(s)}
-                            {n ? ` · ${n}` : ''}
-                          </span>
-                          <span className="lf-muted" style={{ fontSize: 12 }}>{gsecSub(s)}</span>
+                        {a ? <img src={a} alt="" className="gd-art" style={{ width: 40, height: 40, flex: 'none' }} /> : <span style={{ width: 40, height: 40, flex: 'none' }} />}
+                        <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ color: 'var(--text-strong)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gsecName(s)}</span>
+                          <span className="lf-muted" title={gsecSub(s)} style={{ fontSize: 12 }}>{gsecSub(s)}</span>
                         </span>
+                        {n ? <span className="lf-muted" style={{ flex: 'none', fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>{n}</span> : null}
                         <Icon name="chevron-right" size={14} style={{ color: 'var(--text-faint)' }} />
                       </button>
                     );
@@ -381,13 +379,6 @@ export function Wizard({ api }: { api: GuidedApi }) {
                 </div>
               )}
               {!q && W.pick === 'gear' && GearBuilder()}
-              {!q && W.pick === 'home' && (
-                <button className="gd-tile" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }} onClick={() => setW({ pick: 'gear' })}>
-                  <Icon name="sword" size={18} />
-                  <span style={{ flex: 1 }}>{tr('lootfilter_guided_Wizard.or_build_a_rule_for')}</span>
-                  <Icon name="chevron-right" size={14} />
-                </button>
-              )}
             </>
           )}
 
@@ -475,10 +466,12 @@ export function Wizard({ api }: { api: GuidedApi }) {
           )}
 
           <div className="gd-bottombar">
-            <button className="gd-chipbtn" style={{ height: 36, border: 0, color: 'var(--text-strong)' }} onClick={back}>
-              <Icon name="arrow-left" size={14} />
-              {tr('lootfilter_guided_Wizard.back')}
-            </button>
+            {W.step > 1 && (
+              <button className="gd-chipbtn" style={{ height: 36, border: 0, color: 'var(--text-strong)' }} onClick={back}>
+                <Icon name="arrow-left" size={14} />
+                {tr('lootfilter_guided_Wizard.back')}
+              </button>
+            )}
             <span style={{ flex: 1, textAlign: 'right', color: 'var(--text-muted)', fontSize: 13 }} id="gd-next-why">{why}</span>
             {W.step === 3 && (
               <button className="gd-chipbtn" style={{ border: 0, color: 'var(--text-2)' }} onClick={() => apply(false, true)} title={tr('lootfilter_guided_Wizard.apply_then_open_this_rule')}>
@@ -548,6 +541,7 @@ export function Wizard({ api }: { api: GuidedApi }) {
               </button>
             </div>
           )}
+          {(W.sel.length > 0 || W.exc.length > 0 || aff.length > 0) && (
           <div style={{ borderTop: '1px solid rgba(var(--line-rgb),.08)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <h3>{tr('lootfilter_guided_Wizard.preview')}</h3>
             <span className="lf-muted" style={{ fontSize: 13 }}>
@@ -572,6 +566,7 @@ export function Wizard({ api }: { api: GuidedApi }) {
               <span className="lf-muted" style={{ fontSize: 12.5 }}>{tr('lootfilter_guided_Wizard.length_more_they_all_look', { value: aff.length - 6 })}</span>
             )}
           </div>
+          )}
         </aside>
       </div>
     </div>

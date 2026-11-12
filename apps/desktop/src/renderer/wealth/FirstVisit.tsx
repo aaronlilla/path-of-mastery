@@ -153,68 +153,74 @@ export function FirstVisit({ w, reconnect, onDone, onClose }: Props) {
           </button>
         )}
         <div className="w-fv-h">
-          <span className="w-eyebrow-t">{reconnect ? tr('wealth_FirstVisit.wealth_reconnect') : tr('wealth_FirstVisit.wealth_first_visit')}</span>
+          {reconnect && <span className="w-eyebrow-t">{tr('wealth_FirstVisit.wealth_reconnect')}</span>}
           <h2>{reconnect ? tr('wealth_FirstVisit.your_session_cookie_expired') : tr('wealth_FirstVisit.track_what_your_stash_is')}</h2>
           <p>{reconnect ? tr('wealth_FirstVisit.paste_a_fresh_poesessid_to') : tr('wealth_FirstVisit.connect_your_path_of_exile')}</p>
         </div>
         {phase === 'connect' && (
           <div className="w-fv-b">
-            <div className="w-fv-row">
-              <span className="w-fv-ic"><Icon name="user" size={18} /></span>
-              <span className="w-fv-t">
-                <b>{tr('wealth_FirstVisit.n1_path_of_exile_account')}</b>
-                <i>{connected ? `${tr('h_c_Wf.acct_league', { account, league })}${saved ? '' : ` · ${tr('h_c_Wf.no_secure')}`}` : tr('wealth_FirstVisit_2.opens_pathofexile_com_to_sign_in')}</i>
-              </span>
-              {!connected && (
-                <button type="button" className="w-btn alt" disabled={waiting || blocked} onClick={() => void signIn()}>
-                  <Icon name={waiting ? 'loader' : 'link'} size={14} spin={waiting} />
-                  {waiting ? tr('wealth_FirstVisit.waiting_for_sign_in') : blocked ? tr('wealth_FirstVisit.try_again_in_left_s', { left }) : reconnect ? tr('wealth_FirstVisit.reconnect') : tr('wealth_FirstVisit.connect')}
-                </button>
-              )}
-              {connected && (
-                <span className="w-fv-ok">
-                  <Icon name="check-circle" size={14} />
-                  {tr('wealth_FirstVisit.connected')}
-                </span>
-              )}
-            </div>
-            {error && !formOpen && !connected && <div className="w-err" role="alert">{error}</div>}
-            {!connected && (
-              <button type="button" className="w-link w-fv-alt" aria-expanded={formOpen} onClick={() => setFormOpen((o) => !o)}>
-                {tr('wealth_FirstVisit.paste_a_cookie_instead')}
-              </button>
-            )}
-            {formOpen && !connected && (
-              <form className="w-form" onSubmit={(e) => { e.preventDefault(); if ((reconnect || account) && cookie && !busy) void connect(); }}>
-                {!reconnect && (
-                  <>
+            <div className="w-fv-step">
+              <div className="w-fv-tabs-h">
+                <Icon name="user" size={16} />{tr('wealth_FirstVisit.n1_path_of_exile_account')}
+                <i>
+                  {connected && (
+                    <span className="w-fv-ok">
+                      <Icon name="check-circle" size={14} />
+                      {tr('wealth_FirstVisit.connected')}
+                    </span>
+                  )}
+                </i>
+              </div>
+              <div className="w-fv-box">
+                <div className="w-fv-row">
+                  <span className="w-fv-t">
+                    <i>{connected ? `${tr('h_c_Wf.acct_league', { account, league })}${saved ? '' : ` · ${tr('h_c_Wf.no_secure')}`}` : tr('wealth_FirstVisit_2.opens_pathofexile_com_to_sign_in')}</i>
+                    {!connected && (
+                      <button type="button" className="w-link w-fv-alt" aria-expanded={formOpen} onClick={() => setFormOpen((o) => !o)}>
+                        {tr('wealth_FirstVisit.paste_a_cookie_instead')}
+                      </button>
+                    )}
+                  </span>
+                  {!connected && (
+                    <button type="button" className="w-btn alt" disabled={waiting || blocked} onClick={() => void signIn()}>
+                      <Icon name={waiting ? 'loader' : 'link'} size={14} spin={waiting} />
+                      {waiting ? tr('wealth_FirstVisit.waiting_for_sign_in') : blocked ? tr('wealth_FirstVisit.try_again_in_left_s', { left }) : reconnect ? tr('wealth_FirstVisit.reconnect') : tr('wealth_FirstVisit.connect')}
+                    </button>
+                  )}
+                </div>
+                {error && !formOpen && !connected && <div className="w-err" role="alert">{error}</div>}
+                {formOpen && !connected && (
+                  <form className="w-form" onSubmit={(e) => { e.preventDefault(); if ((reconnect || account) && cookie && !busy) void connect(); }}>
+                    {!reconnect && (
+                      <div className="w-form-2">
+                        <label>
+                          <span>{tr('wealth_FirstVisit.account_name')}</span>
+                          <input value={account} onChange={(e) => setAccount(e.target.value)} placeholder={tr('wealth_FirstVisit.name_1234')} autoComplete="off" spellCheck={false} aria-label={tr('wealth_FirstVisit.account_name')} />
+                        </label>
+                        <label>
+                          <span>{tr('wealth_FirstVisit.league')}</span>
+                          <Select value={league} options={leagues.map((l) => ({ value: l, label: l }))} onChange={setLeague} width="100%" ariaLabel={tr('wealth_FirstVisit.league')} />
+                        </label>
+                      </div>
+                    )}
                     <label>
-                      <span>{tr('wealth_FirstVisit.account_name')}</span>
-                      <input value={account} onChange={(e) => setAccount(e.target.value)} placeholder={tr('wealth_FirstVisit.name_1234')} autoComplete="off" spellCheck={false} aria-label={tr('wealth_FirstVisit.account_name')} />
+                      <span>{tr('wealth_FirstVisit.poesessid')}</span>
+                      <input type="password" value={cookie} onChange={(e) => setCookie(e.target.value)} placeholder={tr('wealth_FirstVisit.n32_character_cookie_value')} autoComplete="off" spellCheck={false} aria-label={tr('wealth_FirstVisit.poesessid')} />
                     </label>
-                    <label>
-                      <span>{tr('wealth_FirstVisit.league')}</span>
-                      <Select value={league} options={leagues.map((l) => ({ value: l, label: l }))} onChange={setLeague} width="100%" ariaLabel={tr('wealth_FirstVisit.league')} />
-                    </label>
-                  </>
+                    {error && formOpen && <div className="w-err" role="alert">{error}</div>}
+                    <div className="w-help">
+                      <b>{tr('wealth_FirstVisit.where_to_find_it')}</b> {tr('wealth_FirstVisit.sign_in_at_pathofexile_com')}
+                    </div>
+                    <div className="w-fv-f">
+                      <button type="submit" className="w-btn" disabled={busy || blocked || (!reconnect && !account) || !cookie || !league}>
+                        <Icon name={busy ? 'loader' : 'link'} size={14} spin={busy} />
+                        {busy ? tr('wealth_FirstVisit.checking') : reconnect ? tr('wealth_FirstVisit.reconnect') : tr('wealth_FirstVisit.check_and_connect')}
+                      </button>
+                    </div>
+                  </form>
                 )}
-                <label>
-                  <span>{tr('wealth_FirstVisit.poesessid')}</span>
-                  <input type="password" value={cookie} onChange={(e) => setCookie(e.target.value)} placeholder={tr('wealth_FirstVisit.n32_character_cookie_value')} autoComplete="off" spellCheck={false} aria-label={tr('wealth_FirstVisit.poesessid')} />
-                </label>
-                {error && formOpen && <div className="w-err" role="alert">{error}</div>}
-                <div className="w-help">
-                  <b>{tr('wealth_FirstVisit.where_to_find_it')}</b> {tr('wealth_FirstVisit.sign_in_at_pathofexile_com')}
-                </div>
-                <div className="w-fv-f">
-                  <span />
-                  <button type="submit" className="w-btn" disabled={busy || blocked || (!reconnect && !account) || !cookie || !league}>
-                    <Icon name={busy ? 'loader' : 'link'} size={14} spin={busy} />
-                    {busy ? tr('wealth_FirstVisit.checking') : reconnect ? tr('wealth_FirstVisit.reconnect') : tr('wealth_FirstVisit.check_and_connect')}
-                  </button>
-                </div>
-              </form>
-            )}
+              </div>
+            </div>
             {!reconnect && (
               <>
                 <div className="w-fv-tabs-wrap" style={{ opacity: connected ? 1 : 0.45 }}>
@@ -242,8 +248,7 @@ export function FirstVisit({ w, reconnect, onDone, onClose }: Props) {
                   )}
                 </div>
                 <div className="w-fv-f">
-                  <span className="faint">{tr('wealth_FirstVisit.read_only_nothing_in_your')}</span>
-                  <button type="button" className="w-btn lg" aria-disabled={!connected || n === 0} style={{ opacity: connected && n > 0 ? 1 : 0.5 }} onClick={() => connected && n > 0 && void snapshot()}>
+                  <button type="button" className={connected && n > 0 ? 'w-btn lg' : 'w-btn alt lg'} aria-disabled={!connected || n === 0} style={{ opacity: connected && n > 0 ? 1 : 0.5 }} onClick={() => connected && n > 0 && void snapshot()}>
                     <Icon name="snapshot" size={16} />
                     {tr('wealth_FirstVisit.take_first_snapshot')}
                   </button>

@@ -454,7 +454,8 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
       const r = await engineSend('timelessFallback', { buildId, jewelType: s.jewelType, stat: mode });
       set({ searchListFallback: r.list });
       setView('fallback');
-      toast({ text: tr('timeless_TimelessDialog.fallback_weights_generated'), kind: 'ok' });
+      if (r.list.trim()) toast({ text: tr('timeless_TimelessDialog.fallback_weights_generated'), kind: 'ok' });
+      else toast({ text: tr('timeless_TimelessDialog.no_fallback_weights'), kind: 'warn' });
     } catch (e) {
       toast({ text: tr('timeless_TimelessDialog.the_weights_were_not_generated', { value: e instanceof Error ? e.message : String(e) }), kind: 'error' });
     } finally {
@@ -497,7 +498,7 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
               <b>{tr('timeless_TimelessDialog.the_timeless_jewel_data_is')}</b>
               {inflating ? (
                 <p>
-                  {tr('timeless_TimelessDialog.unpacking_the_tables_from_the', { percent: tables?.percent ?? 0, current: tables?.current ?? 'starting' })}
+                  {tr('timeless_TimelessDialog.unpacking_the_tables_from_the', { percent: tables?.percent ?? 0 })}
                 </p>
               ) : tables?.state === 'error' ? (
                 <p>{tr('timeless_TimelessDialog.the_tables_could_not_be', { error: tables.error })} <code>{status.dir}</code>.</p>
@@ -600,19 +601,11 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
           <Field label={tr('timeless_TimelessDialog.total_minimum_weight')} tip={TIPS.total}>
             <input className="input tl-total" inputMode="decimal" aria-label={tr('timeless_TimelessDialog.total_minimum_weight_2')} title={TIPS.total.join('\n')} value={s.totalMin} onChange={(e) => set({ totalMin: e.target.value.replace(/[^0-9.\-]/g, '') })} placeholder="0" />
           </Field>
-          <Field label={tr('timeless_TimelessDialog.fallback_weight_mode')} wide>
-            <div className="tl-inline">
-              <Select ariaLabel={tr('timeless_TimelessDialog.fallback_weight_mode_2')} value={mode} options={powerStats.map((p) => ({ value: p.stat, label: tr('h_c_Tl.sort_by', { stat: lbl(p.label) }) }))} width={220} onChange={(v) => set({ fallbackMode: v })} />
-              <button type="button" className="btn sm" title={TIPS.generate.join('\n')} onClick={() => void generate()} aria-disabled={!buildId || generating || undefined}>
-                {generating ? <span className="spinner" /> : <Icon name="sparkle" size={14} />}{tr('timeless_TimelessDialog.generate')}
-              </button>
-            </div>
-          </Field>
         </div>
 
         {protectOptions.length > 0 && (
-          <>
-            <Section icon="shield" title={tr('timeless_TimelessDialog.protect_allocated_nodes_from_changin')} />
+          <details className="tl-protect-box" open={Object.values(protect).some(Boolean)}>
+            <summary>{tr('timeless_TimelessDialog.protect_allocated_nodes_from_changin')}</summary>
             <div className="tl-protect">
               {protectOptions.map((o) => (
                 <label key={o.id}>
@@ -621,7 +614,7 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
                 </label>
               ))}
             </div>
-          </>
+          </details>
         )}
 
         <div className="tl-split">
@@ -630,6 +623,16 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
               <button type="button" role="tab" aria-selected={view === 'desired'} title={TIPS.desired.join('\n')} onClick={() => setView('desired')}>{tr('timeless_TimelessDialog.desired_nodes')}</button>
               <button type="button" role="tab" aria-selected={view === 'fallback'} title={TIPS.fallback.join('\n')} onClick={() => setView('fallback')}>{tr('timeless_TimelessDialog.fallback_nodes')}</button>
             </div>
+            {view === 'fallback' && (
+            <Field label={tr('timeless_TimelessDialog.fallback_weight_mode')}>
+              <div className="tl-inline">
+                <Select ariaLabel={tr('timeless_TimelessDialog.fallback_weight_mode_2')} value={mode} options={powerStats.map((p) => ({ value: p.stat, label: tr('h_c_Tl.sort_by', { stat: lbl(p.label) }) }))} width={220} onChange={(v) => set({ fallbackMode: v })} />
+                <button type="button" className="btn sm" title={TIPS.generate.join('\n')} onClick={() => void generate()} aria-disabled={!buildId || generating || undefined}>
+                  {generating ? <span className="spinner" /> : <Icon name="sparkle" size={14} />}{tr('timeless_TimelessDialog.generate')}
+                </button>
+              </div>
+            </Field>
+            )}
             <textarea
               className="tl-list"
               aria-label={view === 'desired' ? tr('timeless_TimelessDialog.desired_nodes') : tr('timeless_TimelessDialog.fallback_nodes')}
@@ -642,7 +645,6 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
           </div>
 
           <div className="tl-results">
-            <Section icon="list-ordered" title={tr('timeless_TimelessDialog.results')} />
             <div className="tl-table"><div className="tl-table-in" style={{ minWidth: tableMin }}>
             <div className="tl-rows-head" style={colsStyle} aria-hidden="true">
               <span>{tr('timeless_TimelessDialog.seed')}</span>
@@ -717,9 +719,7 @@ export function TimelessDialog({ eng, fmt, xml, onSave, onClose }: { eng: Engine
             {tr('timeless_TimelessDialog.search_maximum_amount')}
           </span>
           <Select ariaLabel={tr('timeless_TimelessDialog.trade_status')} value={String(s.tradeType)} options={TRADE_TYPES.map((t, i) => ({ value: String(i), label: [tr('items_trader_model.instant_buyout'), tr('h_c_It.tt_instant_inperson'), tr('h_c_It.tt_inperson_league'), tr('h_c_It.tt_inperson_online'), tr('h_c_It.tt_any')][i] ?? t }))} width={210} onChange={(v) => set({ tradeType: Number(v) })} />
-          <span className="lbl">{tr('timeless_TimelessDialog.realm')}</span>
           <Select ariaLabel={tr('timeless_TimelessDialog.realm_2')} value={s.realm} options={REALMS.map((r) => ({ value: r, label: r }))} width={86} onChange={(v) => set({ realm: v })} />
-          <span className="lbl">{tr('timeless_TimelessDialog.league')}</span>
           <Select ariaLabel={tr('timeless_TimelessDialog.league_2')} value={s.league || leagues[0] || 'Standard'} options={(leagues.length ? leagues : ['Standard']).map((l) => ({ value: l, label: l }))} width={160} onChange={(v) => set({ league: v })} />
           <button type="button" className="btn" data-lg="control" title={TIPS.trade.join('\n')} aria-disabled={!rows.length || undefined} onClick={() => rows.length && void openTrade()}>
             <Icon name="external" size={15} />{tradeLabel}

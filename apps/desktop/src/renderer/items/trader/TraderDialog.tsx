@@ -139,6 +139,7 @@ export function TraderDialog(p: TraderProps) {
   const [rows, setRows] = useState<Record<string, RowState>>({});
   const [dlg, setDlg] = useState<null | { k: 'weights' } | { k: 'options'; row: RowDef }>(null);
   const [wait, setWait] = useState<{ label: string; pct: number } | null>(null);
+  const [pasting, setPasting] = useState<Record<string, boolean>>({});
   const alive = useRef(true);
   const cancelFlag = useRef(0);
   useEffect(() => () => void (alive.current = false), []);
@@ -450,17 +451,24 @@ export function TraderDialog(p: TraderProps) {
               <button type="button" className="it-btn xs" disabled={!league || st.busy} title={tr('items_trader_TraderDialog.creates_a_weighted_search_to')} onClick={() => setDlg({ k: 'options', row: d })}>
                 {tr('items_trader_TraderDialog.find_best')}
               </button>
-              <input
-                className="it-input tr-url"
-                placeholder={tr('items_trader_TraderDialog.paste_trade_url_here')}
-                aria-label={tr('items_trader_TraderDialog.trade_url_for_label', { label: d.label })}
-                value={st.url}
-                title={valid ? tr('items_trader_TraderDialog.control_click_to_open_in') : undefined}
-                onChange={(e) => patch(d.key, { url: e.target.value })}
-                onClick={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && valid) void window.pom.app.openExternal(/^https?:\/\//i.test(st.url) ? st.url : `https://${st.url}`);
-                }}
-              />
+              {st.url || pasting[d.key] ? (
+                <input
+                  className="it-input tr-url"
+                  placeholder={tr('items_trader_TraderDialog.paste_trade_url_here')}
+                  aria-label={tr('items_trader_TraderDialog.trade_url_for_label', { label: d.label })}
+                  value={st.url}
+                  autoFocus={pasting[d.key]}
+                  title={valid ? tr('items_trader_TraderDialog.control_click_to_open_in') : undefined}
+                  onChange={(e) => { setPasting((x) => (x[d.key] ? x : { ...x, [d.key]: true })); patch(d.key, { url: e.target.value }); }}
+                  onClick={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && valid) void window.pom.app.openExternal(/^https?:\/\//i.test(st.url) ? st.url : `https://${st.url}`);
+                  }}
+                />
+              ) : (
+                <button type="button" className="it-btn xs ghost" style={{ gridColumn: 3, justifySelf: 'start' }} aria-label={tr('items_trader_TraderDialog.trade_url_for_label', { label: d.label })} onClick={() => setPasting((x) => ({ ...x, [d.key]: true }))}>
+                  {tr('items_trader_TraderDialog.paste_link')}
+                </button>
+              )}
               <button type="button" className="it-btn xs" disabled={!valid || st.busy || noSocket} title={priceTip} onClick={() => void priceUrl(d)}>
                 {st.busy ? tr('items_trader_TraderDialog.searching') : tr('items_trader_TraderDialog.price_item')}
               </button>
@@ -518,7 +526,7 @@ export function TraderDialog(p: TraderProps) {
 
   return (
     <Over>
-      <Dialog size="large" title={tr('items_trader_TraderDialog.trader')} subtitle={tr('items_trader_TraderDialog.price_each_slot_on_the')} confirmLabel={tr('items_trader_TraderDialog.done')} confirmIcon="check" cancelLabel={null} onCancel={p.onClose} onConfirm={p.onClose}>
+      <Dialog size="large" title={tr('items_trader_TraderDialog.trader')} confirmLabel={tr('items_trader_TraderDialog.done')} confirmIcon="check" cancelLabel={null} onCancel={p.onClose} onConfirm={p.onClose}>
         <div className="tr">
           <div className="tr-top">
             <div className="tr-col">
@@ -529,12 +537,22 @@ export function TraderDialog(p: TraderProps) {
               <PickButton small dataKey="tr-type" value={TRADE_TYPES[tradeType]!.label} onOpen={(el) => open(el, TRADE_TYPES.map((t, i) => ({ key: t.status, label: t.label, on: i === tradeType, run: () => { setTradeType(i); store.set('pom.trade.type', String(i)); } })), 240)} />
             </div>
             <div className="tr-realm">
-              <span className="k">{tr('items_trader_TraderDialog.realm')}</span>
-              <PickButton small value={REALMS.find((r) => r.id === realm)?.label} onOpen={opt(REALMS.map((r) => r.label), REALMS.find((r) => r.id === realm)?.label ?? 'PC', (v) => { const r = REALMS.find((x) => x.label === v)!; setRealm(r.id); store.set('pom.trade.realm', r.id); }, 120)} />
               <span className="k">{tr('items_trader_TraderDialog.league')}</span>
               <PickButton small value={league || tr('items_trader_TraderDialog_2.loading')} disabled={leagues.length < 2} onOpen={opt(leagues, league, (v) => { setLeague(v); store.set('pom.trade.league', v); }, 200)} />
             </div>
             <div className="tr-col right">
+              <button type="button" className="it-btn xs" style={{ width: 150 }} title={`Sorts the weights by the stats selected multiplied by a value\nCurrently sorting by:\n${weights.map((w) => `${w.label}: ${w.weightMult.toFixed(2)}`).join('\n')}`} onClick={() => setDlg({ k: 'weights' })}>
+                {tr('items_trader_TraderDialog.adjust_search_weights')}
+              </button>
+            </div>
+          </div>
+          <details className="tr-more">
+            <summary>{tr('items_trader_TraderDialog.search_options')}</summary>
+            <div className="tr-more-body">
+              <span className="tr-sortline">
+                <span className="k">{tr('items_trader_TraderDialog.realm')}</span>
+                <PickButton small value={REALMS.find((r) => r.id === realm)?.label} onOpen={opt(REALMS.map((r) => r.label), REALMS.find((r) => r.id === realm)?.label ?? 'PC', (v) => { const r = REALMS.find((x) => x.label === v)!; setRealm(r.id); store.set('pom.trade.realm', r.id); }, 120)} />
+              </span>
               <input
                 className="it-input n"
                 style={{ width: 150 }}
@@ -552,15 +570,12 @@ export function TraderDialog(p: TraderProps) {
                 }}
                 onBlur={() => setPagesText(String(pages))}
               />
-              <button type="button" className="it-btn xs" style={{ width: 150 }} title={`Sorts the weights by the stats selected multiplied by a value\nCurrently sorting by:\n${weights.map((w) => `${w.label}: ${w.weightMult.toFixed(2)}`).join('\n')}`} onClick={() => setDlg({ k: 'weights' })}>
-                {tr('items_trader_TraderDialog.adjust_search_weights')}
-              </button>
               <span className="tr-sortline">
                 <span className="k">{tr('items_trader_TraderDialog.sort_by')}</span>
                 <PickButton small value={sortWord(sortMode)} onOpen={(el) => open(el, SORT_MODES.map((x) => ({ key: x, label: sortWord(x), on: x === sortMode, run: () => { setSortMode(x); store.set('pom.trade.sort', x); } })), 220)} />
               </span>
             </div>
-          </div>
+          </details>
           <div className="tr-rows">{defs.map(rowView)}</div>
           <div className="tr-foot">
             <span className="tr-total">{total ? tr('items_trader_TraderDialog.total_price_total', { total }) : ''}</span>

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { compareSession, fmtHM, fmtSigned, type CompareLine, type SessionItem, type SessionView, type StrategyView } from '../../shared/wealth.js';
 import { Icon, useToast } from '../ui.js';
+import { ActionMenu } from '../menu.js';
 import { Chip, dayLabel, clock, Eyebrow, ItemIcon, Modal, Panel } from './wui.js';
 import type { Wealth } from './useWealth.js';
 import { tr } from '../i18n';
-import { fmtOld, item, msg, sessName, strat } from './mainText';
+import { item, msg, sessName, strat } from './mainText';
 
 const stratName = (x: { name: string; mine?: boolean }): string => (x.mine ? item(x.name) : strat(x.name));
 
@@ -94,14 +95,6 @@ export function Sessions({ s }: { s: Wealth }) {
               <i>{`${dayLabel(c.start, now)} – ${c.running ? 'now' : clock(c.end)}`}</i>
             </span>
             <span className="w-btns inline">
-              <button type="button" className="w-btn alt sm" onClick={() => void window.pom.wealth.deleteSession(c.id).then(() => toast({ text: tr('wealth_Sessions.session_deleted'), kind: 'ok', ttl: 12_000, action: { label: tr('wealth_Sessions.undo'), run: () => void window.pom.wealth.restoreSession(c.id).then((ok) => !ok && toast({ text: tr('wealth_Sessions.that_session_cannot_be_put'), kind: 'error' })) } }))}>
-                <Icon name="trash" size={14} />
-                {tr('wealth_Sessions.delete')}
-              </button>
-              <button type="button" className="w-btn alt sm" onClick={() => setCmp(true)}>
-                <Icon name="compare" size={14} />
-                {tr('wealth_Sessions.compare_with_a_strategy')}
-              </button>
               <button
                 type="button"
                 className="w-btn sm"
@@ -111,6 +104,15 @@ export function Sessions({ s }: { s: Wealth }) {
               >
                 {c.published ? tr('wealth_Sessions.published') : tr('wealth_Sessions.publish_as_strategy')}
               </button>
+              <ActionMenu
+                title={tr('wealth_Sessions.more')}
+                className="w-btn alt sm"
+                trigger={<Icon name="more" size={14} />}
+                actions={[
+                  { label: tr('wealth_Sessions.compare_with_a_strategy'), icon: 'compare', run: () => setCmp(true) },
+                  { label: tr('wealth_Sessions.delete'), icon: 'trash', run: () => void window.pom.wealth.deleteSession(c.id).then(() => toast({ text: tr('wealth_Sessions.session_deleted'), kind: 'ok', ttl: 12_000, action: { label: tr('wealth_Sessions.undo'), run: () => void window.pom.wealth.restoreSession(c.id).then((ok) => !ok && toast({ text: tr('wealth_Sessions.that_session_cannot_be_put'), kind: 'error' })) } })) },
+                ]}
+              />
             </span>
           </div>
           <div className="w-tiles">
@@ -119,9 +121,9 @@ export function Sessions({ s }: { s: Wealth }) {
             <Tile k="COST" v={fmt(c.cost)} />
             <Tile k="NET" v={fmtSigned(c.net, w.divine)} tone={c.net >= 0 ? 'pos' : 'neg'} />
             <Tile k="PER HOUR" v={tr('wealth_Sessions.tofixed_div', { value: (c.perHour / w.divine).toFixed(1) })} />
+            <span className="w-run-sub faint" style={{ gridColumn: '1 / -1' }}>{`${c.mapsUsed ? tr(c.mapsUsed === 1 ? 'h_c_Ws.maps_used_one' : 'h_c_Ws.maps_used_other', { n: c.mapsUsed }) + ' · ' : ''}${tr(c.snapshots === 1 ? 'h_c_Ws.snapshot_one' : 'h_c_Ws.snapshot_other', { n: c.snapshots })}`}</span>
           </div>
           <div className="w-pad">
-            <div className="w-kv"><span>{tr('wealth_Sessions.price_source')}</span><span>{`poe.ninja · ${w.prices.fetchedAt ? fmtOld(now - w.prices.fetchedAt) : tr('wealth_Sessions_2.age_unknown')}`}</span></div>
             <span className="w-eyebrow-t">{tr('wealth_Sessions.value_added_per_snapshot')}</span>
             <div className="w-bars">
               {c.bars.length === 0 && <span className="w-none">{tr('wealth_Sessions.no_snapshots_inside_this_session')}</span>}
@@ -129,7 +131,6 @@ export function Sessions({ s }: { s: Wealth }) {
                 <span key={i} title={`${clock(b.t)}: ${b.v >= 0 ? '+' : '−'}${fmt(Math.abs(b.v))}`} style={{ height: `${Math.max(8, (Math.abs(b.v) / maxBar) * 100)}%`, background: b.v > 1 ? 'var(--positive)' : b.v < -1 ? 'var(--negative)' : 'rgba(var(--line-rgb),.25)' }} />
               ))}
             </div>
-            <span className="w-run-sub faint">{`${c.mapsUsed ? tr(c.mapsUsed === 1 ? 'h_c_Ws.maps_used_one' : 'h_c_Ws.maps_used_other', { n: c.mapsUsed }) + ' · ' : ''}${tr(c.snapshots === 1 ? 'h_c_Ws.snapshot_one' : 'h_c_Ws.snapshot_other', { n: c.snapshots })}`}</span>
           </div>
           {c.flags.length > 0 && (
             <div className="w-flags">
@@ -158,7 +159,6 @@ export function Sessions({ s }: { s: Wealth }) {
               {rows(c.spent, true)}
               {c.spent.length === 0 && <div className="w-none">{tr('wealth_Sessions.nothing_was_used_up')}</div>}
             </div>
-            <div className="w-rail-foot">{tr('wealth_Sessions.items_moved_to_a_tab')}</div>
           </Panel>
         </div>
       </div>

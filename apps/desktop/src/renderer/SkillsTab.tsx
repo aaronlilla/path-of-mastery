@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useDeferredValue, useLayoutEffect } from 'react';
 import { getAppSettings } from './appSettings';
 import type { BuildEdit, GemInfo, GroupSpec, SkillGem, SkillGroup, SkillsState, SkillSlotInfo } from '@pom/protocol';
-import { appendedGroupIndex, ATTR, defaultGemLevel, dpsColour, formatGemPower, GEM_LEVEL_MODES, gemRowLook, gemTagLabels, gemWikiUrl, groupToText, matchColourOrder, matchSummary, openingGroup, optimisedSockets, optimiseWanted, gemListed, gemVersions, groupWarnings, searchGems, skillIdOf, socketColour, SORT_FIELDS, SUPPORT_TYPES, textToGroup, type PickerFilter } from '../shared/skillsLogic';
+import { appendedGroupIndex, ATTR, defaultGemLevel, dpsColour, formatGemPower, GEM_LEVEL_MODES, gemRowLook, gemWikiUrl, groupToText, matchColourOrder, matchSummary, openingGroup, optimisedSockets, optimiseWanted, gemListed, gemVersions, groupWarnings, searchGems, skillIdOf, socketColour, SORT_FIELDS, SUPPORT_TYPES, textToGroup, type PickerFilter } from '../shared/skillsLogic';
 import { pickerView, scoreGems, type GemScores, type PickerView, type RankPass } from '../shared/gemRanking';
 import { readItems, setItemText } from '../shared/itemsXml';
 import { engineCall, type EngineHandle } from './engineHandle';
@@ -12,7 +12,7 @@ import { NameDialog } from './skills/SetsDialog';
 import { SetsPopover } from './SetsPopover';
 import { loadItemInfo, useSkillTips, type SkillTip, type TipBind, type TipSeg } from './skills/skillTips';
 import type { OpenBuild } from './types';
-import { Dialog, Icon, PortalMenu, Switch, useToast } from './ui';
+import { Dialog, Icon, PortalMenu, Switch, useDismiss, useToast } from './ui';
 import { useDelayedFlag } from './delayedFlag';
 import { requestAssistant, useHighlight } from './assistant/bus';
 import './skillsTab.css';
@@ -66,7 +66,9 @@ function GemImg({ name, colour, size = 22 }: { name: string; colour: SkillGem['c
 /** `− 20 +` box: the number can be typed too; it is applied on Enter or when the box loses focus. */
 function Stepper({ value, min, max, onChange, label, fg, title, tip }: { value: number; min: number; max: number; onChange: (n: number) => void; label: string; fg?: string; title?: string; tip?: TipBind }) {
   const [draft, setDraft] = useState<string | null>(null);
+  const esc = useRef(false); // Escape blurs the box, and blur would commit the draft the closure still holds
   const commit = () => {
+    if (esc.current) { esc.current = false; setDraft(null); return; }
     if (draft == null) return;
     const n = Math.round(Number(draft));
     setDraft(null);
@@ -92,7 +94,7 @@ function Stepper({ value, min, max, onChange, label, fg, title, tip }: { value: 
         onKeyDown={(e) => {
           if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
           else if (e.key === 'Escape') {
-            setDraft(null);
+            esc.current = true;
             (e.target as HTMLInputElement).blur();
           }
         }}
@@ -109,7 +111,9 @@ function Stepper({ value, min, max, onChange, label, fg, title, tip }: { value: 
 function NumCell({ value, min, max, onChange, label, fg, title, tip }: { value: number; min: number; max: number; onChange: (n: number) => void; label: string; fg?: string; title?: string; tip?: TipBind }) {
   const [draft, setDraft] = useState<string | null>(null);
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
+  const esc = useRef(false); // Escape blurs the box, and blur would commit the draft the closure still holds
   const commit = () => {
+    if (esc.current) { esc.current = false; setDraft(null); return; }
     if (draft == null) return;
     const n = Math.round(Number(draft));
     setDraft(null);
@@ -140,7 +144,7 @@ function NumCell({ value, min, max, onChange, label, fg, title, tip }: { value: 
             e.preventDefault();
             step((e.key === 'ArrowUp' ? 1 : -1) * (e.shiftKey ? 5 : 1));
           } else if (e.key === 'Escape') {
-            setDraft(null);
+            esc.current = true;
             (e.target as HTMLInputElement).blur();
           }
         }}
@@ -163,7 +167,7 @@ function leadGem(g: SkillGroup): SkillGem | null {
 
 /** The name the list shows: upstream's label, or the gem names for a group with no active skill ("<No active skills>"). */
 function groupName(g: SkillGroup): string {
-  if (g.displayLabel === '<No active skills>' && g.gems.length) return g.gems.map((x) => x.nameSpec).join(', ');
+  if (g.displayLabel === '<No active skills>') return g.gems.length ? g.gems.map((x) => x.nameSpec).join(', ') : tr('SkillsTab.new_group');
   return g.displayLabel || tr('SkillsTab.new_group');
 }
 
@@ -280,6 +284,46 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
     // The root is drawn once the state is read (the placeholders before it have no root).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!state]);
+  // The group's settings sit in a drawer at the foot of the editor, shut until the bar is pressed.
+  const [drawer, setDrawer] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerBar = useRef<HTMLButtonElement>(null);
+  const drawerPanel = useRef<HTMLDivElement>(null);
+  const drawerWas = useRef(false);
+  const edScroll = useRef<HTMLDivElement>(null);
+  // Open, the drawer covers the foot of the gem list: the rows fade out just above its top edge instead of being cut in half.
+  useEffect(() => {
+    const list = edScroll.current;
+    const panel = drawerPanel.current;
+    if (!list) return;
+    if (!drawer || !panel) {
+      list.style.maskImage = '';
+      return;
+    }
+    const fade = () => {
+      const dh = Math.max(0, list.getBoundingClientRect().bottom - panel.getBoundingClientRect().top);
+      list.style.maskImage = `linear-gradient(to bottom, #000 calc(100% - ${dh + 22}px), transparent calc(100% - ${dh}px))`;
+    };
+    fade();
+    const t = window.setTimeout(fade, 180); // after the slide-in
+    const ro = new ResizeObserver(fade);
+    ro.observe(panel);
+    return () => {
+      ro.disconnect();
+      window.clearTimeout(t);
+      list.style.maskImage = '';
+    };
+  }, [drawer, sel, docked]);
+  // A press inside one of the drawer's dropdowns (drawn outside it) is not an outside press; Escape reaches the top layer first.
+  useDismiss(drawerRef, drawer, useCallback(() => { if (!document.querySelector('.menu.portal')) setDrawer(false); }, []));
+  useEffect(() => {
+    const panel = drawerPanel.current;
+    const at = document.activeElement;
+    if (drawer) panel?.querySelector<HTMLElement>('input:not(:disabled), button:not(:disabled)')?.focus({ preventScroll: true });
+    else if (drawerWas.current && (!at || at === document.body || panel?.contains(at))) drawerBar.current?.focus({ preventScroll: true });
+    drawerWas.current = drawer;
+  }, [drawer]);
+  useEffect(() => setDrawer(false), [sel]);
   // A new group puts the caret in its blank gem row once the editor for it is on screen.
   const focusAdd = useRef(false);
   const version = engine?.version ?? 0;
@@ -514,7 +558,7 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
       focusAdd.current = false;
       addRef.current.focus();
     }
-  }, [sel, groups.length, group]);
+  }, [sel, groups.length, group, docked]);
 
   const listKey = (e: React.KeyboardEvent) => {
     const mod = e.ctrlKey || e.metaKey;
@@ -757,7 +801,6 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
         wiki: gemWikiUrl(m.name, m.support),
       };
     });
-  const tagText = (m: GemInfo) => gemTagLabels(m.tags).join(', ');
 
   const closeMenu = () => setMenu(null);
   const tgl = (m: Menu) => () => setMenu((c) => (c === m ? null : m));
@@ -775,8 +818,8 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
       onMouseDown={(e) => e.preventDefault()}
     >
       {rowMode == null && groupFull && (
-        <div className="rank" role="note" data-full="true" title={tr('SkillsTab.a_gem_added_past_the')}>
-          <span>{tr('SkillsTab.no_free_socket_length_groupcap', { count: group?.gems.length, groupCap })}</span>
+        <div className="rank" role="note" data-full="true" title={tr('SkillsTab.no_free_socket_length_groupcap', { count: group?.gems.length, groupCap }) + ' ' + tr('SkillsTab.a_gem_added_past_the')}>
+          <span>{tr('SkillsTab.no_free_socket_short', { count: group?.gems.length, groupCap })}</span>
         </div>
       )}
       {sortOn && (view.held || view.stale) && (
@@ -828,9 +871,6 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
             <GemImg name={m.name} colour={m.colour} size={20} />
             <span className="grow" style={{ color: ATTR[m.colour].text }}>
               {m.name}
-            </span>
-            <span className="tag" title={tagText(m)}>
-              {tagText(m)}
             </span>
             <span className="mark" aria-hidden style={{ color: typeof v === 'number' ? dpsColour(v) : undefined }}>
               {typeof v === 'number' ? (m.support ? <Icon name="check" size={15} /> : '+') : ''}
@@ -887,182 +927,8 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
     const slotOn = !!(g.slot && !src) && (!slotTaken || !!g.imbuedSupport);
     const setAttr = (attr: string, value: string | number | boolean | null) => apply({ kind: 'setGroup', group: sel, attr, value });
     return (
-      <div className="sk-ed-scroll">
-        <div className="sk-line">
-          <div className="sk-label" data-lg="tile">
-            {leadGem(g) ? <GemImg name={leadGem(g)!.nameSpec} colour={leadGem(g)!.colour} size={20} /> : <img className="sk-gem-img" src={gemFrame('str')} alt="" width={20} height={20} />}
-            <GroupLabel key={sel + ':' + (g.label ?? '')} value={g.label ?? ''} placeholder={(g.displayLabel || tr('SkillsTab_2.new_group')) + (g.gems.length > 1 && !g.source ? ' ' + g.gems.length + 'L' : '')} disabled={src} onCommit={(v) => setAttr('label', v.trim() ? v : null)} />
-            <Icon name="pencil" size={12} style={{ flex: 'none', color: 'var(--text-faint)', marginRight: 4 }} />
-          </div>
-          <div className="sk-pick slot">
-            <button ref={slotBtn} type="button" className="sk-sel" disabled={src} {...tips.bind(SLOT_NOTE)} aria-haspopup="listbox" aria-expanded={menu === 'slot'} onClick={tgl('slot')}>
-              {g.slot && slotIcon(g.slot) ? <img src={slotIcon(g.slot)} alt="" width={18} height={18} className="sk-slot-img" /> : <img src={slotIcon('Body Armour')} alt="" width={18} height={18} className="sk-slot-img" style={{ opacity: g.slot ? 0.85 : 0.35 }} />}
-              <span className="sk-stack">
-                <span className="cap">{tr('SkillsTab.socketed_in')}</span>
-                <span className="val">{g.slot ? slotInfo?.label || g.slot : tr('SkillsTab.none')}</span>
-              </span>
-              <Icon name="chevron-down" size={12} style={{ flex: 'none', color: 'var(--text-muted)' }} />
-            </button>
-            <PortalMenu anchor={slotBtn} open={menu === 'slot'} onClose={closeMenu} role="listbox" label={tr('SkillsTab.socketed_in_2')} minWidth={250}>
-              <div className="sk-menu" style={{ maxHeight: 340 }}>
-                {slotsList.map((m) => {
-                  const on = (g.slot ?? '') === m.slot;
-                  const it = m.info?.item;
-                  return (
-                    <button
-                      key={m.slot || 'none'}
-                      type="button"
-                      role="option"
-                      aria-selected={on}
-                      className="sk-mi tall"
-                      data-on={on}
-                      {...tips.bind(!m.slot ? SLOT_NOTE : it ? { item: () => loadItemInfo(engine, it.id) } : { notes: [tr('SkillsTab.no_item_is_equipped_in')] })}
-                      onClick={() => {
-                        tips.hide();
-                        closeMenu();
-                        void setAttr('slot', m.slot || null);
-                      }}
-                    >
-                      {m.slot && slotIcon(m.slot) ? <img src={slotIcon(m.slot)} alt="" width={18} height={18} className="sk-slot-img" /> : <span style={{ width: 18 }} />}
-                      <span className="sk-stack">
-                        <span>{m.label}</span>
-                        <span className="sub">{!m.slot ? tr('SkillsTab.granted_or_unsocketed') : it ? tr('SkillsTab.base_count_sockets', { count: it.sockets.length, base: it.name || it.base }) : tr('SkillsTab.no_item')}</span>
-                      </span>
-                      <span className="chk">{on && <Icon name="check" size={13} />}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </PortalMenu>
-          </div>
-          <label className="sk-toggle">
-            <Switch checked={g.enabled} onChange={(v) => void setAttr('enabled', v)} label={tr('SkillsTab.enabled')} />
-            {tr('SkillsTab.enabled')}
-          </label>
-          <label className="sk-toggle">
-            <Switch checked={g.includeInFullDPS && g.enabled} onChange={(v) => void setAttr('includeInFullDPS', v)} label={tr('SkillsTab.include_in_full_dps')} />
-            {tr('SkillsTab.include_in_full_dps')}
-          </label>
-          {src && (
-            <label className="sk-toggle">
-              {tr('SkillsTab.count')}
-              <Stepper value={g.groupCount ?? 1} min={1} max={99} label={tr('SkillsTab.group_count')} onChange={(n) => void setAttr('groupCount', n)} />
-            </label>
-          )}
-          <span style={{ flex: 1 }} />
-          <button type="button" className="sk-btn" data-on={isMain} disabled={isMain} title={isMain ? tr('SkillsTab.this_group_is_the_main') : tr('SkillsTab.show_this_group_as_the')} onClick={() => void apply({ kind: 'setMainGroup', group: sel })}>
-            <Icon name="star" size={14} />
-            {isMain ? tr('SkillsTab.main_skill') : tr('SkillsTab.make_main_skill')}
-          </button>
-        </div>
-
-        {g.activeSkills.length > 1 && (
-          <div className="sk-line">
-            <span className="sk-cap">{tr('SkillsTab.active_skill')}</span>
-            <div className="sk-seg" role="radiogroup" aria-label={tr('SkillsTab.main_active_skill_in_this')} data-lg="tile">
-              {g.activeSkills.map((a) => (
-                <button key={a.index} type="button" role="radio" aria-checked={g.mainActiveSkill === a.index} onClick={() => void apply({ kind: 'setMainActiveSkill', group: sel, skill: a.index })}>
-                  {a.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {src ? (
-          <div className="sk-note">
-            <Icon name="info" size={14} />
-            <span>
-              {tr('SkillsTab.this_is_a_special_group', { nameSpec: leadGem(g)?.effectName || leadGem(g)?.nameSpec || 'skill', source: g.sourceName || g.source })}
-            </span>
-          </div>
-        ) : (
-          <>
-            <div className="sk-line">
-              <span className="sk-cap">{tr('SkillsTab.item_sockets')}</span>
-              {item && item.canHaveSockets && sockets.length > 0 && (
-                <>
-                  <span className="sk-socks">
-                    {sockets.map((c, i) => {
-                      const col = socketColour(c);
-                      const gm = g.gems[i];
-                      const m = !!gm && c !== 'W' && c !== 'A' && gm.colour === col;
-                      return (
-                        <span key={i} className="sk-sock-wrap">
-                          {i > 0 && <span className="link" />}
-                          <span className="sock" data-match={m} title={(gm ? (m ? tr('h_rb_Sk.sock_gem_q', { colour: label(ATTR[col].label), gem: gm.nameSpec, q: MATCH_Q }) : tr('h_rb_Sk.sock_gem', { colour: label(ATTR[col].label), gem: gm.nameSpec })) : tr('h_rb_Sk.sock_empty', { colour: label(ATTR[col].label) })) + (c === 'W' || c === 'A' ? '' : '\n' + tr('h_rb_Sk.sock_hint', { colour: label(ATTR[col].label).toLowerCase(), q: MATCH_Q }))} style={{ backgroundImage: `url(${socketIcon(col)})` }} />
-                        </span>
-                      );
-                    })}
-                  </span>
-                  <span className="sk-muted" title={(links > 1 ? tr('h_rb_Sk.link_n', { n: links }) : tr(sockets.length === 1 ? 'h_rb_Sk.sockets_one' : 'h_rb_Sk.sockets_many', { n: sockets.length })) + ' · ' + (item.name || item.base)}>{(links > 1 ? tr('h_rb_Sk.link_n', { n: links }) : tr(sockets.length === 1 ? 'h_rb_Sk.sockets_one' : 'h_rb_Sk.sockets_many', { n: sockets.length })) + ' · ' + (item.name || item.base)}</span>
-                </>
-              )}
-              <span className="sk-match" style={{ color: matchFg }}>
-                <Icon name={matchIc} size={13} />
-                {matchTxt}
-              </span>
-              <button type="button" className="sk-btn" disabled={!canOpt} title={tr('SkillsTab.reorder_the_gems_so_coloured')} onClick={() => order && void apply({ kind: 'orderGems', group: sel, order })}>
-                <Icon name="wand" size={14} />
-                {tr('SkillsTab.match_colours')}
-              </button>
-              {item && item.socketLimit !== undefined && (
-                <button type="button" className="sk-btn" disabled={!optNeeded} {...tips.bind({ notes: [tr('SkillsTab.rebuild_the_item_s_sockets')] })} onClick={() => void optimiseSocketsOf(g, item)}>
-                  <Icon name="links" size={14} />
-                  {tr('SkillsTab.optimise_sockets')}
-                </button>
-              )}
-            </div>
-
-            <div className="sk-line">
-              <span className="sk-cap">{tr('SkillsTab.imbued_support')}</span>
-              <div className="sk-pick imb">
-                <button ref={imbBtn} type="button" className="sk-sel flat" disabled={!slotOn} title={slotOn ? '' : slotTaken ? tr('SkillsTab.only_one_imbued_support_is') : tr('SkillsTab.socketed_in_item_must_be')} aria-haspopup="listbox" aria-expanded={menu === 'imbued'} onClick={tgl('imbued')}>
-                  {imb && <GemImg name={imb.name} colour={imb.colour} size={18} />}
-                  <span className="val" style={{ color: imb ? ATTR[imb.colour].text : 'var(--text-muted)' }}>
-                    {g.imbuedSupport || tr('SkillsTab.none')}
-                  </span>
-                  <Icon name="chevron-down" size={12} style={{ flex: 'none', color: 'var(--text-muted)' }} />
-                </button>
-                <PortalMenu anchor={imbBtn} open={menu === 'imbued'} onClose={closeMenu} role="listbox" label={tr('SkillsTab.imbued_support')} minWidth={280}>
-                  <div className="sk-menu" style={{ maxHeight: 300 }}>
-                    {[{ name: '', colour: 'w' as const } as Pick<GemInfo, 'name' | 'colour'>, ...imbList].map((m) => {
-                      const on = (g.imbuedSupport ?? '') === m.name;
-                      return (
-                        <button
-                          key={m.name || 'none'}
-                          type="button"
-                          role="option"
-                          aria-selected={on}
-                          className="sk-mi"
-                          data-on={on}
-                          onClick={() => {
-                            closeMenu();
-                            void setAttr('imbuedSupport', m.name || null);
-                          }}
-                        >
-                          {m.name ? <GemImg name={m.name} colour={m.colour} size={18} /> : <span style={{ width: 18 }} />}
-                          <span className="grow" style={{ color: m.name ? ATTR[m.colour].text : 'var(--text-muted)' }}>
-                            {m.name || tr('SkillsTab.none')}
-                          </span>
-                          <span className="chk">{on && <Icon name="check" size={13} />}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </PortalMenu>
-              </div>
-              {g.imbuedSupport && (
-                <button type="button" className="sk-x" aria-label={tr('SkillsTab.remove_this_imbued_support')} title={tr('SkillsTab.remove_this_imbued_support_2')} onClick={() => void setAttr('imbuedSupport', null)}>
-                  <Icon name="x" size={12} />
-                </button>
-              )}
-            </div>
-          </>
-        )}
-
-        <div className="sk-rule" />
-
+      <>
+        <div ref={edScroll} className="sk-ed-scroll">
         <div className="sk-gems">
           <div className="sk-gemrow head" data-r="gemrow">
             <span />
@@ -1106,17 +972,18 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                           setKind(x.support ? 'S' : 'A');
                         }}
                       >
-                        <span className="dot" style={{ background: ATTR[x.colour].socket, boxShadow: `0 0 6px ${ATTR[x.colour].socket}` }} />
-                        <GemImg name={x.nameSpec} colour={x.colour} />
+                        <span className="dotw" {...(x.matchesSocket ? tips.bind({ notes: [tr('SkillsTab.in_a_matching_socket_match', { MATCH_Q })] }) : {})}>
+                          <span className="dot" style={{ background: ATTR[x.colour].socket, boxShadow: `${x.matchesSocket ? '0 0 0 1.5px rgba(var(--accent-rgb),.75), ' : ''}0 0 6px ${ATTR[x.colour].socket}` }} />
+                        </span>
+                        <GemImg name={x.nameSpec} colour={x.colour} size={18} />
                         <span className="nm" style={{ color: x.known ? ATTR[x.colour].text : gemRowLook(x).muted ? 'var(--text-muted)' : 'var(--negative-text)' }}>
                           {fromMain('skills_texts', gemRowLook(x).text)}
                         </span>
-                        {x.matchesSocket && (
-                          <span className="mq" title={tr('SkillsTab.in_a_matching_socket_match', { MATCH_Q })}>
-                            {tr('SkillsTab.match_q_q', { MATCH_Q })}
+                        {info?.legacy && (
+                          <span style={{ display: 'flex', flex: 'none' }} {...tips.bind({ notes: [tr('SkillsTab.legacy_gem_only_exists_in')] })}>
+                            <Icon name="info" size={13} label={tr('SkillsTab.legacy_gem_only_exists_in')} style={{ color: 'var(--text-faint)' }} />
                           </span>
                         )}
-                        <span className="kind">{x.support ? '' : tr('SkillsTab.active')}</span>
                       </button>
                     ) : (
                       <div className="sk-search">
@@ -1147,7 +1014,6 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                   </div>
                 )}
                 {x.errMsg && x.known && <div className="sk-err">{x.errMsg}</div>}
-                {info && info.legacy && <div className="sk-err muted">{tr('SkillsTab.legacy_gem_only_exists_in')}</div>}
               </div>
             );
           })}
@@ -1160,7 +1026,8 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                   <input
                     ref={addRef}
                     value={qMode === 'add' ? q : ''}
-                    placeholder={!group.gems.length ? tr('SkillsTab.add_an_active_skill_gem') : docked ? tr('SkillsTab.add_a_gem_type_to') : tr('SkillsTab.add_a_gem_type_to_2')}
+                    placeholder={!group.gems.length ? tr('SkillsTab.add_an_active_skill_gem') : docked ? tr('SkillsTab.add_gem_filter_ph') : tr('SkillsTab.add_a_gem_type_to_2')}
+                    title={group.gems.length && docked ? tr('SkillsTab.add_a_gem_type_to') : undefined}
                     aria-label={tr('SkillsTab.add_a_gem')}
                     onChange={(e) => {
                       setQ(e.target.value);
@@ -1206,7 +1073,195 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
             </div>
           )}
         </div>
-      </div>
+        </div>
+        <div ref={drawerRef} className="sk-drawer" data-open={drawer}>
+          <button ref={drawerBar} id="sk-drawer-bar" type="button" className="sk-drawer-bar" aria-expanded={drawer} aria-controls="sk-drawer-panel" onClick={() => setDrawer((v) => !v)}>
+            <span style={{ flex: 1 }}>{tr('SkillsTab.group_settings')}</span>
+            <Icon name="chevron-down" size={12} style={{ flex: 'none', color: 'var(--text-muted)' }} />
+          </button>
+          <div ref={drawerPanel} id="sk-drawer-panel" className="sk-drawer-panel" role="region" aria-labelledby="sk-drawer-bar" tabIndex={-1}>
+            <div className="sk-line">
+              <div className="sk-label" data-lg="tile">
+                {leadGem(g) ? <GemImg name={leadGem(g)!.nameSpec} colour={leadGem(g)!.colour} size={20} /> : <img className="sk-gem-img" src={gemFrame('str')} alt="" width={20} height={20} />}
+                <GroupLabel key={sel + ':' + (g.label ?? '')} value={g.label ?? ''} placeholder={(g.displayLabel || tr('SkillsTab_2.new_group')) + (g.gems.length > 1 && !g.source ? ' ' + g.gems.length + 'L' : '')} disabled={src} onCommit={(v) => setAttr('label', v.trim() ? v : null)} />
+                <Icon name="pencil" size={12} style={{ flex: 'none', color: 'var(--text-faint)', marginRight: 4 }} />
+              </div>
+              <button type="button" className="sk-btn" data-on={isMain} disabled={isMain} title={isMain ? tr('SkillsTab.this_group_is_the_main') : tr('SkillsTab.show_this_group_as_the')} onClick={() => void apply({ kind: 'setMainGroup', group: sel })}>
+                <Icon name="star" size={14} />
+                {isMain ? tr('SkillsTab.main_skill') : tr('SkillsTab.make_main_skill')}
+              </button>
+            </div>
+            <div className="sk-line">
+              <div className="sk-pick slot">
+                <button ref={slotBtn} type="button" className="sk-sel" disabled={src} {...tips.bind(SLOT_NOTE)} aria-haspopup="listbox" aria-expanded={menu === 'slot'} onClick={tgl('slot')}>
+                  {g.slot && slotIcon(g.slot) ? <img src={slotIcon(g.slot)} alt="" width={18} height={18} className="sk-slot-img" /> : <img src={slotIcon('Body Armour')} alt="" width={18} height={18} className="sk-slot-img" style={{ opacity: g.slot ? 0.85 : 0.35 }} />}
+                  <span className="sk-stack">
+                    <span className="cap">{tr('SkillsTab.socketed_in')}</span>
+                    <span className="val">{g.slot ? slotInfo?.label || g.slot : tr('SkillsTab.none')}</span>
+                  </span>
+                  <Icon name="chevron-down" size={12} style={{ flex: 'none', color: 'var(--text-muted)' }} />
+                </button>
+                <PortalMenu anchor={slotBtn} open={menu === 'slot'} onClose={closeMenu} role="listbox" label={tr('SkillsTab.socketed_in_2')} minWidth={250}>
+                  <div className="sk-menu" style={{ maxHeight: 340 }}>
+                    {slotsList.map((m) => {
+                      const on = (g.slot ?? '') === m.slot;
+                      const it = m.info?.item;
+                      return (
+                        <button
+                          key={m.slot || 'none'}
+                          type="button"
+                          role="option"
+                          aria-selected={on}
+                          className="sk-mi tall"
+                          data-on={on}
+                          {...tips.bind(!m.slot ? SLOT_NOTE : it ? { item: () => loadItemInfo(engine, it.id) } : { notes: [tr('SkillsTab.no_item_is_equipped_in')] })}
+                          onClick={() => {
+                            tips.hide();
+                            closeMenu();
+                            void setAttr('slot', m.slot || null);
+                          }}
+                        >
+                          {m.slot && slotIcon(m.slot) ? <img src={slotIcon(m.slot)} alt="" width={18} height={18} className="sk-slot-img" /> : <span style={{ width: 18 }} />}
+                          <span className="sk-stack">
+                            <span>{m.label}</span>
+                            <span className="sub">{!m.slot ? tr('SkillsTab.granted_or_unsocketed') : it ? tr('SkillsTab.base_count_sockets', { count: it.sockets.length, base: it.name || it.base }) : tr('SkillsTab.no_item')}</span>
+                          </span>
+                          <span className="chk">{on && <Icon name="check" size={13} />}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PortalMenu>
+              </div>
+              <label className="sk-toggle">
+                <Switch checked={g.enabled} onChange={(v) => void setAttr('enabled', v)} label={tr('SkillsTab.enabled')} />
+                {tr('SkillsTab.enabled')}
+              </label>
+              <label className="sk-toggle">
+                <Switch checked={g.includeInFullDPS && g.enabled} onChange={(v) => void setAttr('includeInFullDPS', v)} label={tr('SkillsTab.include_in_full_dps')} />
+                {tr('SkillsTab.include_in_full_dps')}
+              </label>
+              {src && (
+                <label className="sk-toggle">
+                  {tr('SkillsTab.count')}
+                  <Stepper value={g.groupCount ?? 1} min={1} max={99} label={tr('SkillsTab.group_count')} onChange={(n) => void setAttr('groupCount', n)} />
+                </label>
+              )}
+            </div>
+
+            {g.activeSkills.length > 1 && (
+              <div className="sk-line">
+                <span className="sk-cap">{tr('SkillsTab.active_skill')}</span>
+                <div className="sk-seg" role="radiogroup" aria-label={tr('SkillsTab.main_active_skill_in_this')} data-lg="tile">
+                  {g.activeSkills.map((a) => (
+                    <button key={a.index} type="button" role="radio" aria-checked={g.mainActiveSkill === a.index} onClick={() => void apply({ kind: 'setMainActiveSkill', group: sel, skill: a.index })}>
+                      {a.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {src ? (
+              <div className="sk-note">
+                <Icon name="info" size={14} />
+                <span>
+                  {tr('SkillsTab.this_is_a_special_group', { nameSpec: leadGem(g)?.effectName || leadGem(g)?.nameSpec || 'skill', source: g.sourceName || g.source })}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="sk-line sk-lbl">
+                  <span className="sk-cap">{tr('SkillsTab.item_sockets')}</span>
+                  <div className="sk-val">
+                  {item && item.canHaveSockets && sockets.length > 0 && (
+                    <div className="sk-vrow">
+                      <span className="sk-socks">
+                        {sockets.map((c, i) => {
+                          const col = socketColour(c);
+                          const gm = g.gems[i];
+                          const m = !!gm && c !== 'W' && c !== 'A' && gm.colour === col;
+                          return (
+                            <span key={i} className="sk-sock-wrap">
+                              {i > 0 && <span className="link" />}
+                              <span className="sock" data-match={m} title={(gm ? (m ? tr('h_rb_Sk.sock_gem_q', { colour: label(ATTR[col].label), gem: gm.nameSpec, q: MATCH_Q }) : tr('h_rb_Sk.sock_gem', { colour: label(ATTR[col].label), gem: gm.nameSpec })) : tr('h_rb_Sk.sock_empty', { colour: label(ATTR[col].label) })) + (c === 'W' || c === 'A' ? '' : '\n' + tr('h_rb_Sk.sock_hint', { colour: label(ATTR[col].label).toLowerCase(), q: MATCH_Q }))} style={{ backgroundImage: `url(${socketIcon(col)})` }} />
+                            </span>
+                          );
+                        })}
+                      </span>
+                      <span className="sk-muted" title={(links > 1 ? tr('h_rb_Sk.link_n', { n: links }) : tr(sockets.length === 1 ? 'h_rb_Sk.sockets_one' : 'h_rb_Sk.sockets_many', { n: sockets.length })) + ' · ' + (item.name || item.base)}>{(links > 1 ? tr('h_rb_Sk.link_n', { n: links }) : tr(sockets.length === 1 ? 'h_rb_Sk.sockets_one' : 'h_rb_Sk.sockets_many', { n: sockets.length })) + ' · ' + (item.name || item.base)}</span>
+                    </div>
+                  )}
+                  <div className="sk-vrow">
+                  <span className="sk-match" style={{ color: matchFg }}>
+                    <Icon name={matchIc} size={13} />
+                    {matchTxt}
+                  </span>
+                  <button type="button" className="sk-btn sm" disabled={!canOpt} title={tr('SkillsTab.reorder_the_gems_so_coloured')} onClick={() => order && void apply({ kind: 'orderGems', group: sel, order })}>
+                    <Icon name="wand" size={14} />
+                    {tr('SkillsTab.match_colours')}
+                  </button>
+                  {item && item.socketLimit !== undefined && (
+                    <button type="button" className="sk-btn sm" disabled={!optNeeded} {...tips.bind({ notes: [tr('SkillsTab.rebuild_the_item_s_sockets')] })} onClick={() => void optimiseSocketsOf(g, item)}>
+                      <Icon name="links" size={14} />
+                      {tr('SkillsTab.optimise_sockets')}
+                    </button>
+                  )}
+                  </div>
+                  </div>
+                </div>
+
+                <div className="sk-line sk-lbl">
+                  <span className="sk-cap">{tr('SkillsTab.imbued_support')}</span>
+                  <div className="sk-val"><div className="sk-vrow">
+                  <div className="sk-pick imb">
+                    <button ref={imbBtn} type="button" className="sk-sel flat" disabled={!slotOn} title={slotOn ? '' : slotTaken ? tr('SkillsTab.only_one_imbued_support_is') : tr('SkillsTab.socketed_in_item_must_be')} aria-haspopup="listbox" aria-expanded={menu === 'imbued'} onClick={tgl('imbued')}>
+                      {imb && <GemImg name={imb.name} colour={imb.colour} size={18} />}
+                      <span className="val" style={{ color: imb ? ATTR[imb.colour].text : 'var(--text-muted)' }}>
+                        {g.imbuedSupport || tr('SkillsTab.none')}
+                      </span>
+                      <Icon name="chevron-down" size={12} style={{ flex: 'none', color: 'var(--text-muted)' }} />
+                    </button>
+                    <PortalMenu anchor={imbBtn} open={menu === 'imbued'} onClose={closeMenu} role="listbox" label={tr('SkillsTab.imbued_support')} minWidth={280}>
+                      <div className="sk-menu" style={{ maxHeight: 300 }}>
+                        {[{ name: '', colour: 'w' as const } as Pick<GemInfo, 'name' | 'colour'>, ...imbList].map((m) => {
+                          const on = (g.imbuedSupport ?? '') === m.name;
+                          return (
+                            <button
+                              key={m.name || 'none'}
+                              type="button"
+                              role="option"
+                              aria-selected={on}
+                              className="sk-mi"
+                              data-on={on}
+                              onClick={() => {
+                                closeMenu();
+                                void setAttr('imbuedSupport', m.name || null);
+                              }}
+                            >
+                              {m.name ? <GemImg name={m.name} colour={m.colour} size={18} /> : <span style={{ width: 18 }} />}
+                              <span className="grow" style={{ color: m.name ? ATTR[m.colour].text : 'var(--text-muted)' }}>
+                                {m.name || tr('SkillsTab.none')}
+                              </span>
+                              <span className="chk">{on && <Icon name="check" size={13} />}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </PortalMenu>
+                  </div>
+                  {g.imbuedSupport && (
+                    <button type="button" className="sk-x" aria-label={tr('SkillsTab.remove_this_imbued_support')} title={tr('SkillsTab.remove_this_imbued_support_2')} onClick={() => void setAttr('imbuedSupport', null)}>
+                      <Icon name="x" size={12} />
+                    </button>
+                  )}
+                  </div></div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </>
     );
   })();
 
@@ -1287,7 +1342,9 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
               <Icon name="links" size={18} style={{ color: 'var(--gold-label)' }} />
               {tr('SkillsTab.socket_groups')}
             </span>
-            <span style={{ flex: 1 }} />
+            <span className="sk-help" aria-label={tr('SkillsTab.usage_tips')} {...tips.bind(USAGE_TIPS)}>
+              <Icon name="keyboard" size={15} />
+            </span>
             <div className="acts">
               <button type="button" className="sk-btn sm" title={tr('SkillsTab.new_socket_group')} onClick={() => void newGroup()}>
                 <Icon name="plus" size={14} />
@@ -1301,9 +1358,6 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                 <Icon name="trash" size={14} />
                 {tr('SkillsTab.delete_all')}
               </button>
-              <span className="sk-help" aria-label={tr('SkillsTab.usage_tips')} {...tips.bind(USAGE_TIPS)}>
-                <Icon name="keyboard" size={15} />
-              </span>
             </div>
           </div>
 
@@ -1375,11 +1429,11 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                     <span className="nm" style={{ color: !g.enabled ? 'var(--text-muted)' : lead ? ATTR[lead.colour].text : 'var(--text-2)' }}>
                       {groupName(g)}
                     </span>
-                    {sub && <span className="sub">{sub}</span>}
                     {state.mainGroup === g.index && <span className="badge">{tr('SkillsTab.main')}</span>}
                     {g.includeInFullDPS && g.enabled && <span className="badge dim">{tr('SkillsTab.full_dps')}</span>}
+                    {sub && <span className="sub">{sub}</span>}
                     {g.gems.length > 1 && (
-                      <span className="gl">
+                      <span className="sk-gl">
                         {g.gems.map((x, i) => (
                           <span key={i} style={{ color: x.known ? ATTR[x.colour].text : 'var(--negative-text)', opacity: x.enabled ? 0.92 : 0.45 }}>
                             {x.nameSpec}
@@ -1550,7 +1604,7 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
                 </div>
               </div>
               <div className="sk-dock-sub">
-                {sortOn ? tr('SkillsTab.sorted_by_what_each_gem', { field: SORT_LABEL[field] ?? field }) : tr('SkillsTab.sort_gems_by_dps_is')} {rowMode != null ? tr('SkillsTab.click_one_to_swap_it') : tr('SkillsTab.click_one_to_add_it')}
+                {sortOn ? tr('SkillsTab.sorted_by', { field: SORT_LABEL[field] ?? field }) : tr('SkillsTab.sort_gems_by_dps_is')}
                 {q.trim() ? <span className="q"> {tr('SkillsTab.matching_trim', { value: q.trim() })}</span> : null}
               </div>
               {pickerList}
@@ -1610,6 +1664,7 @@ export function SkillsTab({ build, engine }: SkillsTabProps) {
 /** The group label box: edited locally, applied on Enter or when it loses focus. */
 function GroupLabel({ value, placeholder, disabled, onCommit }: { value: string; placeholder: string; disabled: boolean; onCommit: (v: string) => void }) {
   const [v, setV] = useState(value);
+  const esc = useRef(false); // Escape blurs the box, and blur would commit the draft the closure still holds
   return (
     <input
       value={v}
@@ -1618,10 +1673,11 @@ function GroupLabel({ value, placeholder, disabled, onCommit }: { value: string;
       maxLength={50}
       disabled={disabled}
       onChange={(e) => setV(e.target.value)}
-      onBlur={() => v !== value && onCommit(v)}
+      onBlur={() => { if (esc.current) esc.current = false; else if (v !== value) onCommit(v); }}
       onKeyDown={(e) => {
         if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
         else if (e.key === 'Escape') {
+          esc.current = true;
           setV(value);
           (e.target as HTMLInputElement).blur();
         }

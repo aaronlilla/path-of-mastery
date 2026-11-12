@@ -109,3 +109,10 @@
 .tl-socket { display: flex; align-items: flex-start; gap: 12px; }
 .tl-socket > .grow { flex: 1; min-width: 0; }
 .tl-preview { flex: none; border-radius: 10px; border: 1px solid rgba(var(--line-rgb), .12); background: rgba(var(--void-rgb), .35); margin-top: -2px; }
+
+.tl-protect-box > summary { cursor: pointer; width: max-content; padding: 2px 4px; color: var(--text-muted); font-size: 12.5px; list-style: none; }
+.tl-protect-box > summary::-webkit-details-marker { display: none; }
+.tl-protect-box > summary::before { content: '›'; display: inline-block; width: 12px; transition: transform .15s; }
+.tl-protect-box[open] > summary::before { transform: rotate(90deg); }
+.tl-protect-box > summary:hover { color: var(--text-strong); }
+.tl-protect-box > .tl-protect { padding-top: 6px; }

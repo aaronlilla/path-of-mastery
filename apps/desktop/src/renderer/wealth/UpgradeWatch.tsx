@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { BuildEdit } from '@pom/protocol';
 import { fmtChaos } from '../../shared/wealth.js';
 import { listingAgeMin, sellerPrice, defaultRule, type TradeListing, type SlotScan, type StatGain, type UpgradeCandidate, type UpgradeView, type WatchedBuild, type WatchRule } from '../../shared/wealthTrade.js';
-import { Icon, useToast } from '../ui.js';
+import { Icon, useDismiss, useToast } from '../ui.js';
 import { artFor, slotIcon } from '../gameArt.js';
 import { ageText, TradeBanner, useCopy, type LibraryChoice, type PremiumBuild } from './premiumUi.js';
 import type { Wealth } from './useWealth.js';
@@ -13,15 +13,15 @@ import { item, msg } from './mainText';
 const REFRESH_MS = 30_000;
 
 function pollText(v: UpgradeView | null, now: number): string {
-  const base = tr('wealth_UpgradeWatch.from_the_trade_site_on');
+  const base = '';
   if (!v) return base;
   const p = v.poll;
   const mins = p.nextAt ? Math.max(1, Math.round((p.nextAt - now) / 60000)) : null;
-  if (p.state === 'off') return tr('wealth_UpgradeWatch.base_background_checks_are_off', { base });
-  if (p.state === 'no-cookie') return tr('wealth_UpgradeWatch.base_background_checks_are_paused', { base });
-  if (p.state === 'idle') return tr('wealth_UpgradeWatch.base_background_checks_are_paused_2', { base });
-  if (p.state === 'backoff') return tr('h_c_Uw.backoff', { base, mins: mins ?? tr('h_c_Uw.backoff_few') });
-  return mins ? tr('h_c_Uw.active_next', { base, mins }) : tr('h_c_Uw.active', { base });
+  if (p.state === 'off') return tr('wealth_UpgradeWatch.base_background_checks_are_off', { base }).trim();
+  if (p.state === 'no-cookie') return tr('wealth_UpgradeWatch.base_background_checks_are_paused', { base }).trim();
+  if (p.state === 'idle') return tr('wealth_UpgradeWatch.base_background_checks_are_paused_2', { base }).trim();
+  if (p.state === 'backoff') return tr('h_c_Uw.backoff', { base, mins: mins ?? tr('h_c_Uw.backoff_few') }).trim();
+  return (mins ? tr('h_c_Uw.active_next', { base, mins }) : tr('h_c_Uw.active', { base })).trim();
 }
 
 function gainText(g: StatGain | null): string {
@@ -63,6 +63,9 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
     if (s.ui.wsel) setSel(s.ui.wsel);
   }, [s.ui.wsel]);
   const [tryOn, setTryOn] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(false);
+  const prefsRef = useRef<HTMLSpanElement>(null);
+  useDismiss(prefsRef, prefsOpen, () => setPrefsOpen(false));
   const [err, setErr] = useState<{ kind: string; message: string } | null>(null);
   const alive = useRef(true);
   useEffect(() => () => void (alive.current = false), []);
@@ -181,9 +184,10 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
   const age = lst ? listingAgeMin(lst.indexed, now) : null;
   const over = c?.overBudget ? fmtChaos(c.overBudget, w.divine) : null;
   const heldNote = c?.held;
+  const notBetter = view && view.scannedAt && checked > 0 ? Object.values(scans).reduce((a, x) => a + x.candidates.filter((c) => !c.sold && (c.held || (c.main?.pct ?? -1) * 100 < (rules[x.slot]?.minGainPct ?? 3))).length, 0) : null;
+  const showWarn = !!(view && failedScan && !err && !tradeShown);
   const equipped = cur ? `${cur.scan.equipped}${cur.scan.equippedBase ? ` (${cur.scan.equippedBase})` : ''}` : '';
 
-  const first = (n: string) => (n.split(' ')[0] ?? n).toUpperCase();
   const hdr = lst ? (lst.item.frameType === 3 ? 'unique' : lst.item.frameType === 2 ? 'rare' : lst.item.frameType === 1 ? 'magic' : 'normal') : 'rare';
   const dbl = !!lst?.item.name;
   const hpath = (side: string) => `game/poe/ui/header-${dbl && (hdr === 'rare' || hdr === 'unique') ? 'double-' : ''}${hdr}-${side}.png`;
@@ -195,6 +199,9 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
     .filter((x): x is typeof x & { name: string } => !!x.name && x.slots.some((s) => !s.rule.off));
   // The picker offers only builds that are not already in the watch list above it.
   const unwatched = library.filter((b) => 'lib:' + b.id !== key && !watched.some((x) => x.key === 'lib:' + b.id && x.slots.some((sl) => !sl.rule.off)));
+  const dflt = defaultRule();
+  /** A slot shows its rule only when it differs from the default, which is stated once under the build name. */
+  const ownRule = (r: WatchRule): boolean => r.off || r.minGainPct !== dflt.minGainPct || r.budgetDiv !== dflt.budgetDiv || r.keepResists !== dflt.keepResists;
   const ruleText = (slotName: string, r: WatchRule = rule(slotName)): string => {
     if (r.off) return tr('wealth_UpgradeWatch_2.paused');
     return `${tr('h_c_Uw.gain_pct', { pct: r.minGainPct, stat: rank === 0 ? 'DPS' : 'EHP' })}${r.keepResists ? `, ${tr('h_c_Uw.keep_resists')}` : ''}${r.budgetDiv ? ` · ${tr('h_c_Uw.up_to_div', { n: r.budgetDiv })}` : ''}`;
@@ -207,11 +214,19 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
       <Panel className="w-wl">
         <div className="w-eyebrow">
           <span>{tr('wealth_UpgradeWatch.watches_click_to_pause')}</span>
+          <div className="w-wl-ctl">
+            <Seg labels={[tr('wealth_UpgradeWatch_2.damage'), tr('wealth_UpgradeWatch_2.defence')]} active={rank} onPick={(i) => setRank(i as 0 | 1)} label={tr('wealth_UpgradeWatch.rank_by')} />
+            <button type="button" className="w-btn alt sm" disabled={busy || slots.length === 0} onClick={() => void scan()} title={busy ? tr('wealth_UpgradeWatch.checking') : tr('wealth_UpgradeWatch.check_now')} aria-label={busy ? tr('wealth_UpgradeWatch.checking') : tr('wealth_UpgradeWatch.check_now')}>
+              <Icon name="refresh" size={14} />
+              <span className="lbl">{busy ? tr('wealth_UpgradeWatch.checking') : tr('wealth_UpgradeWatch.check_now')}</span>
+            </button>
+          </div>
         </div>
         <div className="w-wl-b">
           <div className="w-wl-build">
             <b title={build.name}>{build.name}</b>
           </div>
+          <div className="w-wl-rule">{tr('wealth_UpgradeWatch.default_rule', { rule: ruleText('', dflt) })}</div>
           {slots.length === 0 && <div className="w-note-line">{tr('wealth_UpgradeWatch.this_build_has_no_equipped')}</div>}
           {slots.map((sl) => {
             const r = rule(sl.slot);
@@ -222,7 +237,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                 <div role="button" tabIndex={0} className="w-wslot-h" onClick={() => void patch(sl.slot, { off: !r.off })} onKeyDown={(e) => e.key === 'Enter' && void patch(sl.slot, { off: !r.off })}>
                   <Cb on={!r.off} label={tr('wealth_UpgradeWatch.watch_slot', { slot: label(sl.slot) })} onClick={(e) => { e.stopPropagation(); void patch(sl.slot, { off: !r.off }); }} />
                   <img className="w-wslot-ic" src={slotIcon(sl.slot)} alt="" draggable={false} />
-                  <span className="w-name" title={sc?.rule ? msg(sc.rule) : undefined}><b>{label(sl.slot)}</b><i>{ruleText(sl.slot)}</i></span>
+                  <span className="w-name" title={sc?.rule ? msg(sc.rule) : undefined}><b>{label(sl.slot)}</b>{ownRule(r) && <i>{ruleText(sl.slot)}</i>}</span>
                   <span className="w-wcount" style={{ color: !r.off && n ? 'var(--gold-text)' : 'var(--text-faint)' }}>{r.off ? tr('wealth_UpgradeWatch.off') : sc?.error ? tr('wealth_UpgradeWatch.error') : n ? tr(n > 1 ? 'h_c_Uw.matches' : 'h_c_Uw.match', { n }) : sc ? '—' : ''}</span>
                   <button type="button" className="w-link w-wgear" aria-label={tr('wealth_UpgradeWatch.edit_the_rule_for_slot', { slot: label(sl.slot) })} aria-expanded={slot === sl.slot} title={tr('wealth_UpgradeWatch.edit_the_rule')} onClick={(e) => { e.stopPropagation(); setSlot(slot === sl.slot ? null : sl.slot); }}>
                     <Icon name="settings" size={13} />
@@ -258,7 +273,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                   <div role="button" tabIndex={0} className="w-wslot-h" title={tr('wealth_UpgradeWatch.show_the_matches_for_name', { name: o.name })} onClick={() => onPick(o.id)} onKeyDown={(e) => e.key === 'Enter' && onPick(o.id)}>
                     <Cb on label={tr('wealth_UpgradeWatch.name_slot_is_watched', { name: o.name, slot: label(x.slot) })} onClick={(e) => { e.stopPropagation(); onPick(o.id); }} />
                     <img className="w-wslot-ic" src={slotIcon(x.slot)} alt="" draggable={false} />
-                    <span className="w-name"><b>{label(x.slot)}</b><i>{ruleText(x.slot, x.rule)}</i></span>
+                    <span className="w-name"><b>{label(x.slot)}</b>{ownRule(x.rule) && <i>{ruleText(x.slot, x.rule)}</i>}</span>
                     <span className="w-wcount" style={{ color: x.matches ? 'var(--gold-text)' : 'var(--text-faint)' }}>{x.matches ? tr(x.matches > 1 ? 'h_c_Uw.matches' : 'h_c_Uw.match', { n: x.matches }) : '—'}</span>
                   </div>
                 </div>
@@ -279,19 +294,20 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
         </div>
         <div className="w-wl-f">
           <span className="w-wl-f1">{lastFailed ? tr('wealth_UpgradeWatch.the_last_check_did_not_2', { scannedAt: view?.scannedAt ? ` · ${ageText(Math.round((now - view.scannedAt) / 60000))}` : '' }) : view?.scannedAt ? tr('wealth_UpgradeWatch.tolocalestring_listings_checked_scan', { checked: checked.toLocaleString(), scannedAt: ageText(Math.round((now - view.scannedAt) / 60000)) }) : tr('wealth_UpgradeWatch.nothing_checked_yet')}</span>
-          <span>{pollText(view, now)}</span>
-          {view && (
-            <div className="w-wl-ctl">
-              <div className="w-bulk-b" role="presentation" onClick={() => void window.pom.wealth.upgradePrefs({ poll: !view.prefs.poll }).then(load)}><Cb on={view.prefs.poll} label={tr('wealth_UpgradeWatch.check_in_the_background')} onClick={() => {}} />{tr('wealth_UpgradeWatch.check_in_the_background')}</div>
-              <div className="w-bulk-b" role="presentation" aria-disabled={!view.prefs.poll || undefined} onClick={() => { if (view.prefs.poll) void window.pom.wealth.upgradePrefs({ os: !view.prefs.os }).then(load); }}><Cb on={view.prefs.os} label={tr('wealth_UpgradeWatch.desktop_notification')} disabled={!view.prefs.poll} onClick={() => {}} />{tr('wealth_UpgradeWatch.desktop_notification')}</div>
-            </div>
-          )}
-          <div className="w-wl-ctl">
-            <Seg labels={[tr('wealth_UpgradeWatch_2.damage'), tr('wealth_UpgradeWatch_2.defence')]} active={rank} onPick={(i) => setRank(i as 0 | 1)} label={tr('wealth_UpgradeWatch.rank_by')} />
-            <button type="button" className="w-btn alt sm" disabled={busy || slots.length === 0} onClick={() => void scan()}>
-              <Icon name="refresh" size={14} />
-              {busy ? tr('wealth_UpgradeWatch.checking') : tr('wealth_UpgradeWatch.check_now')}
-            </button>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}><span style={{ flex: 1, minWidth: 0 }}>{pollText(view, now)}</span>
+            {view && (
+              <span ref={prefsRef} className="w-pop-wrap">
+                <button type="button" className="w-link" aria-label={tr('wealth_UpgradeWatch.check_settings')} title={tr('wealth_UpgradeWatch.check_settings')} aria-haspopup="dialog" aria-expanded={prefsOpen} onClick={() => setPrefsOpen((o) => !o)}>
+                  <Icon name="settings" size={14} />
+                </button>
+                {prefsOpen && (
+                  <div className="w-pop" data-lg="pop" data-solid="" role="dialog" aria-label={tr('wealth_UpgradeWatch.check_settings')}>
+                    <div className="w-bulk-b" role="presentation" onClick={() => void window.pom.wealth.upgradePrefs({ poll: !view.prefs.poll }).then(load)}><Cb on={view.prefs.poll} label={tr('wealth_UpgradeWatch.check_in_the_background')} onClick={() => {}} />{tr('wealth_UpgradeWatch.check_in_the_background')}</div>
+                    <div className="w-bulk-b" role="presentation" aria-disabled={!view.prefs.poll || undefined} onClick={() => { if (view.prefs.poll) void window.pom.wealth.upgradePrefs({ os: !view.prefs.os }).then(load); }}><Cb on={view.prefs.os} label={tr('wealth_UpgradeWatch.desktop_notification')} disabled={!view.prefs.poll} onClick={() => {}} />{tr('wealth_UpgradeWatch.desktop_notification')}</div>
+                  </div>
+                )}
+              </span>
+            )}
           </div>
         </div>
       </Panel>
@@ -299,7 +315,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
       <div className="w-wm">
         <TradeBanner trade={w.trade} now={now} onReconnect={onReconnect} />
         {err && !tradeShown && err.kind !== 'expired' && err.kind !== 'rate-limited' && <div className="w-banner inline bad" role="alert"><Icon name="warning" size={14} /><span>{err.message}</span></div>}
-        {busy && <div className="w-banner inline info" role="status"><Icon name="info" size={14} /><span>{w.trade.phase === 'waiting' ? tr('wealth_UpgradeWatch.waiting_for_the_trade_site') : tr('wealth_UpgradeWatch.progress_each_listing_is_calculated', { progress: progress ?? tr('wealth_UpgradeWatch.searching_the_trade_site') })}</span></div>}
+        {busy && <div className="w-banner inline info" role="status"><Icon name="info" size={14} /><span>{w.trade.phase === 'waiting' ? tr('wealth_UpgradeWatch.waiting_for_the_trade_site') : progress ?? tr('wealth_UpgradeWatch.searching_the_trade_site')}</span></div>}
         <Panel className="w-wmatch">
           {!c || !lst ? (
             <Empty
@@ -310,7 +326,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
           ) : (
             <div className="w-wm-in" key={c.key}>
               <div className="w-wm-top">
-                <span className="w-eyebrow-t">{tr('wealth_UpgradeWatch.match_touppercase_name', { slot: label(c.slot).toUpperCase(), name: first(build.name) })}</span>
+                <span className="w-eyebrow-t">{tr('wealth_UpgradeWatch.match_touppercase_name', { slot: label(c.slot).toUpperCase() })}</span>
                 <span className="w-seen" style={{ color: c.sold ? 'var(--text-muted)' : 'var(--text-muted)' }}>
                   {!c.sold && <i className="w-live sm" />}
                   {c.sold ? tr('wealth_UpgradeWatch.sold_or_removed') : tr('wealth_UpgradeWatch.listed_age_still_listed', { age: ageText(age) })}
@@ -349,7 +365,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                   <div className="w-note-line gold" role="note">
                     <Icon name="sparkle-fill" size={12} />
                     <span>
-                      {tr('wealth_UpgradeWatch.replaces_your_equipped', { equipped })} {c.main?.pct !== null && c.main ? tr('wealth_UpgradeWatch.ranklabel_goes_from_before_to', { rankLabel: label(cur.scan.rankLabel), before: num(c.main.before), after: num(c.main.after) }) : tr('wealth_UpgradeWatch.calculated_by_the_engine_on')}
+                      {tr('wealth_UpgradeWatch.replaces_your_equipped', { equipped })} {c.main?.pct !== null && c.main ? tr('wealth_UpgradeWatch.ranklabel_goes_from_before_to', { rankLabel: label(cur.scan.rankLabel), before: num(c.main.before), after: num(c.main.after) }) : ''}
                       {heldNote ? tr('wealth_UpgradeWatch.held_back_heldnote', { heldNote: msg(heldNote) }) : ''}
                       {c.score !== null ? tr('wealth_UpgradeWatch.tofixed_points_of_gain_per', { score: c.score.toFixed(1) }) : tr('wealth_UpgradeWatch.unpriced_so_it_is_not')}
                     </span>
@@ -358,7 +374,7 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                     <button type="button" className="w-btn" title={lst.hideoutToken ? tr('wealth_UpgradeWatch.same_as_the_trade_site') : tr('wealth_UpgradeWatch.no_hideout_link_on_this')} onClick={() => void travel(lst)}>
                       {lst.hideoutToken ? (demand === lst.id ? tr('wealth_UpgradeWatch.in_demand_teleport_anyway') : tr('wealth_UpgradeWatch.travel_to_hideout')) : tr('wealth_UpgradeWatch.copy_whisper')}
                     </button>
-                    <button type="button" className="w-btn" onClick={() => void window.pom.app.openExternal(cur.scan.link)}>
+                    <button type="button" className="w-btn alt" onClick={() => void window.pom.app.openExternal(cur.scan.link)}>
                       {tr('wealth_UpgradeWatch.open_on_trade_site')}
                       <Icon name="external" size={12} />
                     </button>
@@ -366,6 +382,8 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                       <Icon name="tree" size={14} />
                       {tr('wealth_UpgradeWatch.try_it_on_the_build')}
                     </button>
+                    <button type="button" className="w-link" onClick={() => void window.pom.wealth.upgradeDismiss(key, c.slot, c.key, 'base').then(load)}><Icon name="x" size={12} />{tr('wealth_UpgradeWatch.not_this_base')}</button>
+                    <button type="button" className="w-link" onClick={() => void window.pom.wealth.upgradeDismiss(key, c.slot, c.key, 'price').then(load)}><Icon name="coins" size={12} />{tr('wealth_UpgradeWatch.too_expensive')}</button>
                   </div>
                   {tryOn && (
                     <div className="w-tryon" role="region" aria-label={tr('wealth_UpgradeWatch.try_it_on')}>
@@ -386,13 +404,6 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
                       )}
                     </div>
                   )}
-                  <div className="w-feedback">
-                    <span className="faint">{tr('wealth_UpgradeWatch.not_right')}</span>
-                    <button type="button" className="w-link" onClick={() => void window.pom.wealth.upgradeDismiss(key, c.slot, c.key, 'base').then(load)}><Icon name="x" size={12} />{tr('wealth_UpgradeWatch.not_this_base')}</button>
-                    <span className="faint">·</span>
-                    <button type="button" className="w-link" onClick={() => void window.pom.wealth.upgradeDismiss(key, c.slot, c.key, 'price').then(load)}><Icon name="coins" size={12} />{tr('wealth_UpgradeWatch.too_expensive')}</button>
-                  </div>
-                  <span className="faint">{tr('wealth_UpgradeWatch.the_trade_site_opens_on')}</span>
                 </div>
               </div>
             </div>
@@ -400,17 +411,16 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
         </Panel>
       </div>
 
-      <Panel className="w-wr">
+      {(all.length > 0 || notBetter !== null || showWarn) && <Panel className="w-wr">
         <div className="w-eyebrow"><span>{tr('wealth_UpgradeWatch.recent_matches')}</span></div>
         <div className="w-body">
-          {all.length === 0 && <div className="w-note-line">{tr('wealth_UpgradeWatch.matches_show_here_after_a')}</div>}
           {all.map(({ c: x, scan: sc }) => {
             const g = x.main;
             const art = artFor(x.listing.item.baseType ?? x.listing.item.typeLine, 'bases');
             return (
               <div key={x.key} role="button" tabIndex={0} className="w-wrow" data-on={cur?.c.key === x.key} data-sold={x.sold} onClick={() => { setSel(x.key); setTryOn(false); }} onKeyDown={(e) => e.key === 'Enter' && setSel(x.key)}>
                 <span className="w-wthumb">{art && <img src={art} alt="" draggable={false} />}</span>
-                <span className="w-name"><b>{x.listing.item.name || x.listing.item.typeLine}</b><i>{label(x.slot)} · {ageText(listingAgeMin(x.listing.indexed, now))}{x.copies ? tr('wealth_UpgradeWatch.copies_identical_listings', { copies: x.copies }) : ''}</i></span>
+                <span className="w-name"><b>{x.listing.item.name || x.listing.item.typeLine}</b><i>{label(x.slot)} · {ageText(listingAgeMin(x.listing.indexed, now))}</i></span>
                 <span className="r">{x.priceChaos !== null ? fmt(x.priceChaos) : item(sellerPrice(x.listing.price))}</span>
                 <span className="w-wchip">
                   {x.sold ? <Chip>{tr('wealth_UpgradeWatch.sold_or_removed')}</Chip> : x.held ? <Chip tone="warning">{tr('wealth_UpgradeWatch.held_back')}</Chip> : x.overBudget ? <Chip tone="warning">{tr('wealth_UpgradeWatch.over_budget')}</Chip> : <Chip tone={g && g.delta > 0 ? 'positive' : 'neutral'}>{label(sc.rankLabel)} {gainText(g)}</Chip>}
@@ -419,9 +429,9 @@ export function UpgradeWatch({ s, build, library, onPick, openName, onEquip, onR
             );
           })}
         </div>
-        {view && view.scannedAt && checked > 0 && <div className="w-note-line">{Object.values(scans).reduce((a, x) => a + x.candidates.filter((c) => !c.sold && (c.held || (c.main?.pct ?? -1) * 100 < (rules[x.slot]?.minGainPct ?? 3))).length, 0)} {tr('wealth_UpgradeWatch.checked_listings_were_not_better')}</div>}
-        {view && failedScan && !err && !tradeShown && <div className="w-note-line warn">{failedScan.error ? msg(failedScan.error.message) : ''}</div>}
-      </Panel>
+        {notBetter !== null && <div className="w-note-line">{notBetter} {tr('wealth_UpgradeWatch.checked_listings_were_not_better')}</div>}
+        {showWarn && <div className="w-note-line warn">{failedScan?.error ? msg(failedScan.error.message) : ''}</div>}
+      </Panel>}
     </div>
   );
 }

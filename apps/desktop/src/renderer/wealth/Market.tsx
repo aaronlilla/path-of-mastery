@@ -48,7 +48,7 @@ export function Market({ s }: { s: Wealth }) {
     <div className="w-market">
       <Panel className="w-mcats">
         {MC.map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={ui.mcat === k} className="w-mcat" title={l} onClick={() => { patch({ mcat: k }); setShown(PAGE); }}>
+          <button key={k} type="button" aria-pressed={ui.mcat === k} className="w-mcat" data-empty={counts(k) === 0 ? 'true' : undefined} title={l} onClick={() => { patch({ mcat: k }); setShown(PAGE); }}>
             <ItemIcon name={MC_ICON[k]![0]} cat="other" {...(MC_ICON[k]![1] ? { artCat: MC_ICON[k]![1] } : {})} size={26} />
             <span>{l}</span>
             <i>{counts(k)}</i>
@@ -85,8 +85,8 @@ export function Market({ s }: { s: Wealth }) {
                 <span className="r">{fmt(r.chaos)}</span>
                 <Spark data={r.spark} title={sparkTitle(r.spark, fmt)} />
                 <span className="r" style={{ color: r.spark.length > 1 && Math.abs(c) >= 0.005 ? (c > 0 ? 'var(--positive-text)' : 'var(--negative-text)') : 'var(--text-faint)' }}>{r.spark.length > 1 ? fmtPct(c) : '—'}</span>
-                <span className="r">{h ? h.toLocaleString() : '—'}</span>
-                <span className="r">{h ? fmt(h * r.chaos) : '—'}</span>
+                <span className="r">{h ? h.toLocaleString() : ''}</span>
+                <span className="r">{h ? fmt(h * r.chaos) : ''}</span>
               </div>
             );
           })}
@@ -115,9 +115,7 @@ export function Market({ s }: { s: Wealth }) {
               {sel.spark.length > 1 ? <Chip tone={Math.round(change(sel.spark) * 100) === 0 ? 'neutral' : change(sel.spark) > 0 ? 'positive' : 'negative'}>{tr('wealth_Market.spark_7_days', { spark: fmtPct(change(sel.spark)) })}</Chip> : <Chip>{tr('wealth_Market.new_this_league')}</Chip>}
             </div>
             <LineChart data={sel.spark} height={110} />
-            <div className="w-kv"><span>{tr('wealth_Market.standard_price')}</span><span title={std?.failed ? tr('wealth_Market.poe_ninja_did_not_answer') : tr('wealth_Market.poe_ninja_standard_league')}>{stdText}</span></div>
-            <div className="w-kv"><span>{tr('wealth_Market.price_source')}</span><span>{`poe.ninja · ${w.prices.fetchedAt ? fmtOld(now - w.prices.fetchedAt) : tr('wealth_Market_2.age_unknown')}`}</span></div>
-            {sel.cx && <div className="w-kv"><span>{tr('wealth_Market.ggg_exchange')}</span><span title={tr('wealth_Market.official_currency_exchange_volume_we')}>{cxText(sel.cx, now, fmt)}</span></div>}
+            <div className="w-kv"><span>{tr('wealth_Market.standard_price')}</span><span title={std?.failed ? tr('wealth_Market.poe_ninja_did_not_answer') : tr('wealth_Market.poe_ninja_standard_league')}>{stdText}{sel.cx && <span title={tr('wealth_Market.official_currency_exchange_volume_we')}>{` · ${tr('wealth_Market.ggg_exchange')} ${cxText(sel.cx, now, fmt)}`}</span>}</span></div>
             <div className="w-kv"><span>{tr('wealth_Market.you_have_2')}</span><span>{mh ? `${mh.toLocaleString()} · ${fmt(mine!.value)}` : (mine && mine.versions.length ? tr('wealth_Market.none_of_this_version') : tr('wealth_Market.none'))}</span></div>
             {mine && mine.versions.length > 1 && mine.versions.map((v, i) => (
               <div key={i} className="w-kv"><span>{v.exact ? tr('wealth_Market.this_version') : (v.label ? item(v.label) : tr('wealth_Market.another_version'))}</span><span title={tr('wealth_Market.priced_on_its_own_line')}>{`${v.qty.toLocaleString()} · ${fmt(v.value)}`}</span></div>
@@ -127,7 +125,11 @@ export function Market({ s }: { s: Wealth }) {
               <button type="button" className="w-btn alt" onClick={() => { const on = w.alerts[sel.key] === undefined; void window.pom.wealth.setAlert(sel.key, on).then(() => toast({ text: on ? tr('wealth_Market.alert_set_name_moves_alertpct', { name: sel.name, alertPct: w.alertPct }) : tr('wealth_Market.alert_removed'), kind: 'ok' })); }}>
                 {w.alerts[sel.key] !== undefined ? tr('wealth_Market.alert_on_alertpct', { alertPct: w.alertPct }) : tr('wealth_Market.price_alert')}
               </button>
-              <label className="w-kv" title={tr('wealth_Market.how_far_the_price_must')}><span>{tr('wealth_Market.alert_at')}</span><input type="number" min={0.1} max={100} step={0.5} aria-label={tr('wealth_Market.alert_threshold_percent')} defaultValue={w.alertPct} key={w.alertPct} style={{ width: 56 }} onBlur={(e) => { const v = Number(e.currentTarget.value); if (v > 0) void window.pom.wealth.setAlertPct(v); }} /><span>%</span></label>
+              {w.alerts[sel.key] !== undefined && (
+                <label className="w-alertat" title={tr('wealth_Market.how_far_the_price_must')}><span>{tr('wealth_Market.alert_at')}</span><input type="number" min={0.1} max={100} step={0.5} aria-label={tr('wealth_Market.alert_threshold_percent')} defaultValue={w.alertPct} key={w.alertPct} onBlur={(e) => { const v = Number(e.currentTarget.value); if (v > 0) void window.pom.wealth.setAlertPct(v); }} /><span>%</span></label>
+              )}
+            </div>
+            <div className="w-btns wrap">
               <button type="button" className="w-btn alt" onClick={() => { const on = w.goal !== sel.key; void window.pom.wealth.setGoal(on ? sel.key : null).then(() => toast({ text: on ? tr('wealth_Market.goal_set_name', { name: sel.name }) : tr('wealth_Market.goal_removed'), kind: 'ok' })); }}>
                 {w.goal === sel.key ? tr('wealth_Market.remove_goal') : tr('wealth_Market.set_as_goal')}
               </button>

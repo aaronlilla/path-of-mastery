@@ -125,6 +125,8 @@ export function PortalMenu({ anchor, open, onClose, align = 'left', children, la
     if (!a || !m) return;
     const r = a.getBoundingClientRect();
     // Whole pixels, so the first measure (before the min-width is applied) and every re-measure agree and the menu never drifts a fraction.
+    // Measure at the final cap, not the CSS 320px one, so the flip and the footer limit below use the height the menu really gets.
+    m.style.maxHeight = Math.min(420, window.innerHeight - 16) + 'px';
     const w = Math.max(m.offsetWidth, Math.ceil(r.width), minWidth ?? 0);
     const h = m.offsetHeight;
     let left = align === 'right' ? r.right - w : r.left;
@@ -136,6 +138,8 @@ export function PortalMenu({ anchor, open, onClose, align = 'left', children, la
     const roomAbove = r.top - 6 - 8;
     const flip = below + h > limit && roomAbove >= h;
     const top = flip ? Math.max(8, r.top - 6 - h) : Math.min(below, Math.max(8, limit - h));
+    // Cap after placement to the room it was placed in (above its anchor when flipped, down to the footer or viewport bottom otherwise); only its own list scrolls.
+    m.style.maxHeight = Math.max(120, (flip ? r.top - 6 : limit) - top) + 'px';
     // Snapped to device pixels: a fractional origin lets the text re-rasterise a pixel over when the open animation ends or a re-render lands.
     const dpr = window.devicePixelRatio || 1;
     const snap = (v: number) => Math.round(v * dpr) / dpr;
@@ -196,14 +200,17 @@ export function Select<T extends string>({ value, options, onChange, width = 190
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const trigger = useRef<HTMLButtonElement>(null);
+  const hovered = useRef(false);
   const cur = options.find((o) => o.value === value);
   const idx = Math.max(0, options.findIndex((o) => o.value === value));
   const close = useCallback(() => setOpen(false), []);
   const openMenu = () => {
+    hovered.current = false;
     setActive(idx);
     setOpen(true);
   };
   const onKey = (e: React.KeyboardEvent) => {
+    hovered.current = false;
     if (!open) {
       if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -248,8 +255,9 @@ export function Select<T extends string>({ value, options, onChange, width = 190
             role="option"
             aria-selected={o.value === value}
             data-active={i === active}
+            ref={i === active ? (el) => { if (el && !hovered.current) el.scrollIntoView({ block: 'nearest' }); } : undefined}
             className="menu-item"
-            onMouseEnter={() => setActive(i)}
+            onMouseEnter={() => { hovered.current = true; setActive(i); }}
             onClick={() => {
               onChange(o.value);
               setOpen(false);
@@ -278,6 +286,7 @@ const BADGE: Record<string, [string, string, string]> = {
   share: ['share', 'rgba(var(--accent-rgb),.12)', 'var(--gold-text)'],
   history: ['history', 'rgba(var(--line-rgb),.08)', 'var(--text-2)'],
   save: ['save', 'rgba(var(--accent-rgb),.12)', 'var(--gold-text)'],
+  plus: ['plus', 'rgba(var(--accent-rgb),.12)', 'var(--gold-text)'],
   keyboard: ['keyboard', 'rgba(var(--line-rgb),.08)', 'var(--text-2)'],
   user: ['user', 'rgba(var(--accent-rgb),.12)', 'var(--gold-text)'],
   compare: ['compare', 'rgba(var(--accent-rgb),.12)', 'var(--gold-text)'],
@@ -297,6 +306,8 @@ export interface DialogProps {
   confirmIcon?: string;
   confirmDisabled?: boolean;
   confirmBusy?: boolean;
+  /** Tooltip on the confirm button. */
+  confirmTitle?: string;
   altLabel?: string;
   altIcon?: string;
   altDisabled?: boolean;
@@ -398,7 +409,7 @@ export function Dialog(p: DialogProps) {
                 </button>
               )}
               {confirm !== undefined && (
-                <button type="button" className={'btn ' + (danger ? 'danger' : 'gold')} style={{ minWidth: 96 }} aria-disabled={p.confirmDisabled || undefined} {...(p.focusConfirm ? { 'data-autofocus': '' } : {})} onClick={() => !p.confirmDisabled && p.onConfirm?.()}>
+                <button type="button" className={'btn ' + (danger ? 'danger' : 'gold')} style={{ minWidth: 96 }} title={p.confirmTitle} aria-disabled={p.confirmDisabled || undefined} {...(p.focusConfirm ? { 'data-autofocus': '' } : {})} onClick={() => !p.confirmDisabled && p.onConfirm?.()}>
                   {p.confirmBusy ? <span className="spinner" /> : p.confirmIcon || danger ? <Icon name={p.confirmIcon ?? 'trash'} size={16} /> : null}
                   {confirm}
                 </button>

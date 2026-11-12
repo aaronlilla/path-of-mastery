@@ -141,7 +141,6 @@ const Row = memo(function Row({ r, d, fmt, ex, pv }: { r: SidebarRow; d: [StatSc
         <span style={{ color: r.negative ? 'var(--negative-text)' : r.muted ? 'var(--text-faint)' : 'var(--text-strong)' }}>{r.text}</span>
         {r.suffix && <span className="suffix">({label(r.suffix)})</span>}
         {dt && <span className={'delta ' + (dt.good ? 'up' : 'down')}>{dt.text}</span>}
-        {pv && !pv.chg && <span className="pv-same">{tr('Sidebar.no_change')}</span>}
       </span>
       {pv && pv.chg && (
         <>
@@ -385,6 +384,7 @@ export function Sidebar(p: SidebarProps) {
   }, [!!tip]);
   const tile0 = useRef<HTMLDivElement>(null);
   const tile1 = useRef<HTMLDivElement>(null);
+  const bigRef = useRef<HTMLDivElement>(null);
   const skillBtn = useRef<HTMLDivElement>(null);
   const warnBtn = useRef<HTMLButtonElement>(null);
 
@@ -473,7 +473,7 @@ export function Sidebar(p: SidebarProps) {
       <Rail open={p.drawer} onDrawer={p.onDrawer} nav={p.nav} tiles={railTiles} />
       <div className="sb-full">
       <div style={{ padding: '10px 10px 0', display: 'flex', flexDirection: 'column', gap: 6, flex: 'none' }}>
-        <div ref={skillBtn} className="sb-pick" role="button" tabIndex={0} title={tr('Sidebar.main_skill_and_socket_group')} onClick={() => setSkillOpen((v) => !v)} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSkillOpen((v) => !v)}>
+        <div ref={skillBtn} className="sb-pick" role="button" tabIndex={0} title={tr('Sidebar.main_skill_and_socket_group') + (grp && grp.actives.length <= 1 && grp.actives[0]?.level ? ` · ${grp.actives[0].level}/${grp.actives[0].quality ?? 0}` : '')} onClick={() => setSkillOpen((v) => !v)} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSkillOpen((v) => !v)}>
           <span className="gem">{mainName && artFor(mainName, 'gems') ? <img src={artFor(mainName, 'gems')} alt="" /> : null}</span>
           <span className="txt">
             <span className="cap">{grp ? tr('Sidebar.main_skill_touppercase_link_l', { value: grp.slot ? label(grp.slot).toUpperCase() + ' ' : '', link: grp.link }) : tr('Sidebar.main_skill')}</span>
@@ -487,7 +487,7 @@ export function Sidebar(p: SidebarProps) {
             <button key={g.index} type="button" role="menuitemradio" aria-checked={g.index === p.mainGroup} className="menu-item" onClick={() => { p.onMainGroup(g.index); setSkillOpen(false); }}>
               <span className="grow ellipsis" title={g.summary}><GroupName g={g} info={info} /></span>
               <span className="meta">{tr('Sidebar.link_l', { link: g.link })}</span>
-              {g.index === p.mainGroup && <Icon name="check" size={14} style={{ color: 'var(--gold-text)' }} />}
+              <span className="sb-ck">{g.index === p.mainGroup && <Icon name="check" size={14} style={{ color: 'var(--gold-text)' }} />}</span>
             </button>
           ))}
           <button type="button" className="menu-item" onClick={() => { setSkillOpen(false); p.onOpenSkills(); }}>
@@ -495,7 +495,7 @@ export function Sidebar(p: SidebarProps) {
             <span className="grow">{tr('Sidebar.edit_in_skills')}</span>
           </button>
         </PortalMenu>
-        {grp && grp.actives.length > 1 ? (
+        {grp && grp.actives.length > 1 && (
           <label className="sb-skill">
             <i style={{ background: gemColour(info, mainName), boxShadow: `0 0 8px ${gemColour(info, mainName)}` }} />
             <select aria-label={tr('Sidebar.active_skill_of_the_main')} value={p.mainActive} onChange={(e) => p.onMainActive(p.mainGroup, Number(e.target.value))}>
@@ -504,17 +504,11 @@ export function Sidebar(p: SidebarProps) {
               ))}
             </select>
           </label>
-        ) : (
-          <div className="sb-skill static">
-            <i style={{ background: gemColour(info, mainName), boxShadow: `0 0 8px ${gemColour(info, mainName)}` }} />
-            <span className="ellipsis" title={mainName} style={{ color: gemColour(info, mainName) }}>{mainName ? label(mainName) : '—'}</span>
-            {grp?.actives[0]?.level ? <span className="lv">{grp.actives[0].level}/{grp.actives[0].quality ?? 0}</span> : null}
-          </div>
         )}
         <SidebarSkillControls xml={p.xml} engine={p.engine} view={skillView.view} gem={skillView.gem} mainGroup={p.mainGroup} />
       </div>
 
-      <div className="big" style={{ padding: '8px 10px 6px', position: 'relative' }}>
+      <div className="big" ref={bigRef} style={{ padding: '8px 10px 6px', position: 'relative' }}>
         {([0, 1] as const).map((i) => {
           const t = tiles[i]!;
           const v = tileValue(t.id);
@@ -534,14 +528,13 @@ export function Sidebar(p: SidebarProps) {
                 if (typeof lv !== 'number') return null;
                 const c = pctChange(v.value, lv, 'lowerIsBetter' in v ? (v as SidebarRow).lowerIsBetter : false);
                 const was = Math.abs(lv) >= 1e4 ? formatNumSep(compactNumber(lv), p.fmt) : formatNumSep(sFormat(Math.abs(lv) >= 100 ? '.0f' : '.2f', lv).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, ''), p.fmt);
-                return <span className="pv-tile">{c ? <><span className={c.good ? 'up' : 'down'}>{c.text}</span> <span className="from">{tr('Sidebar.from_was', { was })}</span></> : <span className="from">{tr('Sidebar.no_change')}</span>}</span>;
+                return c ? <span className="pv-tile"><span className={c.good ? 'up' : 'down'}>{c.text}</span> <span className="from">{tr('Sidebar.from_was', { was })}</span></span> : null;
               })()}
             </div>
           );
         })}
-        <PortalMenu anchor={pinOpen === 1 ? tile1 : tile0} open={pinOpen !== null} onClose={() => setPinOpen(null)} label={tr('Sidebar.pinned_stat')} minWidth={300}>
+        <PortalMenu anchor={bigRef} open={pinOpen !== null} onClose={() => setPinOpen(null)} label={tr('Sidebar.pinned_stat')} minWidth={300}>
           <div className="pin-head">
-            <span>{tr('Sidebar.pin_a_stat')}</span>
             <button type="button" onClick={() => savePin(pinOpen ?? 0, null)}><Icon name="reset" size={13} />{tr('Sidebar.reset_to_default')}</button>
           </div>
           <div className="pin-search"><Icon name="search" size={15} /><input autoFocus value={pinQ} onChange={(e) => setPinQ(e.target.value)} placeholder={tr('Sidebar.search_stats')} aria-label={tr('Sidebar.search_stats')} /></div>
@@ -616,11 +609,10 @@ export function Sidebar(p: SidebarProps) {
           <button ref={warnBtn} type="button" className="sb-warn" title={warnings.join('\n')} aria-expanded={warnOpen} onClick={() => setWarnOpen((v) => !v)}>
             <i />
             <span className="n">{tr('Sidebar.count_warnings', { count: warnings.length })}</span>
-            <span className="wtxt">{warnings[0]}</span>
           </button>
-          <PortalMenu anchor={warnBtn} open={warnOpen} onClose={() => setWarnOpen(false)} label={tr('Sidebar.warnings')} minWidth={300}>
+          <PortalMenu anchor={warnBtn} open={warnOpen} onClose={() => setWarnOpen(false)} label={tr('Sidebar.warnings')} minWidth={300} className="menu-wrap">
             {warnings.map((w) => (
-              <div key={w} className="menu-empty" style={{ color: 'var(--negative-text)', textAlign: 'left', whiteSpace: 'normal' }}>{w}</div>
+              <div key={w} className="sb-warn-row"><i />{w}</div>
             ))}
           </PortalMenu>
         </>

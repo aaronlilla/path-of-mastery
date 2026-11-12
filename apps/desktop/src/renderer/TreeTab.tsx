@@ -164,12 +164,12 @@ export function TreeTab(p: TreeTabProps) {
   const [power, setPower] = useState<{ nodes: NodePower[]; max: NonNullable<Awaited<ReturnType<typeof stepPower>>['max']> } | null>(null);
   const [powerProgress, setPowerProgress] = useState<number | null>(null);
   const [report, setReport] = useState(false);
-  // On by default; the last choice is kept like the tips switch.
+  // Off by default; the last choice is kept like the tips switch.
   const [smart, setSmart] = useState(() => {
     try {
-      return localStorage.getItem('pom.smartPathing') !== 'off';
+      return localStorage.getItem('pom.smartPathing') === 'on';
     } catch {
-      return true;
+      return false;
     }
   });
   const [marks, setMarks] = useState<Map<number, Mark>>(() => new Map());
@@ -463,6 +463,8 @@ export function TreeTab(p: TreeTabProps) {
     return { found: r.ids.length, allocated: r.allocated };
   }, [search, ready, tree]);
   const matchCount = searchInfo.found;
+  const foundText = searchInfo.allocated > 0 ? tr('TreeTab.found_allocated', { matchCount, allocated: searchInfo.allocated }) : tr('TreeTab.matchcount_found', { matchCount });
+  const foundTitle = tr('TreeTab.search_found_title', { matchCount, allocated: searchInfo.allocated });
 
   const heatMap = useMemo(() => {
     if (!powerOn || !power) return null;
@@ -475,6 +477,11 @@ export function TreeTab(p: TreeTabProps) {
     }
     return out;
   }, [powerOn, power, powerStat]);
+  // Every edit restarts the ranking and empties `power` for a few seconds; the tree keeps the last heat meanwhile instead of flashing undarkened.
+  const lastHeat = useRef<{ id: string | null; map: NonNullable<typeof heatMap> } | null>(null);
+  if (!powerOn) lastHeat.current = null;
+  else if (heatMap) lastHeat.current = { id: eng.buildId ?? null, map: heatMap };
+  const heatShown = heatMap ?? (lastHeat.current?.id === (eng.buildId ?? null) ? lastHeat.current.map : null);
 
   // The distance limit: All, 5, 10, 15 or a number of the player's own (upstream's Custom).
   const effDepth = customDepth ? Math.max(1, Math.floor(Number(customDepthN) || 0)) || null : depth;
@@ -839,6 +846,16 @@ export function TreeTab(p: TreeTabProps) {
       <TreeSetSelect eng={eng} xml={p.xml} level={header?.level ?? 100} fmt={p.fmt} width={stage >= 3 ? '100%' : 150} onManage={() => { setToolsOpen(false); setManage(true); }} />
     </div>
   );
+  const oldBarOn = !!(barVersion && versionKnown && !barVersion.startsWith(LATEST_TREE_VERSION));
+  // With the older-tree bar showing, the first-click hint stacks above it inside the bottom column instead of floating over the bar's buttons.
+  const hintEl = tipOn && tree && tree.allocated.length < 3 && (
+    <div className={'tt-hint' + (oldBarOn ? ' stacked' : '')} role="status">
+      <Icon name="tree" size={15} />
+      <span>{tr('TreeTab.click_a_node_to_allocate')}</span>
+      <button type="button" className="btn ghost sm" onClick={() => { setTipOn(false); try { localStorage.setItem('pom.treeTip', 'off'); } catch { /* storage is optional */ } }}><Icon name="eye-off" size={14} />{tr('TreeTab.turn_off_tips')}</button>
+      <button type="button" className="icon-btn" aria-label={tr('TreeTab.close')} onClick={() => setTipOn(false)}><Icon name="x" size={14} /></button>
+    </div>
+  );
   const versionField = (
     <div className="tt-field tt-ver">
       <span className="cap">{tr('TreeTab.version')}</span>
@@ -850,6 +867,12 @@ export function TreeTab(p: TreeTabProps) {
         onChange={(v) => v !== version && setConvert({ version: v, busy: false })}
       />
     </div>
+  );
+  const edgeCtl = (
+    <label className="tt-sw" title={tr('TreeTab.show_search_circles_at_viewport')}>
+      <Switch checked={edgeCircles} label={tr('TreeTab.show_search_circles_at_viewport')} onChange={setEdgeCircles} />
+      {tr('TreeTab.edge_circles')}
+    </label>
   );
   const compareCtl = (
     <>
@@ -900,7 +923,7 @@ export function TreeTab(p: TreeTabProps) {
       )}
     </>
   );
-  const powerCtl = (<>{powerSw}{powerDepth}</>);
+  const powerCtl = (<>{powerSw}{powerOn && powerDepth}</>);
   const powerMore = (
     <>
       <Select ariaLabel={tr('TreeTab.node_power_stat')} value={powerStat} options={[{ value: '', label: tr('TreeTab.offence_defence') }, ...POWER_STATS.map((s) => ({ value: s.stat, label: s.label }))]} width={stage > 0 ? '100%' : 150} onChange={setPowerStat} />
@@ -956,10 +979,10 @@ export function TreeTab(p: TreeTabProps) {
           compare={compareState}
           search={search}
           overlay={overlay}
-          heat={powerOn && !!heatMap}
+          heat={powerOn && !!heatShown}
           heatSingle={!!powerStat}
           heatTheme={p.settings.nodePowerColours}
-          power={heatMap}
+          power={heatShown}
           jewelInfo={jewelInfo}
           autoApply
           masteryPicker
@@ -1007,58 +1030,39 @@ export function TreeTab(p: TreeTabProps) {
         {nodeTip}
         {versionUnknown && version && <UnknownVersionCard version={version} />}
         {eng.error && <div className="tt-card tt-old" role="alert"><b>{tr('TreeTab.the_engine_could_not_read')}</b><span>{eng.error}</span></div>}
-        {tipOn && tree && tree.allocated.length < 3 && (
-          <div className="tt-hint" role="status">
-            <Icon name="tree" size={15} />
-            <span>{tr('TreeTab.click_a_node_to_allocate')}</span>
-            <button type="button" className="btn ghost sm" onClick={() => { setTipOn(false); try { localStorage.setItem('pom.treeTip', 'off'); } catch { /* storage is optional */ } }}><Icon name="eye-off" size={14} />{tr('TreeTab.turn_off_tips')}</button>
-            <button type="button" className="icon-btn" aria-label={tr('TreeTab.close')} onClick={() => setTipOn(false)}><Icon name="x" size={14} /></button>
-          </div>
-        )}
+        {!oldBarOn && hintEl}
       </div>
 
       <div className="tt-bottom">
-        {barVersion && versionKnown && !barVersion.startsWith(LATEST_TREE_VERSION) && (
-          <div className="tt-bar tt-oldbar" role="status">
+        {oldBarOn && hintEl}
+        {oldBarOn && barVersion && (
+          <div className="tt-bar tt-oldbar" role="status" title={tr('TreeTab.this_is_an_older_tree')}>
             <i className="dot" />
-            <span className="grow">{tr('TreeTab.this_is_an_older_tree')} <span className="muted">{tr('TreeTab.tree_barversion_v4_latest_barversion', { barVersion: displayOf(barVersion), value: '·', barVersion2: displayOf(latestFor(barVersion)) })}</span></span>
-            <button type="button" className="btn gold" data-lg="control" onClick={() => setConvert({ version: latestFor(barVersion), busy: false })}>
+            <span className="grow">{tr('TreeTab.old_tree_line', { from: displayOf(barVersion), to: displayOf(latestFor(barVersion)) })}</span>
+            <button type="button" className="btn" data-lg="control" onClick={() => setConvert({ version: latestFor(barVersion), busy: false })}>
               <Icon name="refresh" size={15} />{tr('TreeTab.convert_to_barversion', { barVersion: displayOf(latestFor(barVersion)) })}
             </button>
-            <button type="button" className="btn" data-lg="control" onClick={() => setConvertAll(latestFor(barVersion))}>
-              <Icon name="refresh" size={15} />{tr('TreeTab.convert_all_trees_to_latest', { LATEST_TREE_VERSION: displayOf(LATEST_TREE_VERSION) })}
+            <button type="button" className="btn ghost" data-lg="control" onClick={() => setConvertAll(latestFor(barVersion))}>
+              {tr('TreeTab.convert_all_trees_to_latest', { LATEST_TREE_VERSION: displayOf(LATEST_TREE_VERSION) })}
             </button>
           </div>
         )}
         {compareOn && compareState && compareCounts && (
           <div className="tt-bar tt-legend" role="status">
-            <span className="muted">{tr('TreeTab.comparing_with')} <b>{compareName}</b></span>
             <span className="lg"><i className="g" />{tr('TreeTab.only_in_comparename_v4_onlythere', { compareName, value: '·', onlyThere: compareCounts.onlyThere })}</span>
             <span className="lg"><i className="r" />{tr('TreeTab.only_in_activename_v4_onlyhere', { activeName, value: '·', onlyHere: compareCounts.onlyHere })}</span>
             {compareCounts.differ > 0 && <span className="lg"><i className="b" />{tr('TreeTab.different_mastery_or_jewel_v2', { value: '·', differ: compareCounts.differ })}</span>}
           </div>
         )}
-        {search.trim() && (
-          <div className="tt-bar tt-found" role="status">
-            <i className="ring" />
-            <span><b>{tr('TreeTab.tolocalestring_found', { found: searchInfo.found.toLocaleString('en-US') })}</b> {tr('TreeTab.for_v2_trim_v4', { value: '“', search: search.trim(), value2: '”' })}</span>
-            <span className="muted">{tr('TreeTab.v1_tolocalestring_allocated', { value: '·', allocated: searchInfo.allocated.toLocaleString('en-US') })}</span>
-            <span className="grow" />
-            <label className="tt-sw sm">
-              <Switch checked={edgeCircles} label={tr('TreeTab.show_search_circles_at_viewport')} onChange={setEdgeCircles} />
-              {tr('TreeTab.show_search_circles_at_viewport')}
-            </label>
-          </div>
-        )}
 
         {report && powerOn && <PowerReport progress={powerProgress} nodes={power?.nodes ?? null} tree={treeRef.current} stat={powerStat} depthLabel={customDepth ? String(effDepth ?? tr('TreeTab_2.all')) : depth === null ? tr('TreeTab.all') : String(depth)} fmt={p.fmt} onStat={setPowerStat} onFocus={(id) => treeRef.current?.focusNode(id)} onHide={() => setReport(false)} />}
 
-        <div className="tt-dock" data-lg="panel" ref={dockRef} data-stage={stage} data-search={searchOpen && stage >= 2 ? 1 : undefined} data-narrow={compareOn || powerOn ? 1 : undefined}>
+        <div className="tt-dock" data-lg="panel" ref={dockRef} data-stage={stage} data-search={searchOpen && stage >= 2 ? 1 : undefined} data-narrow={stage <= 1 && (compareOn || powerOn) ? 1 : undefined}>
           {searchOpen && stage >= 2 && (
             <div className="tt-search wide">
               <Icon name="search" size={15} />
               <input ref={searchRef} autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); setSearchOpen(false); } }} placeholder={tr('TreeTab.search_the_tree')} title={searchHelp} aria-label={tr('TreeTab.search_the_tree')} spellCheck={false} />
-              {search ? <span className="n">{tr('TreeTab.matchcount_found', { matchCount })}</span> : null}
+              {search ? <span className="n" title={foundTitle}>{foundText}</span> : null}
               <button type="button" className="icon-btn" aria-label={tr('TreeTab.close_search')} onClick={() => setSearchOpen(false)}><Icon name="x" size={14} /></button>
             </div>
           )}
@@ -1072,13 +1076,15 @@ export function TreeTab(p: TreeTabProps) {
                 <div className="tt-search" title={searchHelp}>
                   <Icon name="search" size={15} />
                   <input ref={searchRef} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={tr('TreeTab.search_the_tree')} title={searchHelp} aria-label={tr('TreeTab.search_the_tree')} spellCheck={false} />
-                  {search ? <span className="n">{tr('TreeTab.matchcount_found', { matchCount })}</span> : <kbd className="k">Ctrl F</kbd>}
+                  {search ? <span className="n" title={foundTitle}>{foundText}</span> : <kbd className="k">Ctrl F</kbd>}
                 </div>
               ) : (
-                <button type="button" className="btn icon" data-lg="control" aria-label={tr('TreeTab.search_the_tree')} title={searchHelp} onClick={() => setSearchOpen(true)}>
+                <button type="button" className="btn icon" data-lg="control" aria-label={tr('TreeTab.search_the_tree')} aria-pressed={!!search.trim()} title={search.trim() ? foundTitle : searchHelp} onClick={() => setSearchOpen(true)}>
                   <Icon name="search" size={15} />
+                  {search.trim() ? <span className="tt-sn">{matchCount}</span> : null}
                 </button>
               )}
+              {stage === 0 && search.trim() && edgeCtl}
               {stage === 0 && timelessBtn}
               {stage === 0 ? powerCtl : powerSw}
               {stage === 0 && powerOn && !report && powerMore}
@@ -1092,9 +1098,10 @@ export function TreeTab(p: TreeTabProps) {
                   <PortalMenu anchor={toolsBtn} open={toolsOpen} onClose={() => setToolsOpen(false)} label={tr('TreeTab.tools')} minWidth={322} align="right" className="tt-toolsmenu">
                     <div className="tt-tools-pane">
                       {stage >= 3 && (<>{specField}{versionField}</>)}
-                      <div className="bw-menu-cap">{tr('TreeTab.tree_tools')}</div>
+                      {stage >= 3 && <div className="tt-sep" />}
                       {compareCtl}
-                      <div className="tt-trow">{powerDepth}</div>
+                      {edgeCtl}
+                      <div className="tt-trow"><span className="tt-lbl">{tr('TreeTab.node_power_range')}</span>{powerDepth}</div>
                       {powerOn && !report && powerMore}
                       <div className="tt-sep" />
                       <button type="button" role="menuitem" className="menu-item" onClick={() => { setToolsOpen(false); setTimeless(true); }}>
@@ -1109,7 +1116,7 @@ export function TreeTab(p: TreeTabProps) {
               )}
               <span className="grow" />
               <div className="tt-split">
-                <button type="button" className={'btn lg' + (smart ? ' gold' : '') + (stage >= 3 ? ' icon' : '')} aria-pressed={smart} aria-label={tr('TreeTab.smart_pathing')} title={tr('TreeTab.on_click_a_node_to')} onClick={toggleSmart}>
+                <button type="button" className={'btn lg' + (stage >= 3 ? ' icon' : '')} aria-pressed={smart} aria-label={tr('TreeTab.smart_pathing')} title={tr('TreeTab.on_click_a_node_to')} onClick={toggleSmart}>
                   <Icon name="path" size={15} />{stage < 3 && tr('TreeTab.smart_pathing')}
                 </button>
               </div>

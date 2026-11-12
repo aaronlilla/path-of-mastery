@@ -3,7 +3,6 @@ import { fmtChaos, fmtDuration, type InboxEntry, type WealthView } from '../../s
 import { fmtAgo, fmtOld, msg } from './mainText';
 import { boardOpen } from '../../shared/bulk.js';
 import { Dialog, Icon, useDismiss, useToast } from '../ui.js';
-import { ArchivePanel } from '../documents/ArchivePanel';
 import { Board } from './Board.js';
 import { CONNECTION_EVENT, ConnectionCheck } from './ConnectionCheck.js';
 import { FirstLoad } from './FirstLoad.js';
@@ -192,8 +191,7 @@ function WealthBar({ s, showFirst, onPickBuild }: { s: Wealth; showFirst: boolea
         ))}
       </nav>
       <span className="w-right" data-r="w-right">
-        <WealthArchive v={v} />
-        <StashSearch q={ui.q} onChange={(q) => patch({ q, tab: 'all' })} onEnter={() => go('stash')} />
+        {ui.sub !== 'stash' && <StashSearch q={ui.q} onChange={(q) => patch({ q, tab: 'all' })} onEnter={() => go('stash')} />}
         {run && !showFirst && (
           <span className="w-chip-sess">
             <i />
@@ -204,7 +202,7 @@ function WealthBar({ s, showFirst, onPickBuild }: { s: Wealth; showFirst: boolea
             </button>
           </span>
         )}
-        {hasNumber && (
+        {hasNumber && ui.sub !== 'overview' && (
           <button type="button" className="w-nwchip" onClick={() => go('overview')} title={noPrices ? tr('wealth_WealthApp.no_prices_are_loaded_so') : tr('wealth_WealthApp.net_worth_low_end_of')}>
             <b>{noPrices ? tr('wealth_WealthApp.no_prices') : tr('wealth_WealthApp.tofixed_div', { value: (v.networth / v.divine).toFixed(1) })}</b>
             {delta !== 0 && <span style={{ color: delta > 0 ? 'var(--positive-text)' : 'var(--negative-text)' }}>{delta > 0 ? '▲' : '▼'} {fmtChaos(Math.abs(delta), v.divine)}</span>}
@@ -247,36 +245,20 @@ function DisconnectChip({ account }: { account: string }) {
   );
 }
 
-/**
- * Archive in the Wealth bar. Wealth keeps one league at a time (the connected one) and its net worth points and sessions carry no league
- * stamp, so there is nothing old to list: the panel says what Wealth holds instead of inventing a split.
- */
-function WealthArchive({ v }: { v: WealthView }) {
-  const [open, setOpen] = useState(false);
-  const league = v.sync.league;
-  return (
-    <>
-      <button type="button" className="w-btn alt" onClick={() => setOpen(true)}><Icon name="history" size={14} />{tr('wealth_WealthApp.archive')}</button>
-      {open && <ArchivePanel area="Wealth" current={league || tr('wealth_WealthApp_2.the_current_league')} rows={[]} onClose={() => setOpen(false)}
-        emptyText={tr('wealth_WealthApp.no_archived_leagues_wealth_keeps')}
-        note={league ? `Wealth holds ${league}: ${v.series.length} net worth ${v.series.length === 1 ? 'point' : 'points'} and ${v.sessions.length} ${v.sessions.length === 1 ? 'session' : 'sessions'}. They are not stamped with a league.` : tr('wealth_WealthApp.no_path_of_exile_account')} />}
-    </>
-  );
-}
-
-/** The stash search in the bar: the Enter hint shows only when the box is wide enough to hold it whole. */
+/** The stash search in the bar: the Enter hint shows only when the box is wide enough to hold it whole, and the box hides when other chips squeeze it under 90px. */
 function StashSearch({ q, onChange, onEnter }: { q: string; onChange: (q: string) => void; onEnter: () => void }) {
   const ref = useRef<HTMLInputElement>(null);
   const [wide, setWide] = useState(false);
+  const [tiny, setTiny] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setWide(el.clientWidth >= 290));
+    const ro = new ResizeObserver(() => { setWide(el.clientWidth >= 290); setTiny(el.clientWidth < 90); });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
   return (
-    <span className="w-bsearch" data-r="w-search">
+    <span className="w-bsearch" data-r="w-search" data-tiny={tiny || undefined}>
       <input ref={ref} value={q} onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && onEnter()} placeholder={wide ? tr('wealth_WealthApp.search_your_stash_enter_to') : tr('wealth_WealthApp.search_your_stash')} aria-label={tr('wealth_WealthApp.search_your_stash')} title={tr('wealth_WealthApp.enter_opens_stash_with_the')} spellCheck={false} />
     </span>
   );

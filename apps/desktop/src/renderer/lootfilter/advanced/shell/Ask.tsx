@@ -18,12 +18,12 @@ export function InboxMenu({ at, nav, onClose }: { at: { x: number; y: number }; 
   };
   return (
     <FloatMenu at={at} onClose={onClose} width={400} label={tr('lootfilter_advanced_shell_Ask.adapt_inbox')}>
-      <div style={{ padding: '6px 8px', display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <div style={{ padding: 'var(--s-3) var(--s-5)', display: 'flex', flexDirection: 'column', gap: 1 }}>
         <span style={{ color: 'var(--text-strong)', font: '600 14px Geist' }}>{tr('lootfilter_advanced_shell_Ask.notices')}</span>
-        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{count ? tr('lootfilter_advanced_shell_Ask.count_suggestions', { count: count }) : tr('lootfilter_advanced_shell_Ask.nothing_new')}</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{count ? (newer && count > 1 ? tr('lootfilter_advanced_shell_Ask.shown_here_count_in_the_inbox', { count }) : tr('lootfilter_advanced_shell_Ask.count_suggestions', { count: count })) : tr('lootfilter_advanced_shell_Ask.nothing_new')}</span>
       </div>
       {newer && (
-        <div style={{ padding: 10, borderRadius: 10, background: 'rgba(var(--shadow-rgb),calc(.25*var(--shadow-k)))', display: 'flex', flexDirection: 'column', gap: 6, margin: '0 2px 4px' }}>
+        <div style={{ padding: 10, borderRadius: 10, background: 'rgba(var(--shadow-rgb),calc(.25*var(--shadow-k)))', display: 'flex', flexDirection: 'column', gap: 6, margin: '0 0 var(--s-2)' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{tr('lootfilter_advanced_shell_Ask.neversink')}</span>
           <span style={{ color: 'var(--text-strong)', lineHeight: 1.4 }}>{tr('lootfilter_advanced_shell_Ask.neversink_tag_is_out_you', { tag: newer.tag, baseVersion: lf.baseVersion })}</span>
           <div style={{ display: 'flex' }}>
@@ -34,8 +34,7 @@ export function InboxMenu({ at, nav, onClose }: { at: { x: number; y: number }; 
           </div>
         </div>
       )}
-      <div style={{ padding: '4px 10px 8px', color: 'var(--text-muted)', fontSize: 12.5, lineHeight: 1.5 }}>{tr('lootfilter_advanced_shell_Ask.suggestions_come_from_neversink_rele')}</div>
-      <button type="button" className="adv-sh-btn sm" style={{ margin: '0 2px 2px' }} onClick={() => go('adapt')}>
+      <button type="button" className="adv-sh-btn sm" style={{ margin: '0 0 var(--s-1)' }} title={tr('lootfilter_advanced_shell_Ask.suggestions_come_from_neversink_rele')} onClick={() => go('adapt')}>
         <Icon name="inbox" size={14} />
         {tr('lootfilter_advanced_shell_Ask.open_full_inbox')}
       </button>

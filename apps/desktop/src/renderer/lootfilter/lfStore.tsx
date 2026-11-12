@@ -496,13 +496,17 @@ export function LootFilterProvider({ build, children }: { build: OpenBuild | nul
     [commitState],
   );
 
-  const undo = useCallback(() => {
+  const undoNow = useCallback(() => {
     const last = past[past.length - 1];
     if (!doc || !last) return;
     setFuture((f) => [...f, snapshotOf(doc, last.label)]);
     setPast(past.slice(0, -1));
     restore(last);
   }, [doc, past, restore]);
+  // A toast's Undo button is built before the edit it belongs to lands; a stable undo that reads the latest history keeps it from undoing the change before.
+  const undoRef = useRef(undoNow);
+  undoRef.current = undoNow;
+  const undo = useCallback(() => undoRef.current(), []);
   const redo = useCallback(() => {
     const next = future[future.length - 1];
     if (!doc || !next) return;

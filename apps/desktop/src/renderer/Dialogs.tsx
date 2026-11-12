@@ -63,23 +63,22 @@ export function AboutDialog({ version, engineVersion, interfaceVersion, platform
   );
   const help = HELP.filter((h) => !query || h.head.toLowerCase().includes(query) || h.body.toLowerCase().includes(query));
   return (
-    <Dialog size="medium" width={820} title={tr('Dialogs.about')} cancelLabel={null} confirmLabel={tr('Dialogs.close')} confirmIcon="x" onCancel={onClose} onConfirm={onClose}>
+    <Dialog size="medium" width={820} title={tr('Dialogs.about')} cancelLabel={null} confirmLabel={null} onCancel={onClose} onConfirm={onClose}>
       <div className="about" style={{ display: 'flex', flexDirection: 'column', gap: 14 }} data-screen-label="About / Dialog / Version history">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div className="about-brand">
             <img className="about-logo" src={crest} alt="" />
             <span className="about-name">{tr('Dialogs.path_of_mastery')}</span>
           </div>
-          <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>{tr('Dialogs.version_version', { version })}</span>
           <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>{tr('Dialogs.engine_v_engineversion_interface_v', { engineVersion: layer(engineVersion), interfaceVersion: layer(interfaceVersion), version })}</span>
         </div>
         <div style={{ color: 'var(--text-2)', lineHeight: 1.5 }}>
-          <div>{tr('Dialogs.plan_level_and_loot_a')}</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{tr('Dialogs.calculated_on_your_pc_the')}</div>
           <button type="button" className="link-btn" style={{ color: 'var(--gold-text)', textDecoration: 'underline', textUnderlineOffset: 3 }} onClick={onOpenSite}>{tr('Dialogs.website_pathofmastery_gg')}</button>
           <button type="button" className="link-btn" style={{ color: 'var(--gold-text)', textDecoration: 'underline', textUnderlineOffset: 3, display: 'block' }} onClick={onFeedback}>{tr('Dialogs.send_feedback')}</button>
         </div>
-        <div className="about-credits" style={{ display: 'flex', gap: 28, flexWrap: 'wrap', color: 'var(--text-2)', fontSize: 13, lineHeight: 1.5 }}>
+        <details>
+          <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: 13 }}>{tr('Dialogs.credits_and_licences')}</summary>
+        <div className="about-credits" style={{ marginTop: 8, display: 'flex', gap: 28, flexWrap: 'wrap', color: 'var(--text-2)', fontSize: 13, lineHeight: 1.5 }}>
           <div>
             <b style={{ color: 'var(--text-display)' }}>{tr('Dialogs.credits')}</b>
             <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
@@ -93,8 +92,9 @@ export function AboutDialog({ version, engineVersion, interfaceVersion, platform
             </ul>
           </div>
         </div>
+        </details>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div className="seg" data-lg="tile">
+          <div className="seg tall" data-lg="tile">
             <button type="button" aria-pressed={tab === 'history'} onClick={() => setTab('history')}>{tr('Dialogs.version_history')}</button>
             <button type="button" aria-pressed={tab === 'help'} onClick={() => setTab('help')}>
               <Icon name="help" size={15} />
@@ -102,15 +102,15 @@ export function AboutDialog({ version, engineVersion, interfaceVersion, platform
             </button>
           </div>
           <span style={{ flex: 1 }} />
-          <div className="lib-search" style={{ flex: 'none', width: 240, height: 34, borderRadius: 10, padding: '0 12px' }}>
+          <div className="lib-search" style={{ flex: 'none', width: 240, height: 'var(--control-h)', borderRadius: 10, padding: '0 12px' }}>
             <Icon name="search" size={16} />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tab === 'history' ? tr('Dialogs.search_changelog') : tr('Dialogs.search_help')} spellCheck={false} aria-label={tr('Dialogs.search')} />
           </div>
         </div>
-        <div className="tile-box scroll-y" data-lg="tile" style={{ maxHeight: 360, padding: '16px 18px', display: 'flex', flexDirection: 'column' }}>
+        <div className="scroll-y" style={{ maxHeight: 360, padding: '14px 0 0', borderTop: '1px solid rgba(var(--line-rgb),.07)', display: 'flex', flexDirection: 'column' }}>
           {tab === 'history' &&
             log.map((c, i) => (
-              <section key={c.version} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: i === 0 ? '0 0 16px' : '16px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(var(--line-rgb),.07)' }}>
+              <section key={c.version} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: `${i === 0 ? 0 : 16}px 0 ${i === log.length - 1 ? 0 : 16}px`, borderTop: i === 0 ? 'none' : '1px solid rgba(var(--line-rgb),.07)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ font: "600 20px/1.2 'Cormorant Garamond',serif", color: 'var(--text-display)' }}>{tr('Dialogs.version_version', { version: c.version })}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{c.date}</span>
@@ -157,7 +157,7 @@ const SHORTCUTS: { head: string; rows: [string, string][] }[] = [
 
 export function ShortcutsDialog({ onClose }: { onClose: () => void }) {
   return (
-    <Dialog size="medium" icon="keyboard" title={tr('Dialogs.keyboard_shortcuts')} cancelLabel={null} confirmLabel={tr('Dialogs.close')} confirmIcon="x" onCancel={onClose} onConfirm={onClose}>
+    <Dialog size="medium" icon="keyboard" title={tr('Dialogs.keyboard_shortcuts')} cancelLabel={null} confirmLabel={null} onCancel={onClose} onConfirm={onClose}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18, paddingTop: 6 }}>
         {SHORTCUTS.map((g) => (
           <section key={g.head}>
@@ -184,7 +184,7 @@ export function NameDialog({ title, label, value, confirmLabel, icon = 'folder',
       <label className="field-label">
         <span className="lbl">{label}</span>
         <input className={'input' + (error ? ' bad' : '')} value={v} onChange={(e) => setV(e.target.value)} maxLength={120} spellCheck={false} aria-label={label} />
-        <span className={'field-msg' + (error ? ' bad' : '')}>{error ?? ''}</span>
+        {error && <span className="field-msg bad">{error}</span>}
       </label>
     </Dialog>
   );
@@ -231,14 +231,14 @@ export function SaveAsDialog({ name, folder, folders, error, onSave, onCancel }:
     <Dialog icon="save" title={tr('Dialogs.save_as')} confirmLabel={tr('Dialogs.save')} confirmIcon="save" confirmDisabled={!n.trim()} onCancel={onCancel} onConfirm={() => onSave(n.trim(), f)}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <label className="field-label">
-          <span className="lbl">{tr('Dialogs.enter_new_build_name')}</span>
+          <span className="lbl">{tr('Dialogs.build_name')}</span>
           <input className={'input' + (error ? ' bad' : '')} value={n} onChange={(e) => setN(e.target.value)} maxLength={120} spellCheck={false} aria-label={tr('Dialogs.build_name')} />
         </label>
         <label className="field-label">
           <span className="lbl">{tr('Dialogs.folder')}</span>
           <Select ariaLabel={tr('Dialogs.folder')} width="100%" value={f} options={options} onChange={setF} />
         </label>
-        <span className={'field-msg' + (error ? ' bad' : '')}>{error ?? ''}</span>
+        {error && <span className="field-msg bad">{error}</span>}
       </div>
     </Dialog>
   );
@@ -251,7 +251,7 @@ export function NewBuildDialog({ initialClass, onCreate, onCancel, busy }: { ini
   const [name, setName] = useState('');
   const placeholder = tr('Dialogs.new_cls_build', { cls });
   return (
-    <Dialog size="medium" icon="save" title={tr('Dialogs.new_build')} subtitle={tr('Dialogs.pick_a_class_you_choose')} confirmLabel={tr('Dialogs.create_build')} confirmIcon="plus" confirmBusy={busy} onCancel={onCancel} onConfirm={() => onCreate(cls, name.trim() || placeholder)}>
+    <Dialog size="medium" icon="plus" title={tr('Dialogs.new_build')} subtitle={tr('Dialogs.pick_a_class_you_choose')} confirmLabel={tr('Dialogs.create_build')} confirmIcon="plus" confirmBusy={busy} onCancel={onCancel} onConfirm={() => onCreate(cls, name.trim() || placeholder)}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div className="class-grid" role="radiogroup" aria-label={tr('Dialogs.class')} onKeyDown={(e) => { if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); e.stopPropagation(); onCreate(cls, name.trim() || placeholder); } }}>
           {CLASSES.map((c) => (
@@ -275,7 +275,7 @@ export function NewBuildDialog({ initialClass, onCreate, onCancel, busy }: { ini
 export function TrashDialog({ items, onRestore, onPurge, onEmpty, onClose }: { items: TrashEntry[]; onRestore: (t: TrashEntry) => void; onPurge: (t: TrashEntry) => void; onEmpty: () => void; onClose: () => void }) {
   return (
     <Dialog size="medium" icon="trash" title={tr('Dialogs.recently_deleted')} subtitle={tr('Dialogs.builds_stay_here_for_30')} cancelLabel={null} confirmLabel={tr('Dialogs.close')} confirmIcon="x" onCancel={onClose} onConfirm={onClose} altLabel={items.length ? tr('Dialogs.empty') : undefined} altIcon="trash" onAlt={onEmpty}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minHeight: 80 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {items.length === 0 && <span style={{ color: 'var(--text-muted)', padding: '16px 0' }}>{tr('Dialogs.nothing_has_been_deleted_lately')}</span>}
         {items.map((t) => (
           <div key={t.token} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 48, borderTop: '1px solid rgba(var(--line-rgb),.06)' }}>

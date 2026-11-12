@@ -178,7 +178,7 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
     if (party.showAdvanced) {
       return (
         <div className="pty-raw" style={{ opacity: dim }}>
-          <span className="h">{TITLES[f]} <span className="m">{tr('PartyTab.raw_values')}</span></span>
+          <span className="h">{TITLES[f]}{f !== 'stats' && f !== 'enemyCond' && <> <span className="m">{tr('PartyTab.raw_values')}</span></>}</span>
           <textarea
             value={v}
             rows={Math.max(2, Math.min(8, v.split('\n').length))}
@@ -195,8 +195,8 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
     if (!always) return null;
     return (
       <div className="pty-raw" style={{ opacity: dim }}>
-        <span className="h">{TITLES[f]} <span className="m">{tr('PartyTab.raw_values')}</span></span>
-        {party[f].trim() ? <div className="pty-view">{party[f]}</div> : <div className="pty-rule" />}
+        <span className="h">{TITLES[f]}{f !== 'stats' && f !== 'enemyCond' && <> <span className="m">{tr('PartyTab.raw_values')}</span></>}</span>
+        {party[f].trim() ? <div className="pty-view">{party[f]}</div> : null}
       </div>
     );
   };
@@ -222,9 +222,9 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
         <span className="h">
           {TITLES[f]}
           {limit !== null && <span className="m">{tr('PartyTab.curse_limit_limit', { limit })}</span>}
+          {!rows.length && !emptyWhy(f) && <span className="m">{tr('PartyTab.none_yet')}</span>}
         </span>
-        {!rows.length && <div className="pty-rule" />}
-        {!rows.length && (emptyWhy(f) ?? <span className="pty-none">{tr('PartyTab.none_yet')}</span>)}
+        {!rows.length && emptyWhy(f)}
         <div className="pty-rows">
           {rows.map((r, i) => {
             const isGem = f !== 'enemyMods' && r.name !== 'extraAura' && r.name !== 'otherEffects';
@@ -255,16 +255,8 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
     <div className="tabroot pc" data-screen-label="Party / Tab / Content">
       <div className="pty-grid" data-r="party-grid">
         <div className="gl pty-col">
-          <span className="pty-note">
-            {tr('PartyTab.to_import_a_build_it')}
-            <br />
-            {tr('PartyTab.auras_with_the_highest_effect')}
-            <br />
-            <br />
-            {tr('PartyTab.all_of_these_effects_can')}
-          </span>
+          <span className="pty-note">{tr('PartyTab.to_import_a_build_it')}</span>
           {!ready && <span className="pty-warn"><Icon name="warning" size={13} />{tr('PartyTab.the_calculation_engine_has_not')}</span>}
-          <span style={{ color: 'var(--text)' }}>{tr('PartyTab.enter_a_build_code_url')}</span>
           <div className="pty-line">
             <div className={'lib-search pty-in ' + ((read.state === 'ok' || read.state === 'link') ? 'good' : message.tone === 'bad' ? 'bad' : '')} data-lg="tile">
               <input
@@ -275,6 +267,7 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
                 }}
                 placeholder={tr('PartyTab.build_code_or_url')}
                 aria-label={tr('PartyTab.build_code_or_url')}
+                title={tr('PartyTab.auras_with_the_highest_effect') + ' ' + tr('PartyTab.all_of_these_effects_can')}
                 spellCheck={false}
               />
               {url && (
@@ -283,14 +276,29 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
                 </button>
               )}
             </div>
-            {message.text && (
-              <span className="pty-msg" style={{ color: message.tone === 'good' ? 'var(--positive)' : message.tone === 'bad' ? 'var(--negative-text)' : 'var(--text-muted)' }}>
-                {message.tone === 'good' && <Icon name="check-circle" size={12} />}
-                {message.tone === 'bad' && <Icon name="error" size={12} />}
-                {message.text}
-              </span>
-            )}
+            <CapSelect
+              caption={tr('PartyTab.destination')}
+              valueLabel={destLabel}
+              value={party.destination}
+              options={destOptions}
+              width={150}
+              ariaLabel={tr('PartyTab.destination_for_import_and_clear')}
+              title={tr('PartyTab.destination_for_import_clear_current')}
+              onChange={(v) => void apply({ ...party, destination: v as PartyDestination })}
+              disabled={!ready || busy !== null}
+            />
+            <button type="button" className={'btn pty-imp ' + (canImport ? 'gold' : '')} aria-disabled={!canImport || undefined} onClick={() => void doImport()}>
+              {busy === 'import' ? <span className="spinner" /> : <Icon name="import" size={16} />}
+              {busy === 'import' ? tr('PartyTab.importing') : tr('PartyTab.import')}
+            </button>
           </div>
+          {message.text && (
+            <span className="pty-msg" style={{ color: message.tone === 'good' ? 'var(--positive)' : message.tone === 'bad' ? 'var(--negative-text)' : 'var(--text-muted)' }}>
+              {message.tone === 'good' && <Icon name="check-circle" size={12} />}
+              {message.tone === 'bad' && <Icon name="error" size={12} />}
+              {message.text}
+            </span>
+          )}
           {read.state === 'ok' && (
             <>
               <ImportPreview d={read.d} />
@@ -298,21 +306,6 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
             </>
           )}
           <div className="pty-line">
-            <CapSelect
-              caption={tr('PartyTab.destination')}
-              valueLabel={destLabel}
-              value={party.destination}
-              options={destOptions}
-              width={170}
-              ariaLabel={tr('PartyTab.destination_for_import_and_clear')}
-              title={tr('PartyTab.destination_for_import_clear_current')}
-              onChange={(v) => void apply({ ...party, destination: v as PartyDestination })}
-              disabled={!ready || busy !== null}
-            />
-            <button type="button" className={'btn ' + (canImport ? 'gold' : '')} aria-disabled={!canImport || undefined} style={{ width: 120, ...(canImport ? {} : { background: 'rgba(var(--line-rgb),.03)', boxShadow: 'none', color: 'var(--text-disabled)', cursor: 'default' }) }} onClick={() => void doImport()}>
-              {busy === 'import' ? <span className="spinner" /> : <Icon name="import" size={16} />}
-              {busy === 'import' ? tr('PartyTab.importing') : tr('PartyTab.import')}
-            </button>
             <SwitchRow checked={party.append} label={tr('PartyTab.append')} title={tr('PartyTab.this_sets_the_import_button')} onChange={(v) => void apply({ ...party, append: v })} disabled={!ready || busy !== null} />
             <button type="button" className="btn" data-lg="control" disabled={!nClear || busy !== null} title={tr('PartyTab.clears_all_the_party_tab')} style={{ opacity: nClear ? 1 : 0.5 }} onClick={clearDest}>
               <Icon name="x" size={16} />
@@ -321,7 +314,7 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
           </div>
           <div className="pty-line">
             <SwitchRow checked={party.showAdvanced} label={tr('PartyTab.show_advanced_info')} title={tr('PartyTab.this_shows_the_advanced_info')} onChange={(v) => void apply({ ...party, showAdvanced: v })} disabled={!ready || busy !== null} />
-            <span style={{ flex: 1 }} />
+            <div className="pty-grp">
             <button
               type="button"
               className="btn"
@@ -333,10 +326,10 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
               <Icon name={party.disabled ? 'eye' : 'eye-off'} size={16} />
               {party.disabled ? tr('PartyTab.enable_party_effects') : tr('PartyTab.disable_party_effects')}
             </button>
-            <button type="button" className="btn" data-lg="control" disabled={!ready || busy !== null} title={tr('PartyTab.reparse_all_the_inputs_in')} onClick={() => void rebuild()}>
+            <button type="button" className="btn" data-lg="control" disabled={!ready || busy !== null} title={tr('PartyTab.rebuild_all') + ' · ' + tr('PartyTab.reparse_all_the_inputs_in')} aria-label={tr('PartyTab.rebuild_all')} onClick={() => void rebuild()}>
               <Icon name="refresh" size={16} />
-              {tr('PartyTab.rebuild_all')}
             </button>
+            </div>
           </div>
           {off && (
             <span className="pty-warn">
@@ -349,7 +342,7 @@ export function PartyTab({ xml, ready, onEdit, onUndo }: PartyTabProps) {
           {section('warcries', false)}
           {section('links', false)}
         </div>
-        <div className="gl pty-col" style={{ gap: 14 }}>
+        <div className="gl pty-col">
           {rawBox('stats', true)}
           {rawBox('enemyCond', true)}
           {section('enemyMods', true)}

@@ -142,7 +142,7 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
     <div className={'w-stash' + (sel ? ' sel' : '')}>
       <Panel className="w-rail">
         <div className="w-eyebrow">
-          <span>{tr('wealth_Stash.tabs_counted_of_length_counted', { counted, count: w.tabs.length })}</span>
+          <span title={tr('wealth_Stash.tick_a_tab_to_count')}>{tr('wealth_Stash.tabs_counted_of_length_counted', { counted, count: w.tabs.length })}</span>
         </div>
         <div className="w-rail-list">
           {w.tabs.map((t) => (
@@ -150,12 +150,11 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
               <Cb on={t.counted && t.readable} label={tr('wealth_Stash.count_name', { name: t.name })} onClick={(e) => toggleTab(t, e)} />
               <i className="w-tab-bar" style={{ background: t.colour }} />
               <ItemIcon name={tabArt(t)[0]} cat={tabArt(t)[2]} size={26} {...(tabArt(t)[1] ? { artCat: tabArt(t)[1] } : {})} />
-              <span className="w-name" title={t.readable ? (t.counted ? tr('h_c_Wl.tab_tip_counted', { n: t.items.toLocaleString(), value: fmt(t.value) }) : tr('h_c_Wl.tab_tip_uncounted', { n: t.items.toLocaleString() })) : tr('wealth_Stash.cannot_be_read_why', { why: item(t.why ?? 'not readable') })}><span className="w-tn">{t.name}</span>{!t.readable ? <i style={{ color: 'var(--warning)' }}>{t.why ? item(t.why) : t.why}</i> : !t.counted && <i>{tr('wealth_Stash.not_counted')}</i>}</span>
-              <span className="r" style={{ color: t.counted ? 'var(--text-strong)' : 'var(--text-faint)' }}>{t.readable && t.counted ? (w.prices.lines === 0 ? '—' : fmt(t.value)) : ''}</span>
+              <span className="w-name" title={t.readable ? (t.counted ? tr('h_c_Wl.tab_tip_counted', { n: t.items.toLocaleString(), value: fmt(t.value) }) : tr('h_c_Wl.tab_tip_uncounted', { n: t.items.toLocaleString() })) : tr('wealth_Stash.cannot_be_read_why', { why: item(t.why ?? 'not readable') })}><span className="w-tn">{t.name}</span></span>
+              <span className="r" style={{ color: t.counted ? 'var(--text-strong)' : 'var(--text-faint)' }}>{t.readable && t.counted ? (w.prices.lines === 0 ? '—' : fmt(t.value)) : !t.readable ? <i className="w-tab-st" style={{ color: 'var(--warning)' }} title={t.why ? item(t.why) : undefined}>{t.why ? item(t.why) : ''}</i> : <i className="w-tab-st">{tr('wealth_Stash.not_counted')}</i>}</span>
             </div>
           ))}
         </div>
-        <div className="w-rail-foot">{tr('wealth_Stash.tick_a_tab_to_count')}</div>
       </Panel>
       <Panel className="w-tbl">
         <div className="w-tool">
@@ -171,9 +170,8 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
             ))}
           </div>
           <span className="grow" />
-          <button type="button" className="w-btn alt sm" onClick={exportCsv}>
+          <button type="button" className="w-btn alt sm" aria-label={tr('wealth_Stash.export_csv')} title={tr('wealth_Stash.export_csv')} onClick={exportCsv}>
             <Icon name="export" size={14} />
-            <span className="lbl">{tr('wealth_Stash.export_csv')}</span>
           </button>
           <button type="button" className="w-btn sm" onClick={() => (sellable.length ? patch({ sell: sellable.map((r) => r.key) }) : toast({ text: ui.q.trim() || ui.cat !== 'all' || ui.tab !== 'all' ? tr('wealth_Stash.nothing_priced_to_sell_clear') : tr('wealth_Stash.nothing_priced_to_sell_yet'), kind: 'error' }))}>
             {tr(sellable.length === 1 ? 'h_c_Wl.sell_item' : 'h_c_Wl.sell_items', { n: sellable.length, total: fmt(sellable.reduce((a, r) => a + (r.unit ?? 0) * r.qty, 0)) })}
@@ -205,7 +203,7 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
                 <span className="r" title={r.unit === null ? (r.why ? msg(r.why) : tr('wealth_Stash.no_price')) : r.hi ? tr('wealth_Stash.unit_to_hi', { unit: fmt(r.unit), hi: fmt(r.hi) }) : fmt(r.unit)}>{r.unit === null ? <em className="w-np">{tr('wealth_Stash.no_price')}</em> : r.hi ? `${fmt(r.unit)} – ${fmt(r.hi)}` : fmt(r.unit)}</span>
                 <span className="r" title={r.unit === null ? '' : fmt(r.unit * r.qty)}>{r.unit === null ? '—' : fmt(r.unit * r.qty)}</span>
                 <Spark data={r.spark} title={sparkTitle(r.spark, fmt)} />
-                <span className="w-cell">{r.unit === null ? <Chip tone="neutral" title={r.why ? msg(r.why) : undefined}>{r.why ? msg(r.why) : tr('wealth_Stash.no_price')}</Chip> : rising ? <Chip tone="warning" title={sparkTitle(r.spark, fmt)}>{tr('wealth_Stash.rising_v1_this_week', { value: fmtPct(c) })}</Chip> : r.hi ? <Chip tone="gold" title={r.why ? msg(r.why) : undefined}>{tr('wealth_Stash.several_versions')}</Chip> : null}</span>
+                <span className="w-cell">{r.unit === null ? <Chip tone="neutral" title={r.why ? msg(r.why) : undefined}>{r.why ? msg(r.why) : tr('wealth_Stash.no_price')}</Chip> : rising ? <span className="w-rise" title={tr('wealth_Stash.rising_v1_this_week', { value: fmtPct(c) })}>{fmtPct(c)}</span> : r.hi ? <Chip tone="gold" title={r.why ? msg(r.why) : undefined}>{tr('wealth_Stash.several_versions')}</Chip> : null}</span>
               </div>
             );
           })}
@@ -229,7 +227,7 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
         </div>
         <div className="w-foot">
           <span>{tr('wealth_Stash.showing_length_of_length2_items', { count: rows.length, count2: w.rows.length, shownVal: fmt(shownVal) })}</span>
-          <span className="faint">{w.prices.fetchedAt ? tr('wealth_Stash.poe_ninja_prices_fetchedat', { fetchedAt: fmtOld(now - w.prices.fetchedAt) }) : tr('wealth_Stash.no_prices_loaded')} {tr('wealth_Stash.totals_use_the_low_end')}{w.unpriced ? tr('wealth_Stash.count_kinds_unpriced', { count: w.unpriced }) : ''}</span>
+          <span className="faint">{w.prices.fetchedAt ? '' : `${tr('wealth_Stash.no_prices_loaded')} · `}{tr('wealth_Stash.totals_low_end')}{w.unpriced ? tr('wealth_Stash.count_kinds_unpriced', { count: w.unpriced }) : ''}</span>
         </div>
       </Panel>
       {sel && (
@@ -258,15 +256,13 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
               <Icon name="tag" size={14} />
               {tr('wealth_Stash.sell_this')}
             </button>
-            <button type="button" className="w-btn alt" onClick={() => go('market', { mq: sel.name, mi: sel.name, mcat: 'all' })}>
+            <button type="button" className="w-btn alt" aria-label={tr('wealth_Stash.open_in_market')} title={tr('wealth_Stash.open_in_market')} onClick={() => go('market', { mq: sel.name, mi: sel.name, mcat: 'all' })}>
               <Icon name="external" size={14} />
-              {tr('wealth_Stash.open_in_market')}
             </button>
           </div>
           <div className="w-btns wrap" aria-label={tr('wealth_Stash.take_this_item_into_a')}>
-            <button type="button" className="w-btn alt" onClick={() => void copyText(sel)}>
+            <button type="button" className="w-btn alt" aria-label={tr('wealth_Stash.copy_item_text')} title={tr('wealth_Stash.copy_item_text')} onClick={() => void copyText(sel)}>
               <Icon name="copy" size={14} />
-              {tr('wealth_Stash.copy_item_text')}
             </button>
             <button
               type="button"
@@ -278,9 +274,8 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
               <Icon name="tree" size={14} />
               {trying ? tr('wealth_Stash.calculating') : tr('wealth_Stash.equip_in_open_build')}
             </button>
-            <button type="button" className="w-btn alt" disabled={sel.cat !== 'uniq'} title={sel.cat !== 'uniq' ? tr('wealth_Stash.only_gear_can_be_saved') : tr('wealth_Stash.keep_this_item_in_the')} onClick={() => void saveShared(sel)}>
+            <button type="button" className="w-btn alt" disabled={sel.cat !== 'uniq'} aria-label={tr('wealth_Stash.save_as_shared_item')} title={sel.cat !== 'uniq' ? tr('wealth_Stash.only_gear_can_be_saved') : `${tr('wealth_Stash.save_as_shared_item')}: ${tr('wealth_Stash.keep_this_item_in_the')}`} onClick={() => void saveShared(sel)}>
               <Icon name="plus" size={14} />
-              {tr('wealth_Stash.save_as_shared_item')}
             </button>
           </div>
           {tried && tried.key === sel.key && (
@@ -302,7 +297,6 @@ export function Stash({ s, build, onEquip, onTryItem }: { s: Wealth; build?: Pre
                 )}
                 <button type="button" className="w-btn alt" onClick={() => setTried(null)}>{tr('wealth_Stash.not_now')}</button>
               </div>
-              <span className="faint">{tr('wealth_Stash.nothing_changes_until_you_press')}</span>
             </div>
           )}
         </Panel>

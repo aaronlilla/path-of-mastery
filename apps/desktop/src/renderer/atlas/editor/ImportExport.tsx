@@ -69,7 +69,7 @@ export function ImportAtlas({ port, plan, selected, close, commit, copy, openBui
     if (now && now.leagueId.status === 'known') setSourceStamp(now); else setUnknownAccepted(true);
   }, [preview]); // eslint-disable-line react-hooks/exhaustive-deps
   const canCommit = !!first && !!preview && preview.sourceInput === input && !parsing && !checking && (!requiresChoice || unknownAccepted || !!sourceStamp) && !busy && (target === 'new' || !!plan && !!selected);
-  return <Dialog title={tr('atlas_editor_ImportExport.import_atlas_plan')} size="large" onCancel={() => { generation.current++; fileGeneration.current++; close(); }} confirmLabel={importLabel(target)} confirmDisabled={!canCommit} confirmBusy={busy} onConfirm={async () => {
+  return <Dialog title={tr('atlas_editor_ImportExport.import_atlas_plan')} size={imported || result?.kind === 'allocation' ? 'large' : 'medium'} onCancel={() => { generation.current++; fileGeneration.current++; close(); }} confirmLabel={importLabel(target)} confirmDisabled={!canCommit} confirmBusy={busy} onConfirm={async () => {
     if (!canCommit || !preview || !first) return;
     setBusy(true); setError('');
     try { await commit(preview, target, first, sourceStamp); close(); } catch { setError(tr('atlas_editor_ImportExport.could_not_import_atlas_plan')); } finally { setBusy(false); }

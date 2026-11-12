@@ -193,6 +193,12 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
     { sep: true },
     { label: tr('Library.delete'), icon: 'trash', danger: true, meta: 'Del', run: () => props.onDelete(b) },
   ];
+  const newFolderChip = (
+    <button type="button" className="folder add" onClick={props.onNewFolder}>
+      <Icon name="plus" size={14} />
+      {tr('Library.new_folder')}
+    </button>
+  );
   const sortLabel = SORTS.find((s) => s.id === settings.librarySort)?.label ?? tr('Library.last_edited');
 
   return (
@@ -211,14 +217,6 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
             <span className="eyebrow">{tr('Library.library_count_builds', { count: total })}</span>
             <span className="lib-h1" data-r="bl-h1">{tr('Library.your_builds')}</span>
           </div>
-          <button type="button" className="btn lg" data-lg="control" data-r="bl-btn" onClick={props.onNewFolder}>
-            <Icon name="folder-plus" size={16} />
-            {tr('Library.new_folder')}
-          </button>
-          <button type="button" className="btn lg" data-lg="control" data-r="bl-btn" onClick={() => setArchive(true)}>
-            <Icon name="history" size={16} />
-            {tr('Library.archive')}
-          </button>
           {props.onLeagueStarts && (
             <button type="button" className="btn lg" data-lg="control" data-r="bl-btn" onClick={props.onLeagueStarts}>
               <Icon name="flag" size={16} />
@@ -273,18 +271,18 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
               <Icon name="list" size={14} />
             </button>
           </div>
-          {/* The design's toolbar ends with the view toggle; this menu (Recently deleted) only appears once something is in the trash. The builds folder opens from the path on the Local row. */}
-          {listing && listing.trashCount > 0 && (
-            <ActionMenu
-              title={tr('Library.more_library_actions')}
-              className="lib-more"
-              trigger={<Icon name="more" size={16} />}
-              actions={[
-                { label: tr('Library.recently_deleted'), icon: 'trash', meta: listing && listing.trashCount > 0 ? String(listing.trashCount) : undefined, run: props.onOpenTrash },
-                { label: tr('Library.open_the_builds_folder'), icon: 'folder-open', run: props.onReveal },
-              ]}
-            />
-          )}
+          {/* The design's toolbar ends with the view toggle; this menu holds New folder, Archive, Recently deleted (once something is in the trash) and the builds folder. */}
+          <ActionMenu
+            title={tr('Library.more_library_actions')}
+            className="lib-more"
+            trigger={<Icon name="more" size={16} />}
+            actions={[
+              { label: tr('Library.new_folder'), icon: 'folder-plus', run: props.onNewFolder },
+              { label: tr('Library.archive'), icon: 'history', run: () => setArchive(true) },
+              ...(listing && listing.trashCount > 0 ? [{ label: tr('Library.recently_deleted'), icon: 'trash', meta: String(listing.trashCount), run: props.onOpenTrash }] : []),
+              { label: tr('Library.open_the_builds_folder'), icon: 'folder-open', run: props.onReveal },
+            ]}
+          />
         </div>
 
         {acct.signedIn && (cloudBuilds.length > 0 || !searching) && (
@@ -301,7 +299,6 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
                 <Icon name="cloud" size={20} />
                 <span className="tx">
                   <b>{tr('Library.nothing_in_the_cloud_yet')}</b>
-                  <span>{tr('Library.builds_you_sync_appear_here')}</span>
                 </span>
                 {builds.length > 0 && (
                   <button type="button" className="btn gold sm" onClick={props.onSyncAll}>
@@ -311,7 +308,8 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
                 )}
               </div>
             ) : (
-              <div className={settings.libraryView === 'grid' ? 'cards' : 'rows'} {...(settings.libraryView === 'grid' ? {} : { 'data-lg': 'panel', 'data-card': '' })}>
+              <div className={settings.libraryView === 'grid' ? 'cards' : 'rows'}>
+                {settings.libraryView === 'list' && <RowsHead />}
                 {cloudBuilds.map((b) => settings.libraryView === 'list' ? (
                   <BuildRow key={b.id} b={b} sel={sel === b.id} showFolder={!!b.folder} sync={acct.statusOf(b.id)} onResolve={() => props.onResolve?.(b)} onSelect={() => setSel(b.id)} onOpen={() => props.onOpen(b)} actions={buildActions(b)} />
                 ) : (
@@ -340,6 +338,7 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
           </section>
         )}
         <section className="sec">
+          {(searching || folder) && (
           <div className="sec-head">
             <span className="lbl">{searching ? tr('Library.results') : tr('Library.local')}</span>
             {searching ? (
@@ -363,20 +362,17 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
               </span>
             )}
             <span className="rule" />
-            <button type="button" className="path" title={tr('Library.open_the_builds_folder')} onClick={props.onReveal}>
-              {listing ? listing.root.replace(/\\/g, '/') : ''}
-            </button>
+            {/* A folder with no subfolders has no chip row: the one New folder entry sits here. */}
+            {!searching && subfolders.length === 0 && newFolderChip}
           </div>
+          )}
 
-          {!searching && (
+          {!searching && (subfolders.length > 0 || !folder) && (
             <div className="folders">
               {subfolders.map((f) => (
                 <FolderChip key={f.path} f={f} drop={dropOn === f.path} dropProps={dropProps(f.path)} onOpen={() => setFolder(f.path)} onRename={() => props.onRenameFolder(f)} onDelete={() => props.onDeleteFolder(f)} />
               ))}
-              <button type="button" className="folder add" onClick={props.onNewFolder}>
-                <Icon name="plus" size={14} />
-                {tr('Library.new_folder')}
-              </button>
+              {newFolderChip}
             </div>
           )}
 
@@ -392,7 +388,8 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
               )}
             </div>
           ) : (
-            <div className={settings.libraryView === 'grid' ? 'cards' : 'rows'} {...(settings.libraryView === 'grid' ? {} : { 'data-lg': 'panel', 'data-card': '' })}>
+            <div className={settings.libraryView === 'grid' ? 'cards' : 'rows'}>
+                {settings.libraryView === 'list' && <RowsHead />}
               {localBuilds.map((b) =>
                 settings.libraryView === 'grid' ? (
                   <BuildCard key={b.id} b={b} sel={sel === b.id} showFolder={searching} onSelect={() => setSel(b.id)} onOpen={() => props.onOpen(b)} actions={buildActions(b)} />
@@ -403,16 +400,6 @@ export function Library(props: LibraryProps & { searchRef: React.RefObject<HTMLI
             </div>
           )}
         </section>
-      </div>
-      <div className="lib-foot" data-r="bl-foot">
-        <span className="sp" />
-        <span style={{ color: 'var(--text-muted)' }}>{tr('Library.count_builds', { count: total })}</span>
-        <span className="dot" />
-        <button type="button" className="link gold" onClick={props.onImport}>
-          <Icon name="import" size={15} />
-          {tr('Library.import_more')}
-        </button>
-        <span className="sp" />
       </div>
     </div>
   );
@@ -461,24 +448,37 @@ function cloudUser(v: ReturnType<typeof useAcct>['view']): string {
   return at > 0 ? `${email.slice(0, Math.min(at, 8))}@…` : email || tr('Library_2.your_account');
 }
 
+/** Column titles for the list; same grid as .row (library.css). */
+function RowsHead() {
+  return (
+    <div className="rows-head" aria-hidden>
+      <span />
+      <span>{tr('Library.name')}</span>
+      <span data-r="bl-meta">{tr('Library.class')}</span>
+      <span className="r">{tr('Library.dps')}</span>
+      <span className="r">{tr('Library.life')}</span>
+      <span data-r="bl-date" className="r">{tr('Library.edited')}</span>
+      <span />
+    </div>
+  );
+}
+
 function BuildRow({ b, sel, showFolder, sync, onResolve, onSelect, onOpen, actions }: { b: BuildEntry; sel: boolean; showFolder: boolean; sync?: BuildSyncStatus | undefined; onResolve?: () => void; onSelect: () => void; onOpen: () => void; actions: MenuAction[] }) {
   return (
     <div className="row" {...(sel ? { 'data-sel': '', 'data-lg': 'tile' } : {})} data-build-id={b.id} role="button" tabIndex={0} draggable onDragStart={dragStart(b)} onClick={onSelect} onDoubleClick={onOpen}>
       <Portrait b={b} size={32} />
-      <span className="name">
+      <span className="name" title={b.name}>
         {b.name}
         {showFolder && b.folder && <span style={{ color: 'var(--text-faint)', fontWeight: 400, marginLeft: 10, fontSize: 12.5 }}>{folderLabel(b.folder)}</span>}
         {sync && <SyncBadge status={sync} onResolve={onResolve} inRow />}
       </span>
+      <span data-r="bl-meta" className={'meta' + (b.info.valid ? '' : ' bad')}>{levelLabel(b.info)}</span>
+      <b className="num dps" {...(b.info.dps !== undefined ? { title: exactNumber(b.info.dps) } : {})}>{b.info.dps !== undefined ? compactNumber(b.info.dps) : '—'}</b>
+      <b className="num life" {...(b.info.life !== undefined ? { title: exactNumber(b.info.life) } : {})}>{b.info.life !== undefined ? compactNumber(b.info.life) : '—'}</b>
+      <span data-r="bl-date" className="date">{formatWhen(b.mtimeMs)}</span>
       <div className="acts">
-        <button type="button" className="btn sm" onClick={(e) => { e.stopPropagation(); onOpen(); }}>
-          <Icon name="external" size={14} />
-          {tr('Library.open')}
-        </button>
         <ActionMenu title={tr('Library.copy_rename_move_delete')} trigger={<Icon name="more" size={16} />} actions={actions} />
       </div>
-      <span data-r="bl-meta" className={'meta' + (b.info.valid ? '' : ' bad')}>{levelLabel(b.info)}</span>
-      <span data-r="bl-date" className="date">{formatWhen(b.mtimeMs)}</span>
     </div>
   );
 }
@@ -492,7 +492,7 @@ function BuildCard({ b, sel, showFolder, sync, onResolve, onSelect, onOpen, acti
         <div className="tt">
           <span className="nm">
             {artFor(b.info.mainSkill, 'gems') && <img className="gem" src={artFor(b.info.mainSkill, 'gems')} alt="" aria-hidden="true" />}
-            <span className="nmt">{b.name}</span>
+            <span className="nmt" title={b.name}>{b.name}</span>
           </span>
           <span className={'sub' + (b.info.valid ? '' : ' bad')}>{levelLabel(b.info)}</span>
         </div>

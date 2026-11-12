@@ -8,7 +8,7 @@ import type { DecodedImport } from '../shared/library.js';
 import { AccountCard, NameCard, useCharacterAccess, type ApplyXml, type Confirm } from './CharacterImport';
 import { useReadImport } from './ImportDialog';
 import { CapSelect, type CapOption } from './tabKit';
-import { Icon, Kbd, Switch, useToast } from './ui';
+import { Icon, Switch, useToast } from './ui';
 import './importTab.css';
 import { tr } from './i18n';
 
@@ -29,13 +29,12 @@ export interface ImportExportTabProps {
 
 type Dest = 'this' | 'new' | 'cmp';
 
-const TIP_KEY = 'pom-ie-tip-dismissed';
 const SITE_KEY = 'pom-ie-share-site';
 
-const DESTS: { id: Dest; label: string; icon: string }[] = [
-  { id: 'this', label: tr('h_rb_Ix.dest_this'), icon: 'import' },
-  { id: 'new', label: tr('h_rb_Ix.dest_new'), icon: 'file-plus' },
-  { id: 'cmp', label: tr('h_rb_Ix.dest_cmp'), icon: 'compare' },
+const DESTS: { id: Dest; label: string }[] = [
+  { id: 'this', label: tr('h_rb_Ix.dest_this') },
+  { id: 'new', label: tr('h_rb_Ix.dest_new') },
+  { id: 'cmp', label: tr('h_rb_Ix.dest_cmp') },
 ];
 
 function savedSite(): ShareSiteId {
@@ -51,16 +50,8 @@ function savedSite(): ShareSiteId {
 export function ImportExportTab(p: ImportExportTabProps) {
   const toast = useToast();
   const { access, setAccess } = useCharacterAccess();
-  const [tipOn, setTipOn] = useState(() => {
-    try {
-      return localStorage.getItem(TIP_KEY) !== '1';
-    } catch {
-      return true;
-    }
-  });
   const [code, setCode] = useState('');
   const [codeErr, setCodeErr] = useState('');
-  const [generatedAt, setGeneratedAt] = useState(0);
   const [link, setLink] = useState<{ url: string; site: ShareSiteId } | null>(null);
   const [site, setSite] = useState<ShareSiteId>(savedSite);
   const [sharing, setSharing] = useState(false);
@@ -102,7 +93,6 @@ export function ImportExportTab(p: ImportExportTabProps) {
       if (r.ok) {
         setCode(r.value);
         setCodeErr('');
-        setGeneratedAt(Date.now());
         setLink(null);
         if (!quiet) {
           setFlash(null);
@@ -192,49 +182,18 @@ export function ImportExportTab(p: ImportExportTabProps) {
       toast({ text: tr('ImportExportTab.clipboard_access_was_blocked_press_ctrl'), kind: 'info' });
     }
   };
-  const dismissTip = () => {
-    setTipOn(false);
-    try {
-      localStorage.setItem(TIP_KEY, '1');
-    } catch {
-      /* storage unavailable */
-    }
-  };
-
   const shown = link ? link.url : code;
   const siteLabel = SHARE_SITES.find((s) => s.id === site)!.label;
   const siteOptions: CapOption[] = SHARE_SITES.map((s) => ({ value: s.id, label: s.label }));
-  const mins = generatedAt ? Math.round((Date.now() - generatedAt) / 60000) : 0;
   const codeNote = link
-    ? tr('ImportExportTab.uploaded_to_anyone_with_the_link', { label: SHARE_SITES.find((s) => s.id === link.site)!.label })
+    ? tr('ImportExportTab.uploaded_to_anyone_with_the_link', { label: SHARE_SITES.find((x) => x.id === link.site)!.label })
     : code
-      ? tr('h_rb_Ix.code_note', { n: code.length.toLocaleString('en-US'), upd: mins ? tr('h_rb_Ix.upd_min', { mins: mins }) : tr('h_rb_Ix.upd_now'), inc: exportSupport ? ' · ' + tr('h_rb_Ix.inc_support') : '', site: siteLabel })
+      ? null
       : tr('ImportExportTab.generating_the_code');
 
   return (
     <div className="tabroot" data-screen-label="Import/Export / Tab / Content">
       <div className="ix-grid" data-r="imp-grid">
-        {tipOn && (
-          <div className="ix-hint" data-r="imp-hint">
-            <Icon name="lightbulb" size={15} />
-            <span className="grow">{tr('ImportExportTab.import_and_share_also_open_from')}</span>
-            <button type="button" className="lk" onClick={p.onOpenImportDialog}>
-              <Icon name="import" size={13} />
-              
-              {tr('ImportExportTab.import')}
-              <Kbd>Ctrl I</Kbd>
-            </button>
-            <button type="button" className="lk" onClick={() => void upload().then((u) => { if (u) void copy(u, tr('ImportExportTab.share_link')); })}>
-              <Icon name="share" size={13} />
-              
-              {tr('ImportExportTab.share')}
-            </button>
-            <button type="button" className="x" aria-label={tr('ImportExportTab.dismiss_tip')} title={tr('ImportExportTab.dismiss')} onClick={dismissTip}>
-              <Icon name="x" size={13} />
-            </button>
-          </div>
-        )}
-
         <AccountCard xml={p.xml} apply={p.apply} confirm={p.confirm} access={access} onAccess={setAccess} onOpenWealth={p.onOpenWealth} />
         <NameCard xml={p.xml} apply={p.apply} confirm={p.confirm} access={access} onAccess={setAccess} />
 
@@ -250,17 +209,12 @@ export function ImportExportTab(p: ImportExportTabProps) {
             <div className="ix-col">
               <span className="ix-lbl">{tr('ImportExportTab.export')}</span>
               <div className="ix-row">
-                <button type="button" className="btn" data-lg="control" onClick={() => void generate(false)}>
-                  <Icon name="sparkles" size={16} />
-                  
-                  {tr('ImportExportTab.generate')}
-                </button>
-                <div className="ix-tog" title={tr('ImportExportTab.this_is_for_party_play_to')} onClick={(e) => { if (!(e.target as HTMLElement).closest('[role="switch"]')) setSupport(!exportSupport); }}>
-                  <Switch checked={exportSupport} onChange={setSupport} label={tr('ImportExportTab.export_support')} />
-                  <span>{tr('ImportExportTab.export_support')}</span>
-                </div>
-                <div className="ix-field" data-lg="tile" onClick={selectCode} title={shown ? tr('ImportExportTab.click_to_select') : ''}>
+                <div className="ix-field" data-lg="tile" onClick={selectCode} title={shown ? tr('ImportExportTab.click_to_select') + (link ? '' : ' · ' + tr('ImportExportTab.code_is_n_characters', { n: code.length.toLocaleString('en-US') })) : ''}>
                   <span ref={codeEl} className={'ix-code' + (link ? ' link' : shown ? '' : ' plain')} aria-label={tr('ImportExportTab.build_code')} data-testid="build-code">{shown || (codeErr ? '' : tr('ImportExportTab.click_generate_to_create_a_build'))}</span>
+                  <button type="button" className="mini" disabled={!shown} onClick={(e) => { e.stopPropagation(); void copy(shown, tr('ImportExportTab.build_code'), 'copy'); }}>
+                    <Icon name={flash === 'copy' ? 'check' : 'copy'} size={12} />
+                    {flash === 'copy' ? tr('ImportExportTab.copied_2') : tr('ImportExportTab.copy')}
+                  </button>
                 </div>
               </div>
               {codeErr && (
@@ -270,31 +224,30 @@ export function ImportExportTab(p: ImportExportTabProps) {
                 </span>
               )}
               <div className="ix-row">
-                <button type="button" className="btn" data-lg="control" disabled={!shown} onClick={() => void copy(shown, tr('ImportExportTab.build_code'), 'copy')}>
-                  <Icon name={flash === 'copy' ? 'check' : 'copy'} size={16} />
-                  {flash === 'copy' ? tr('ImportExportTab.copied_2') : tr('ImportExportTab.copy')}
+                <button type="button" className="btn" data-lg="control" onClick={() => void generate(false)}>
+                  <Icon name="sparkles" size={16} />
+                  {tr('ImportExportTab.generate')}
                 </button>
+                <div className="ix-tog" title={tr('ImportExportTab.this_is_for_party_play_to')} onClick={(e) => { if (!(e.target as HTMLElement).closest('[role="switch"]')) setSupport(!exportSupport); }}>
+                  <Switch checked={exportSupport} onChange={setSupport} label={tr('ImportExportTab.export_support')} />
+                  <span>{tr('ImportExportTab.export_support')}</span>
+                </div>
                 <button type="button" className="btn" data-lg="control" onClick={() => void saveFile()} title={tr('ImportExportTab.save_this_build_as_a_path')}>
                   <Icon name="save" size={16} />
-                  
                   {tr('ImportExportTab.save_file')}
                 </button>
-                <button type="button" className="btn" data-lg="control" disabled={!code || sharing} onClick={() => void upload()}>
-                  {sharing ? <span className="spinner" /> : <Icon name={link && link.site === site ? 'check' : 'share'} size={16} />}
-                  {sharing ? tr('ImportExportTab.creating_link') : link && link.site === site ? tr('ImportExportTab.shared') : tr('ImportExportTab.share')}
-                </button>
+              </div>
+              <div className="ix-row">
                 <CapSelect caption={tr('ImportExportTab.site')} valueLabel={siteLabel} options={siteOptions} value={site} onChange={(v) => { setSite(v as ShareSiteId); setLink(null); try { localStorage.setItem(SITE_KEY, v); } catch { /* storage unavailable */ } }} width={150} minWidth={110} ariaLabel="Share site" />
-                <span className="sp" />
-                <button type="button" className="btn gold" disabled={!code || sharing} onClick={() => void upload().then((u) => { if (u) void copy(u, tr('ImportExportTab.share_link'), 'link'); })}>
+                <button type="button" className="btn" data-lg="control" disabled={!code || sharing} onClick={() => void upload().then((u) => { if (u) void copy(u, tr('ImportExportTab.share_link'), 'link'); })}>
                   <Icon name={flash === 'link' ? 'check' : 'link'} size={14} />
                   {flash === 'link' ? tr('ImportExportTab.link_copied') : sharing ? tr('ImportExportTab.uploading') : tr('ImportExportTab.copy_share_link')}
                 </button>
               </div>
-              <span className="ix-note">{codeNote}</span>
+              {codeNote && <span className="ix-note">{codeNote}</span>}
             </div>
             <div className="ix-col">
               <span className="ix-lbl">{tr('ImportExportTab.import_2')}</span>
-              <span style={{ color: 'var(--text-3)' }}>{tr('ImportExportTab.to_import_a_build_enter_url')}</span>
               <div className={'ix-field ix-in' + (msg ? (msg.tone === 'good' ? ' good' : msg.tone === 'bad' ? ' bad' : '') : '')} data-lg="tile">
                 <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr('ImportExportTab.https_pobb_in_or_a_build')} spellCheck={false} aria-label={tr('ImportExportTab.build_url_or_code')} onKeyDown={(e) => { if (e.key === 'Enter') void doImport(); }} />
                 {text ? (
@@ -319,17 +272,8 @@ export function ImportExportTab(p: ImportExportTabProps) {
                 </span>
               )}
               <div className="ix-row">
-                <div className="seg ix-dest" data-lg="tile" role="radiogroup" aria-label={tr('ImportExportTab.import_destination')}>
-                  {DESTS.map((d) => (
-                    <button key={d.id} type="button" role="radio" aria-checked={dest === d.id} aria-pressed={dest === d.id} onClick={() => setDest(d.id)}>
-                      <Icon name={d.icon} size={15} style={{ opacity: 0.85 }} />
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="ix-row">
-                <button type="button" className="btn gold" aria-disabled={!ready || busy || undefined} onClick={() => void doImport()}>
+                <CapSelect caption={tr('ImportExportTab.import_to_caption')} valueLabel={DESTS.find((d) => d.id === dest)!.label} options={DESTS.map((d): CapOption => ({ value: d.id, label: d.label }))} value={dest} onChange={(v) => setDest(v as Dest)} width={230} minWidth={150} ariaLabel={tr('ImportExportTab.import_destination')} />
+                <button type="button" className={'btn' + (text.trim() ? ' gold' : '')} aria-disabled={!ready || busy || undefined} onClick={() => void doImport()}>
                   {busy ? <span className="spinner" /> : <Icon name="import" size={16} />}
                   {busy ? tr('ImportExportTab.importing') : tr('ImportExportTab.import')}
                 </button>

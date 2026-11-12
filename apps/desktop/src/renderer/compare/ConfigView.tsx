@@ -118,8 +118,8 @@ export function ConfigView(p: Props) {
       <div className="cmp-tbar" style={{ padding: '0 0 8px', borderBottom: 0 }}>
         <SetSelect facts={p.aFacts} kind="configSet" caption={tr('compare_ConfigView.a_config_set')} onPick={(id) => void p.editAXml((x) => setActiveSetXml(x, 'configSet', id))} />
         <SetSelect facts={p.bFacts} kind="configSet" caption={tr('compare_ConfigView.b_config_set')} onPick={(id) => void p.editBXml((x) => setActiveSetXml(x, 'configSet', id))} />
-        <button type="button" className="btn sm" data-lg="control" aria-pressed={showAll} title={showAll ? tr('compare_ConfigView.hide_options_these_builds_do') : tr('compare_ConfigView.also_show_options_these_builds')} onClick={() => setShowAll((v) => !v)}>
-          {showAll ? tr('compare_ConfigView.hide_ineligible_configurations') : tr('compare_ConfigView.show_all_configurations')}
+        <button type="button" className="btn sm" data-lg="control" aria-pressed={showAll} aria-label={showAll ? tr('compare_ConfigView.hide_ineligible_configurations') : tr('compare_ConfigView.show_all_configurations')} title={showAll ? tr('compare_ConfigView.hide_options_these_builds_do') : tr('compare_ConfigView.also_show_options_these_builds')} onClick={() => setShowAll((v) => !v)}>
+          {showAll ? tr('compare_ConfigView.hide_ineligible') : tr('compare_ConfigView.show_all')}
         </button>
       </div>
       {cards.map((c) => {

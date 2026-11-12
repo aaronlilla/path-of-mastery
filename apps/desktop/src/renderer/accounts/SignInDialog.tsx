@@ -181,7 +181,6 @@ export function SignInDialog({ onClose }: { onClose: () => void }) {
           <Icon name="arrow-right" size={16} />
           {tr('accounts_SignInDialog.continue_without_an_account')}
         </button>
-        <span className="foot">{tr('accounts_SignInDialog.once_signed_in_the_app')}</span>
       </div>
     </>
   );

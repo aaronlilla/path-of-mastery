@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useLayoutEffect } fr
 import { activeSetOf, addItem, deleteItems, newItemSet, renameItemSet, deleteItemSet, setActiveSet, setFlaskActive, setItemText, setJewel, setSecondWeaponSet, setSlot, type ItemEntry, type ItemSetModel } from '../../shared/itemsXml.js';
 import { artFor } from '../gameArt';
 import type { OpenBuild, TabId } from '../types';
-import { Icon, useDismiss, useToast } from '../ui';
+import { Icon, PortalMenu, useToast } from '../ui';
 import { SetsPopover } from '../SetsPopover';
 import { CraftPopover, DeleteDialog, SetsDialog, TextDialog } from './dialogs';
 import { BuyDialog } from './BuyDialog';
@@ -73,6 +73,7 @@ export function ItemsTab(props: ItemsTabProps) {
   if (dlg?.k === 'text') textSwapped.current = true;
   const manageBtn = useRef<HTMLButtonElement>(null);
   const craftBtn = useRef<HTMLButtonElement>(null);
+  const tradeBtn = useRef<HTMLButtonElement>(null);
   const [setsPop, setSetsPop] = useState(false);
   const [sort, setSort] = useState<SortMode>('Slot');
   const [loadout, setLoadout] = useState('any');
@@ -314,8 +315,8 @@ export function ItemsTab(props: ItemsTabProps) {
 
   const loadoutLabel = loadout === 'any' ? tr('items_ItemsTab.any_loadout_2') : loadout === 'current' ? tr('items_ItemsTab.current_loadout_2') : loadout === 'unused' ? tr('items_ItemsTab.unused_items_2') : loadout.startsWith('set:') ? model.sets.find((s) => s.id === Number(loadout.slice(4)))?.title || tr('items_ItemsTab.default') : model.specs.find((s) => s.index === Number(loadout.slice(5)))?.title || tr('items_ItemsTab.default');
 
-  const loadoutMenu = (el: HTMLElement) => {
-    const e: MenuEntry[] = [
+  const loadoutEntries = (): MenuEntry[] => [
+      { key: 'h0', head: true, label: tr('items_ItemsTab.loadout') },
       { key: 'any', label: tr('items_ItemsTab.any_loadout'), on: loadout === 'any', run: () => setLoadout('any') },
       { key: 'current', label: tr('items_ItemsTab.current_loadout'), on: loadout === 'current', run: () => setLoadout('current') },
       { key: 'unused', label: tr('items_ItemsTab.unused_items'), on: loadout === 'unused', run: () => setLoadout('unused') },
@@ -323,9 +324,7 @@ export function ItemsTab(props: ItemsTabProps) {
       ...model.sets.map((s) => ({ key: `set:${s.id}`, label: s.title || tr('items_ItemsTab.default'), on: loadout === `set:${s.id}`, run: () => setLoadout(`set:${s.id}`) })),
       { key: 'h2', head: true, label: tr('items_ItemsTab.passive_trees') },
       ...model.specs.map((s) => ({ key: `spec:${s.index}`, label: s.title || tr('items_ItemsTab.default'), on: loadout === `spec:${s.index}`, run: () => setLoadout(`spec:${s.index}`) })),
-    ];
-    openMenu(el, e, 180);
-  };
+  ];
 
   const equipFromList = useCallback(
     async (it: ItemEntry, alt: boolean) => {
@@ -399,6 +398,11 @@ export function ItemsTab(props: ItemsTabProps) {
     };
     const onKey = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;
+      // The Return button (title says Esc) only shows when the editor is a sheet over the list.
+      if (e.key === 'Escape' && !e.defaultPrevented && !dlg && rootRef.current?.querySelector<HTMLElement>('[data-r="it-close"]')?.offsetParent) {
+        setSel(null);
+        return;
+      }
       if (mod && !e.altKey && (e.key === 'z' || e.key === 'y') && !typing(e.target) && !dlg) {
         e.preventDefault();
         void (e.key === 'z' && !e.shiftKey ? env.undo() : env.redo());
@@ -508,7 +512,7 @@ export function ItemsTab(props: ItemsTabProps) {
     const active = set.slots.get(def.name)?.active ?? false;
     const art = itemArt(info);
     const icon = slotIcon(def);
-    const cls = 'it-row' + (def.kind === 'abyssal' ? ' sub' : '');
+    const cls = 'it-row';
     return (
       <div key={def.name} className={cls} data-r="it-gear">
         <span className="lbl">
@@ -517,7 +521,7 @@ export function ItemsTab(props: ItemsTabProps) {
               <i />
             </button>
           )}
-          {def.kind === 'abyssal' ? tr('items_ItemsTab.abyssal') : def.label + (def.kind === 'jewel' ? ':' : ':')}
+          {def.kind === 'abyssal' ? tr('items_ItemsTab.abyssal') + ':' : def.label + ':'}
         </span>
         <div
           className={'it-slot' + (dropSlot === def.name ? ' drop' : '')}
@@ -600,9 +604,9 @@ export function ItemsTab(props: ItemsTabProps) {
   if (!empty && !env.ready) return <div className="it-root" data-screen-label="Items / Tab / Content" ref={rootRef} />;
 
   return (
-    <div className="it-root" data-screen-label="Items / Tab / Content" ref={rootRef}>
+    <div className="it-root tabroot" data-screen-label="Items / Tab / Content" ref={rootRef}>
       {/* toolbar */}
-      <div className="it-glass it-tb" data-lg="panel" data-r="tab-tb">
+      <div className="it-glass it-tb tab-tb" data-lg="panel" data-r="tab-tb">
         <button type="button" className="it-pick" style={{ flex: '0 1 220px', minWidth: 110, height: 36, padding: '0 10px 0 12px' }} data-mt="set" aria-haspopup="listbox" onClick={(e) => {
           const el = e.currentTarget;
           openMenu(el, model.sets.map((s) => ({ key: String(s.id), label: s.title || tr('items_ItemsTab.default'), on: s.id === model.activeSet, tip: setTip(s), run: () => void env.runXml(setActiveSet(env.xml, s.id)) })), 220);
@@ -613,14 +617,13 @@ export function ItemsTab(props: ItemsTabProps) {
           </span>
           <Icon name="chevron-down" size={12} />
         </button>
-        <button ref={manageBtn} type="button" className="it-btn" data-pt="manage" aria-haspopup="dialog" aria-expanded={setsPop} onClick={() => setSetsPop((v) => !v)}>
+        <button ref={manageBtn} type="button" className="it-btn" data-pt="manage" aria-haspopup="dialog" aria-expanded={setsPop} aria-label={tr('items_ItemsTab.manage')} title={tr('items_ItemsTab.manage')} onClick={() => setSetsPop((v) => !v)}>
           <Icon name="sliders" size={16} />
-          {tr('items_ItemsTab.manage')}
         </button>
-        <span style={{ flex: 1 }} />
-        <button type="button" className="it-btn" title={tr('items_ItemsTab.trade_searches_for_every_equipped')} onClick={() => setDlg({ k: 'trade' })}>
+        <span className="right">
+        <button ref={tradeBtn} type="button" className="it-btn" aria-haspopup="dialog" aria-expanded={dlg?.k === 'trade'} title={tr('items_ItemsTab.trade_searches_for_every_equipped')} onClick={() => setDlg((d) => (d?.k === 'trade' ? null : { k: 'trade' }))}>
           <Icon name="swap" size={14} />
-          {tr('items_ItemsTab.trade_for_these_items')}
+          {tr('items_ItemsTab.trade')}
         </button>
         <button ref={craftBtn} type="button" className="it-btn" data-pt="craft" aria-haspopup="dialog" aria-expanded={dlg?.k === 'craft'} title={tr('items_ItemsTab.start_a_new_item_from')} onClick={() => setDlg((d) => (d?.k === 'craft' ? null : { k: 'craft' }))}>
           <Icon name="anvil" size={16} />
@@ -630,21 +633,23 @@ export function ItemsTab(props: ItemsTabProps) {
           <Icon name="plus" size={16} />
           {tr('items_ItemsTab.create_custom')}
         </button>
+        </span>
       </div>
 
       {/* equipped items */}
       <div className="it-glass it-body it-slots" data-lg="panel" data-r="tab-body it-slots">
         <div className="it-scroll">
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
-            <span className="it-h"><Icon name="body-armour" size={18} />{tr('items_ItemsTab.equipped_items')}</span>
-            <span style={{ flex: 1 }} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 8px', minWidth: 0 }}>
+            <span className="it-h" style={{ flex: '1 1 auto', minWidth: 0 }}><Icon name="body-armour" size={18} />{tr('items_ItemsTab.equipped_items')}</span>
             <button type="button" className="it-btn xs ghost" data-r="it-trade" title={tr('items_ItemsTab.open_wealth_market_filtered_to')} disabled={!props.onOpenWealth} onClick={() => props.onOpenWealth?.()}>
               {tr('items_ItemsTab.trade_for_upgrades')}
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '2px 0 4px' }}>
-            <span className="it-sub">{tr('items_ItemsTab.weapon_set')}</span>
-            <SegControl label={tr('items_ItemsTab.weapon_set')} value={second ? 'II' : 'I'} options={[{ value: 'I', label: tr('items_ItemsTab.i') }, { value: 'II', label: tr('items_ItemsTab.ii') }]} onChange={(v) => void env.runXml(setSecondWeaponSet(env.xml, v === 'II'))} />
+          <div className="it-row" title={tr('items_ItemsTab.weapon_set')}>
+            <span className="lbl">{tr('items_ItemsTab.weapon_set')}:</span>
+            <div style={{ display: 'flex', minWidth: 0 }}>
+              <SegControl label={tr('items_ItemsTab.weapon_set')} value={second ? 'II' : 'I'} options={[{ value: 'I', label: tr('items_ItemsTab.i') }, { value: 'II', label: tr('items_ItemsTab.ii') }]} onChange={(v) => void env.runXml(setSecondWeaponSet(env.xml, v === 'II'))} />
+            </div>
           </div>
           {empty ? <div className="it-sub" style={{ padding: 8, whiteSpace: 'normal' }}>{env.engineReason ? tr('items_ItemsTab.the_calculation_engine_is_not', { engineReason: env.engineReason }) : tr('items_ItemsTab.reading_the_build')}</div> : (
             <>
@@ -660,9 +665,8 @@ export function ItemsTab(props: ItemsTabProps) {
                   <span className="v">{spec?.title || tr('items_ItemsTab.default')}</span>
                   <Icon name="chevron-down" size={12} />
                 </button>
-                <button type="button" className="it-btn sm" data-pt="manage-trees" title={tr('items_ItemsTab.rename_add_copy_or_remove')} onClick={() => setDlg({ k: 'trees' })}>
+                <button type="button" className="it-btn sm" data-pt="manage-trees" aria-label={tr('items_ItemsTab.manage')} title={tr('items_ItemsTab.rename_add_copy_or_remove')} onClick={() => setDlg({ k: 'trees' })}>
                   <Icon name="tree" size={14} />
-                  {tr('items_ItemsTab.manage')}
                 </button>
               </div>
               {jewelSlots.map(slotRow)}
@@ -674,17 +678,13 @@ export function ItemsTab(props: ItemsTabProps) {
       {/* all items and database */}
       <div className="it-glass it-body it-list" data-lg="panel" data-r="tab-body it-list">
         <div style={{ flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
             <span className="it-h"><Icon name="list" size={18} />{tr('items_ItemsTab.all_items')}</span>
             <span style={{ flex: 1 }} />
-            <PickButton small dataKey="load" value={loadoutLabel} onOpen={loadoutMenu} />
-          </div>
-          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
             <button type="button" className="it-btn xs" title={tr('items_ItemsTab.change_the_sort_order')} onClick={() => setSort((s) => SORTS[(SORTS.indexOf(s) + 1) % SORTS.length]!)}>
               <Icon name="arrow-up-down" size={14} />
               {tr('items_ItemsTab.sort_sort', { sort: SORT_WORD[sort] })}
             </button>
-            <span className="it-sub" style={{ flex: 1, textAlign: 'right', fontSize: 12 }}>{tr('items_ItemsTab.count_items', { count: rows.length })}</span>
             <button
               type="button"
               className="it-icon"
@@ -693,6 +693,8 @@ export function ItemsTab(props: ItemsTabProps) {
               aria-label={tr('items_ItemsTab.more_actions')}
               onClick={(e) =>
                 openMenu(e.currentTarget, [
+                  ...loadoutEntries(),
+                  { key: 'sep0', sep: true },
                   { key: 'unused', label: tr('items_ItemsTab.del_unused'), disabled: !model.items.some((i) => !usage.has(i.id)), run: () => askDelete(model.items.filter((i) => !usage.has(i.id)).map((i) => i.id)) },
                   { key: 'all', label: tr('items_ItemsTab.del_all'), disabled: model.items.length === 0, run: () => askDelete(model.items.map((i) => i.id), true) },
                   { key: 'sep', sep: true },
@@ -704,12 +706,13 @@ export function ItemsTab(props: ItemsTabProps) {
               <Icon name="more" size={14} />
             </button>
           </div>
+          {loadout !== 'any' && <span className="it-sub" style={{ flex: 'none', fontSize: 12, marginTop: -4 }}>{tr('items_ItemsTab.count_items', { count: rows.length })} · {loadoutLabel}</span>}
           <div
             tabIndex={0}
             role="listbox"
             aria-label={tr('items_ItemsTab.all_items')}
             className="it-box"
-            style={{ flex: '0 1 300px', minHeight: 120 }}
+            style={{ flex: '1 1 0', minHeight: 120 }}
             onFocus={() => setListFocus(true)}
             onBlur={() => setListFocus(false)}
             onDragOver={(e) => {
@@ -900,6 +903,7 @@ export function ItemsTab(props: ItemsTabProps) {
       {dlg?.k === 'trade' && (
         <TradeList
           env={env}
+          anchor={tradeBtn}
           slots={slots}
           slotItemId={slotItemId}
           onClose={() => setDlg(null)}
@@ -927,24 +931,21 @@ export function ItemsTab(props: ItemsTabProps) {
 
 // ---- trade list -----------------------------------------------------------------------------------------------
 
-function TradeList({ env, slots, slotItemId, onClose, onSearch, onTrader }: { env: ItemsEnv; slots: SlotDef[]; slotItemId: (d: SlotDef) => number; onClose: () => void; onSearch: (info: ItemInfo, slot: string) => void; onTrader: () => void }) {
+function TradeList({ env, anchor, slots, slotItemId, onClose, onSearch, onTrader }: { env: ItemsEnv; anchor: React.RefObject<HTMLElement | null>; slots: SlotDef[]; slotItemId: (d: SlotDef) => number; onClose: () => void; onSearch: (info: ItemInfo, slot: string) => void; onTrader: () => void }) {
   const rows = slots.map((s) => ({ s, id: slotItemId(s) })).filter((r) => r.id > 0 && env.infos.get(r.id));
-  const ref = useRef<HTMLDivElement>(null);
-  // Escape and a press outside close it; the press does not also click what is underneath (or the button that opened it).
-  useDismiss(ref, true, onClose, true);
+  // Under its button like Craft; the menu caps its own height, only the list scrolls and "Price items" stays in view.
   return (
-    <div ref={ref} className="it-glass" data-lg="pop" data-solid="" style={{ right: 10, top: 52, zIndex: 50, width: 380, padding: 14, gap: 8, background: 'rgba(var(--glass-rgb), .97)', whiteSpace: 'normal' }} role="dialog" aria-label={tr('items_ItemsTab.trade_searches')}>
+    <PortalMenu anchor={anchor} open onClose={onClose} align="right" role="dialog" label={tr('items_ItemsTab.trade_searches')} minWidth={380} className="it-tradepop">
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ flex: 1, font: "600 19px/1 'Cormorant Garamond', serif", color: 'var(--text-display)' }}>{tr('items_ItemsTab.trade_for_these_items')}</span>
         <button type="button" className="it-icon" aria-label={tr('items_ItemsTab.close')} title={tr('items_ItemsTab.close_esc')} onClick={onClose}><Icon name="x" size={14} /></button>
       </div>
-      <span className="it-sub" style={{ lineHeight: 1.45 }}>{tr('items_ItemsTab.each_search_opens_on_the')}</span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 'min(580px, calc(100vh - 240px))', overflowY: 'auto' }}>
+      <div className="it-trade-list">
         {rows.map(({ s, id }) => {
           const info = env.infos.get(id)!;
           const art = itemArt(info);
           return (
-            <div key={s.name} style={{ height: 36, display: 'flex', alignItems: 'center', gap: 10, padding: '0 4px 0 8px', borderRadius: 8 }}>
+            <div key={s.name} style={{ height: 36, flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: '0 4px 0 8px', borderRadius: 8 }}>
               {art ? <img src={art} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /> : <span style={{ width: 22 }} />}
               <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ color: colourOf(info.headerRarity), overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{info.name}</span>
@@ -959,11 +960,11 @@ function TradeList({ env, slots, slotItemId, onClose, onSearch, onTrader }: { en
         })}
         {rows.length === 0 && <span style={{ padding: '14px 8px', color: 'var(--text-muted)' }}>{tr('items_ItemsTab.nothing_equipped_in_this_set')}</span>}
       </div>
-      <button type="button" className="it-btn sm" style={{ alignSelf: 'flex-start' }} title={tr('items_ItemsTab.price_every_slot_on_the')} onClick={() => { onClose(); onTrader(); }}>
+      <button type="button" className="it-btn sm" style={{ alignSelf: 'flex-start', flex: 'none' }} title={tr('items_ItemsTab.price_every_slot_on_the')} onClick={() => { onClose(); onTrader(); }}>
         <Icon name="coins" size={14} />
         {tr('items_ItemsTab.price_items')}
       </button>
-    </div>
+    </PortalMenu>
   );
 }
 

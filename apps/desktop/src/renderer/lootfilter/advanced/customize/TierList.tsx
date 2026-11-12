@@ -54,7 +54,7 @@ export function Frame({
       id={id}
       className="adv-cz-tier"
       {...dropProps}
-      style={{ borderColor: over ? 'var(--gold-400)' : selected ? 'rgba(var(--accent-rgb),.5)' : 'rgba(var(--line-rgb),.08)', background: over ? 'rgba(var(--accent-rgb),.08)' : selected ? 'rgba(var(--accent-rgb),.05)' : 'rgba(var(--shadow-rgb),calc(.18*var(--shadow-k)))' }}
+      style={{ borderColor: over ? 'var(--gold-400)' : selected ? 'rgba(var(--accent-rgb),.5)' : 'transparent', background: over ? 'rgba(var(--accent-rgb),.08)' : selected ? 'rgba(var(--accent-rgb),.05)' : 'transparent' }}
     >
       <div className="adv-cz-thead" style={{ opacity: off ? 0.6 : 1 }}>
         <button type="button" className="adv-sh-ib sm" title={open ? tr('lootfilter_advanced_customize_TierList.collapse_tier') : tr('lootfilter_advanced_customize_TierList.expand_tier')} aria-label={open ? tr('lootfilter_advanced_customize_TierList.collapse_tier') : tr('lootfilter_advanced_customize_TierList.expand_tier')} aria-expanded={open} onClick={onToggle}>

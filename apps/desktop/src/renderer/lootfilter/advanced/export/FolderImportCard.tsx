@@ -41,12 +41,11 @@ export function FolderImportCard({ nav }: { nav: LfNav }) {
   };
 
   return (
-    <div className="lf-card adv-v-panel">
+    <div className="adv-ex-import">
       <Eyebrow>{tr('lootfilter_advanced_export_FolderImportCard.path_of_exile_folder')}</Eyebrow>
-      <span style={{ color: 'var(--text-2)', lineHeight: 1.5, fontSize: 13 }}>{tr('lootfilter_advanced_export_FolderImportCard.import_a_filter_that_is')}</span>
       {err && <div className="adv-v-msg bad">{err}</div>}
       {!rows && (
-        <button type="button" className="btn sm" style={{ alignSelf: 'flex-start', height: 34, padding: '0 14px' }} disabled={busy === 'list'} onClick={() => void load()}>
+        <button type="button" className="adv-sh-btn" style={{ alignSelf: 'flex-start' }} disabled={busy === 'list'} onClick={() => void load()}>
           <Icon name="folder" size={14} />
           {busy === 'list' ? tr('lootfilter_advanced_export_FolderImportCard.reading_the_folder') : tr('lootfilter_advanced_export_FolderImportCard.import_from_path_of_exile')}
         </button>

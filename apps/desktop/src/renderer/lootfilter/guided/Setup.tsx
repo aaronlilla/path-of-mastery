@@ -136,7 +136,7 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
             <h1 className="gd-h1" tabIndex={-1} ref={h1}>
               {editing ? tr('lootfilter_guided_Setup.change_your_base_filter') : tr('lootfilter_guided_Setup.set_up_your_loot_filter')}
             </h1>
-            <p className="gd-sub">{editing ? tr('lootfilter_guided_Setup.these_settings_sit_under_your') : tr('lootfilter_guided_Setup.three_questions_you_can_change')}</p>
+            {editing && <p className="gd-sub">{tr('lootfilter_guided_Setup.these_settings_sit_under_your')}</p>}
           </div>
           <div className="gd-setup-grid">
             <div className="gd-qs">
@@ -156,13 +156,15 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
                     </>
                   )}
                   {!hasBuild && <span style={{ flex: 1, color: 'var(--text-muted)', fontSize: 13 }}>{tr('lootfilter_guided_Setup.no_build_is_open_open')}</span>}
-                  <div className="gd-seg" role="radiogroup" aria-label={tr('lootfilter_guided_Setup.follow_my_build')}>
-                    {(hasBuild ? ([[tr('lootfilter_guided_Setup_2.yes'), true], [tr('lootfilter_guided_Setup_2.no'), false]] as const) : ([[tr('lootfilter_guided_Setup_2.no'), false]] as const)).map(([l, v]) => (
-                      <button key={l} role="radio" aria-checked={follow === v} onClick={() => setFollow(v)}>
-                        {l}
-                      </button>
-                    ))}
-                  </div>
+                  {hasBuild && (
+                    <div className="gd-seg" role="radiogroup" aria-label={tr('lootfilter_guided_Setup.follow_my_build')}>
+                      {([[tr('lootfilter_guided_Setup_2.yes'), true], [tr('lootfilter_guided_Setup_2.no'), false]] as const).map(([l, v]) => (
+                        <button key={l} role="radio" aria-checked={follow === v} onClick={() => setFollow(v)}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {!follow && (
                   <div>
@@ -182,7 +184,7 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
                 <div>
                   <h3>{tr('lootfilter_guided_Setup.how_much_do_you_want')}</h3>
                   <div className="hint">
-                    {tr('lootfilter_guided_Setup.stricter_hides_more_name_blurb', { name: guidedName(strict), blurb: guidedBlurb(strict) })}
+                    {lf.hidden ? tr('lootfilter_guided_Setup.stricter_hides_more_total', { name: guidedName(strict), blurb: guidedBlurb(strict), total: lf.hidden.total.toLocaleString() }) : tr('lootfilter_guided_Setup.stricter_hides_more_name_blurb', { name: guidedName(strict), blurb: guidedBlurb(strict) })}
                   </div>
                 </div>
                 <div role="radiogroup" aria-label={tr('lootfilter_guided_Setup.strictness')} className="gd-tiles5">
@@ -192,7 +194,7 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
                       <button key={s.index} className="gd-tile" role="radio" aria-checked={strict === s.index} onClick={() => setStrict(s.index)} style={{ position: 'relative', paddingTop: 12 }}>
                         <span style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 3, borderRadius: '10px 10px 0 0', background: s.index <= strict ? 'rgba(var(--area-filter-rgb),.85)' : 'rgba(var(--line-rgb),.14)' }} />
                         <span style={{ color: 'var(--text-strong)', fontWeight: 500, whiteSpace: 'nowrap' }}>{guidedName(s.index)}</span>
-                        {c.ready ? <span className="gd-hides">{c.text}</span> : <span className="gd-skel" aria-label={tr('lootfilter_guided_Setup.counting_item_types')} />}
+                        {c.ready ? <span className="gd-hides">{lf.hidden ? tr('lootfilter_guided_Setup.hides_n', { n: (lf.hidden.hidden[s.index] ?? 0).toLocaleString() }) : c.text}</span> : <span className="gd-skel" aria-label={tr('lootfilter_guided_Setup.counting_item_types')} />}
                       </button>
                     );
                   })}
@@ -201,7 +203,6 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
               <section className="gd-card gd-q" aria-label={tr('lootfilter_guided_Setup.colours')}>
                 <div>
                   <h3>{tr('lootfilter_guided_Setup.colours')}</h3>
-                  <div className="hint">{tr('lootfilter_guided_Setup.how_labels_look_on_the')}</div>
                 </div>
                 <div role="radiogroup" aria-label={tr('lootfilter_guided_Setup.colours')} className="gd-tiles4">
                   {STYLES.map((s, i) => (
@@ -218,12 +219,11 @@ export function Setup({ api, editing, cancel }: { api: GuidedApi; editing: boole
                 </div>
               </section>
             </div>
-            <aside className="gd-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, position: 'sticky', top: 0 }} aria-label={tr('lootfilter_guided_Setup.what_you_will_see')}>
+            <aside className="gd-card gd-setup-aside" aria-label={tr('lootfilter_guided_Setup.what_you_will_see')}>
               <div>
                 <h3>{tr('lootfilter_guided_Setup.what_you_will_see')}</h3>
-                <div className="hint">{tr('lootfilter_guided_Setup.a_sample_of_drops_with')}</div>
               </div>
-              <div className="gd-ground" style={{ ['--gd-ground' as string]: ground, padding: 14, display: 'flex', flexWrap: 'wrap', gap: '10px 10px', minHeight: 180 }}>
+              <div className="gd-ground" style={{ ['--gd-ground' as string]: ground }}>
                 {!cat ? <span style={{ color: 'rgba(255,255,255,.7)' }}>{tr('lootfilter_guided_Setup.reading_neversink')}</span> : chips.map((c) => <LabelChip key={c.n} name={c.n} style={noSound(c.style)} hidden={c.hidden} hiddenLook="dashed" scale={0.5} title={`${c.n}${c.hidden ? ' (hidden)' : ''}`} />)}
               </div>
               <div aria-hidden={line.ready || counting ? undefined : true} style={{ color: 'var(--text-strong)', fontWeight: 600, fontSize: 14, fontVariantNumeric: 'tabular-nums', visibility: line.ready || counting ? undefined : 'hidden' }}>{!line.ready && counting ? tr('lootfilter_guided_Setup.counting_item_types_2') : `${line.text}.`}</div>

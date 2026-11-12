@@ -109,7 +109,7 @@ interface Entry {
 
 type View = 'sum' | 'tree' | 'skills' | 'items' | 'calcs' | 'config';
 const VIEWS: { id: View; label: string; icon: string }[] = [
-  { id: 'sum', label: tr('CompareTab.summary'), icon: '' },
+  { id: 'sum', label: tr('CompareTab.summary'), icon: 'chart-bar' },
   { id: 'tree', label: tr('CompareTab.tree'), icon: 'tree' },
   { id: 'skills', label: tr('CompareTab.skills'), icon: 'gem' },
   { id: 'items', label: tr('CompareTab.items'), icon: 'body-armour' },
@@ -639,17 +639,16 @@ export function CompareTab(p: CompareTabProps) {
 
   return (
     <div className="tabroot pc cmp-root" data-screen-label="Compare / Tab / Content">
-      <div className="gl cmp-tb" data-r="tab-tb">
+      <div className="cmp-tb tab-tb" data-r="tab-tb">
         {has && (
           <>
-            <CapSelect caption={tr('CompareTab.compare_with_2')} valueLabel={cur!.label} value={'e:' + cur!.key} options={options} width={340} ariaLabel={tr('CompareTab.compare_with_3')} tone="compare" size="tall" onChange={(v) => void pick(v)} />
-            <button type="button" className="btn ghost" onClick={remove}>
+            <CapSelect caption={tr('CompareTab.compare_with_2')} valueLabel={cur!.label} value={'e:' + cur!.key} options={options} width={240} minWidth={140} ariaLabel={tr('CompareTab.compare_with_3')} tone="compare" onChange={(v) => void pick(v)} />
+            <button type="button" className="btn ghost" title={tr('CompareTab.remove')} aria-label={tr('CompareTab.remove')} onClick={remove}>
               <Icon name="trash" size={16} />
-              {tr('CompareTab.remove')}
             </button>
           </>
         )}
-        <div className={'lib-search cmp-in ' + (read.state === 'ok' || read.state === 'link' ? 'good' : message.tone === 'bad' ? 'bad' : '')} data-lg="tile" style={{ flexBasis: has ? 300 : 480 }}>
+        <div className={'lib-search cmp-in ' + (read.state === 'ok' || read.state === 'link' ? 'good' : message.tone === 'bad' ? 'bad' : '')} data-lg="tile">
           <input
             ref={inRef}
             value={url}
@@ -669,15 +668,18 @@ export function CompareTab(p: CompareTabProps) {
           <Icon name="import" size={16} />
           {tr('CompareTab.import')}
         </button>
-        <span style={{ flex: 1 }} />
-        <div className="seg" data-lg="tile" role="tablist" aria-label={tr('CompareTab.compare_views')} style={{ opacity: has ? 1 : 0.5 }}>
-          {VIEWS.map((v) => (
-            <button key={v.id} type="button" role="tab" aria-selected={view1 === v.id} disabled={!has} onClick={() => has && setView(v.id)} style={{ height: 28 }}>
-              {v.icon && <Icon name={v.icon} size={15} style={{ opacity: 0.85 }} />}
-              {v.label}
-            </button>
-          ))}
-        </div>
+        {has && (
+          <div className="right">
+            <div className="seg cmp-views" data-lg="tile" role="tablist" aria-label={tr('CompareTab.compare_views')}>
+              {VIEWS.map((v) => (
+                <button key={v.id} type="button" role="tab" aria-selected={view1 === v.id} aria-label={v.label} title={v.label} onClick={() => setView(v.id)} style={{ height: 28 }}>
+                  {v.icon && <Icon name={v.icon} size={15} style={{ opacity: 0.85 }} />}
+                  <span className="lbl">{v.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       {importOpen && <ImportCompareDialog initialText={url} onClose={() => setImportOpen(false)} onImport={importSource} />}
       {pickOpen && (
@@ -714,7 +716,7 @@ export function CompareTab(p: CompareTabProps) {
                 : tr('CompareTab.the_calculation_engine_has_not')}
             </span>
             {ready && (
-              <button type="button" className="btn ghost" style={{ marginTop: 10 }} onClick={() => setPickOpen(true)}>
+              <button type="button" className="btn" style={{ marginTop: 10 }} onClick={() => setPickOpen(true)}>
                 <Icon name="compare" size={16} />
                 {tr('CompareTab.compare_with')}
               </button>
@@ -725,18 +727,18 @@ export function CompareTab(p: CompareTabProps) {
           <div className="cmp-sub">
             {view1 === 'tree' && overlay ? (
               <>
-                <span className="lg"><i style={{ background: '#00ff00' }} />{tr('CompareTab.only_in_b_bshort', { bShort })}</span>
+                <span className="lg"><i style={{ background: '#00ff00' }} />{tr('CompareTab.only_in_b_bshort')}</span>
                 <span className="lg"><i style={{ background: '#ff0000' }} />{tr('CompareTab.only_in_a_this_build')}</span>
                 <span className="lg"><i style={{ background: '#0000ff' }} />{tr('CompareTab.mastery_or_jewel_differs')}</span>
               </>
-            ) : (
+            ) : view1 === 'skills' || view1 === 'items' ? null : (
               <>
                 <span className="lg"><i style={{ background: 'var(--positive)' }} />{tr('CompareTab.a_this_build')}</span>
                 <span className="lg"><i style={{ background: 'var(--compare-b)' }} />{tr('CompareTab.b_bshort', { bShort })}</span>
               </>
             )}
             <span className="note">
-              {view1 === 'tree' ? (treeDiff ? tr('CompareTab.length_nodes_only_in_b_2', { count: treeDiff.onlyB.length, count2: treeDiff.onlyA.length }) : '') : view1 === 'skills' ? tr('CompareTab.socket_groups_matched_by_slot') : view1 === 'items' ? tr('CompareTab.change_to_full_dps_if') : view1 === 'calcs' ? tr('CompareTab.the_calculation_results_of_both') : ''}
+              {view1 === 'tree' ? (treeDiff ? tr('CompareTab.length_nodes_only_in_b_2', { count: treeDiff.onlyB.length, count2: treeDiff.onlyA.length }) : '') : view1 === 'skills' ? tr('CompareTab.socket_groups_matched_by_slot') : ''}
             </span>
             <span style={{ flex: 1 }} />
             {view1 === 'tree' && <SwitchRow checked={overlay} onChange={setOverlay} label={tr('CompareTab.overlay_comparison')} />}
@@ -746,9 +748,9 @@ export function CompareTab(p: CompareTabProps) {
                   <Icon name="search" size={14} style={{ color: 'var(--text-muted)' }} />
                   <input value={cq} onChange={(e) => setCq(e.target.value)} placeholder={tr('CompareTab.search')} aria-label={tr('CompareTab.search_config')} spellCheck={false} />
                 </div>
-                <button type="button" className="btn sm" data-lg="control" disabled={!ready || notReady} onClick={() => void copyConfig()}>
+                <button type="button" className="btn sm" data-lg="control" disabled={!ready || notReady} title={tr('CompareTab.copy_config_from_compare_build')} onClick={() => void copyConfig()}>
                   <Icon name="copy" size={14} />
-                  {tr('CompareTab.copy_config_from_compare_build')}
+                  {tr('CompareTab.copy_config')}
                 </button>
               </>
             )}
@@ -765,9 +767,9 @@ export function CompareTab(p: CompareTabProps) {
                 <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
                     <div className="cmp-row head">
-                      <span>{tr('CompareTab.stat')}</span>
-                      <span title={p.buildName}><i style={{ background: 'var(--positive)' }} />{tr('CompareTab.a_this_build_2')}</span>
-                      <span title={cur!.label}><b className="wrap2"><i style={{ background: 'var(--compare-b)', display: 'inline-block', marginRight: 6 }} />{tr('CompareTab.b_touppercase', { label: cur!.label.toUpperCase() })}</b></span>
+                      <span />
+                      <span title={p.buildName}><i style={{ background: 'var(--positive)' }} />{tr('CompareTab.cell_a')}</span>
+                      <span title={cur!.label}><b className="wrap2"><i style={{ background: 'var(--compare-b)', display: 'inline-block', marginRight: 6 }} />{tr('CompareTab.cell_b')}</b></span>
                       <span style={{ textAlign: 'right' }}>{tr('CompareTab.a_b')}</span>
                     </div>
                     <div style={{ padding: '4px 0 8px' }}>
@@ -799,7 +801,6 @@ export function CompareTab(p: CompareTabProps) {
                     {!biggest.length && <span style={{ color: 'var(--text-muted)' }}>{tr('CompareTab.these_builds_have_the_same')}</span>}
                   </div>
                   <div className="cmp-card" data-lg="tile">
-                    <span className="ttl">{tr('CompareTab.show')}</span>
                     <Chips
                       label={tr('CompareTab.show')}
                       value={show}
@@ -830,7 +831,7 @@ export function CompareTab(p: CompareTabProps) {
               {report && report.entryKey === cur!.key && report.state === 'done' && <span style={{ color: 'var(--text-muted)', fontSize: 12.5 }}>{tr('CompareTab.length_of_count_change_label', { count2: report.rows.length, count: report.count, label: lbl(report.stat.label) })}</span>}
               <button type="button" className="btn" data-lg="control" disabled={report?.state === 'running' || !POWER_CATEGORIES.some((c) => cats[c]) || !ready} style={{ opacity: POWER_CATEGORIES.some((c) => cats[c]) ? 1 : 0.5 }} onClick={() => void buildReport()}>
                 {report?.state === 'running' ? <span className="spinner" /> : <Icon name="chart-bar" size={16} />}
-                {report?.state === 'running' ? tr('CompareTab.building_progress', { progress: report.progress }) : report?.state === 'done' ? tr('CompareTab.rebuild_power_report') : tr('CompareTab.build_power_report')}
+                {report?.state === 'running' ? tr('CompareTab.building_progress', { progress: report.progress }) : report?.state === 'done' ? tr('CompareTab.rebuild_report') : tr('CompareTab.build_report')}
               </button>
               {report?.state === 'error' && <span style={{ width: '100%', color: 'var(--negative-text)', fontSize: 12.5 }}>{tr('CompareTab.the_report_stopped_error', { error: report.error })}</span>}
             </div>
@@ -916,7 +917,6 @@ export function CompareTab(p: CompareTabProps) {
                             <Art src={gemArtUrl(info, g.name)} size={20} />
                             <span className="ellipsis" style={{ color: gemColour(info, g.name) }}>{!other.has(g.name) ? '+ ' : ''}{g.name}</span>
                             <span className="lvq">{g.level}{g.quality ? `/${g.quality}%` : ''}</span>
-                            {!other.has(g.name) && <span className="only">{tr('CompareTab.only_here')}</span>}
                           </span>
                         );
                       })}

@@ -3,7 +3,7 @@ import { STRICTNESS } from '../../../../shared/lootfilter/styles.js';
 import type { TierInfo } from '../../../../shared/lootfilter/catalog.js';
 import { Icon } from '../../../ui';
 import { classKey, classPortrait } from '../../../art';
-import { LabelChip, groundFor } from '../../LabelChip';
+import { FitGroup, LabelChip, groundFor } from '../../LabelChip';
 import { useLf } from '../../lfStore';
 import type { LfNav } from '../../LootFilterArea';
 import { buildBoard } from '../overview/board';
@@ -115,10 +115,6 @@ export function OverviewView({ nav }: { nav: LfNav }) {
             <Icon name="eye" size={14} />
             {tr('lootfilter_advanced_views_OverviewView.review_build_rules')}
           </button>
-          <button type="button" className="adv-sh-btn gold" onClick={() => void lf.write()} disabled={lf.phase === 'writing'}>
-            <Icon name="gamepad" size={14} />
-            {tr('lootfilter_advanced_views_OverviewView.write_to_game')}
-          </button>
           <button type="button" className="adv-sh-ib" title={tr('lootfilter_advanced_views_OverviewView.dismiss')} aria-label={tr('lootfilter_advanced_views_OverviewView.dismiss')} onClick={() => lf.setUi('advSummaryDismissed', lf.doc.id)}>
             <Icon name="x" size={14} />
           </button>
@@ -156,7 +152,7 @@ export function OverviewView({ nav }: { nav: LfNav }) {
           const n = c.chips.length;
           return (
             <section key={c.id} className="adv-ov-card lf-card" data-lg="panel" data-card="">
-              <div className="adv-ov-chead">
+              <div className="adv-ov-chead" title={c.note}>
                 <span className="lf-eyebrow">{c.title.toUpperCase()}</span>
                 <span style={{ color: 'var(--text-faint)', fontSize: 12, whiteSpace: 'nowrap' }}>{c.total > n ? tr('lootfilter_advanced_views_OverviewView.n_of_total_items', { n, total: c.total }) : tr('lootfilter_advanced_views_OverviewView.count_items', { count: n })}</span>
                 <span style={{ flex: 1 }} />
@@ -165,8 +161,8 @@ export function OverviewView({ nav }: { nav: LfNav }) {
                   {tr('lootfilter_advanced_views_OverviewView.edit')}
                 </button>
               </div>
-              <div style={{ padding: '0 14px 8px', color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.45, textWrap: 'pretty' }}>{c.note}</div>
               <div className="adv-ov-ground" style={{ background: groundFor(bright ? 'bright' : 'desert') }}>
+                <FitGroup>
                 {c.chips.map((ch) =>
                   ch.kind === 'item' ? (
                     <AdvChip key={ch.item.name} item={ch.item} ghost={ghost} />
@@ -176,6 +172,7 @@ export function OverviewView({ nav }: { nav: LfNav }) {
                     <TierSample key={ch.tier.key} tier={ch.tier} name={ch.name} />
                   ),
                 )}
+                </FitGroup>
                 {c.empty && <span style={{ color: bright ? 'rgba(24,20,14,.72)' : 'rgba(255,240,215,.62)', fontSize: 12.5 }}>{c.empty}</span>}
               </div>
             </section>

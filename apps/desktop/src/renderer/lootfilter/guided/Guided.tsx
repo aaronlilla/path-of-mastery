@@ -199,7 +199,6 @@ export function Guided({ nav }: { nav: LfNav }) {
     return () => window.removeEventListener('keydown', k);
   });
 
-  const hid = (i: number): string => (lf.hidden ? hidesText(lf.hidden.hidden[i]!, lf.hidden.total) : '');
   const strictName = guidedName(Math.min(4, lf.doc.setup.strictness));
   const showSetup = !done || baseEdit;
   const writingSlow = useDelayedFlag(lf.phase === 'writing', 200);
@@ -315,11 +314,7 @@ export function Guided({ nav }: { nav: LfNav }) {
           slots.search,
         )}
       <div className="gd-bar" ref={barRef} data-screen-label="Loot Filter / Guided / Bar">
-        {showSetup ? (
-          <span className="gd-crumb">{done ? tr('lootfilter_guided_Guided.changing_the_base_filter') : tr('lootfilter_guided_Guided.new_filter_setup')}</span>
-        ) : (
-          <ModeSwitch mode="guided" setMode={nav.setMode} />
-        )}
+        {!showSetup && <ModeSwitch mode="guided" setMode={nav.setMode} />}
         <LfArchive />
         <span className="sp" />
         {done && !showSetup && (
@@ -334,7 +329,7 @@ export function Guided({ nav }: { nav: LfNav }) {
                 <AnchorPop align="right" role="dialog" aria-label={tr('lootfilter_guided_Guided.strictness')}>
                   <div className="hd">
                     <b>{tr('lootfilter_guided_Guided.strictness')}</b>
-                    <span>{tr('lootfilter_guided_Guided.how_much_the_filter_hides')}</span>
+                    <span>{lf.hidden ? tr('lootfilter_guided_Guided.how_much_the_filter_hides_total', { total: lf.hidden.total.toLocaleString() }) : tr('lootfilter_guided_Guided.how_much_the_filter_hides')}</span>
                   </div>
                   {GUIDED_STRICTNESS.map((s) => (
                     <button
@@ -351,11 +346,13 @@ export function Guided({ nav }: { nav: LfNav }) {
                       }}
                     >
                       <span className="gd-dot" />
-                      <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{guidedName(s.index)}</span>
+                      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                          <span style={{ flex: 1, color: 'var(--text-strong)', fontWeight: 500 }}>{guidedName(s.index)}</span>
+                          <span style={{ color: 'var(--text-faint)', fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>{lf.hidden ? tr('lootfilter_guided_Setup.hides_n', { n: (lf.hidden.hidden[s.index] ?? 0).toLocaleString() }) : ''}</span>
+                        </span>
                         <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{guidedBlurb(s.index)}</span>
                       </span>
-                      <span style={{ color: 'var(--text-faint)', fontSize: 12 }}>{hid(s.index) || ''}</span>
                     </button>
                   ))}
                   <button className="gd-radio gd-popfoot" onClick={() => { setPop(null); api.editBase(); }}>
@@ -388,13 +385,15 @@ export function Guided({ nav }: { nav: LfNav }) {
                   ) : (
                     <div style={{ padding: '8px 10px', color: 'var(--text-muted)', fontSize: 12.5 }}>{tr('lootfilter_guided_Guided.no_build_is_open_open')}</div>
                   )}
-                  <button className="gd-radio" role="radio" aria-checked={!lf.doc.setup.followBuild} onClick={() => { setPop(null); lf.edit(tr('lootfilter_guided_Guided.no_longer_following_a_build'), (d) => ({ ...d, setup: { ...d.setup, followBuild: false }, rules: d.rules.filter((r) => r.source !== 'build') })); }}>
-                    <span className="gd-dot" />
-                    <span style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{tr('lootfilter_guided_Guided.no_build')}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{tr('lootfilter_guided_Guided.only_the_base_filter_and')}</span>
-                    </span>
-                  </button>
+                  {(lf.build || lf.doc.setup.followBuild) && (
+                    <button className="gd-radio" role="radio" aria-checked={!lf.doc.setup.followBuild} onClick={() => { setPop(null); lf.edit(tr('lootfilter_guided_Guided.no_longer_following_a_build'), (d) => ({ ...d, setup: { ...d.setup, followBuild: false }, rules: d.rules.filter((r) => r.source !== 'build') })); }}>
+                      <span className="gd-dot" />
+                      <span style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{tr('lootfilter_guided_Guided.no_build')}</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{tr('lootfilter_guided_Guided.only_the_base_filter_and')}</span>
+                      </span>
+                    </button>
+                  )}
                 </AnchorPop>
               )}
             </div>
@@ -439,7 +438,7 @@ export function Guided({ nav }: { nav: LfNav }) {
         )}
       </main>
 
-      <div className="gd-status">
+      {(done || baseEdit) && <div className="gd-status">
         <span>{tr('lootfilter_guided_Guided.path_of_exile_1')}</span>
         <span>{'·'}</span>
         <span>{lf.prices ? `Prices: ${lf.prices.league} · ${priceAge(lf.prices.fetchedAt)}${lf.priceStale ? ' (offline, old)' : ''}` : lf.pricesLoading ? tr('lootfilter_guided_Guided.prices_loading') : tr('lootfilter_guided_Guided.prices_not_loaded')}</span>
@@ -457,7 +456,7 @@ export function Guided({ nav }: { nav: LfNav }) {
             </button>
           )}
         </span>
-      </div>
+      </div>}
       {keys && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 85, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(var(--void-rgb),.5)' }} role="dialog" aria-modal="true" aria-label={tr('lootfilter_guided_Guided.keyboard_shortcuts')} onClick={() => setKeys(false)}>
           <div className="gd-card" style={{ width: 420, padding: 20, background: 'var(--surface-2)', display: 'flex', flexDirection: 'column', gap: 8 }} onClick={(e) => e.stopPropagation()}>

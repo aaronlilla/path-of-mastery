@@ -6,7 +6,7 @@ import {
   checkEditValue,
   CUSTOM_SECTION,
   defaultFor,
-  dropdownWidth,
+  isMapModSlot,
   isSegmented,
   listLabel,
   parseNumberText,
@@ -31,6 +31,8 @@ import type { OpenBuild } from './types';
 import { Dialog, Icon, Switch, useToast } from './ui';
 import { useHighlight } from './assistant/bus';
 import { label as lbl, tr } from './i18n';
+/** Matches --ctl-col in tokens.css: the dropdown's own width (CSS makes it fill the value column) and its menu's minimum. */
+const CTL_COL = 200;
 const tl = (t: string) => { const s = stripCodes(t); const r = lbl(s); return r === s ? t : r; };
 
 export interface ConfigTabProps {
@@ -81,7 +83,7 @@ interface RowCtx {
 }
 
 const Row = memo(
-  function Row({ rv, ctx, version, val, stored, ph }: { rv: RowView; ctx: RowCtx; version: number; val: CfgValue | undefined; stored: CfgValue | undefined; ph: CfgValue | undefined }) {
+  function Row({ rv, ctx, version, val, stored, ph, bare }: { rv: RowView; ctx: RowCtx; version: number; val: CfgValue | undefined; stored: CfgValue | undefined; ph: CfgValue | undefined; bare?: boolean }) {
     void version;
     const { opt } = rv;
     const hl = useHighlight();
@@ -107,7 +109,7 @@ const Row = memo(
           </div>
         );
       } else {
-        control = <CfgDropdown value={val as string | number | undefined} items={items} width={dropdownWidth(opt)} ariaLabel={label} defaultVal={defVal} onPick={(v) => set(opt, v)} bind={bind} />;
+        control = <CfgDropdown value={val as string | number | undefined} items={items} width={CTL_COL} ariaLabel={label} defaultVal={defVal} onPick={(v) => set(opt, v)} bind={bind} />;
       }
     } else if (opt.type === 'count' || opt.type === 'countAllowZero' || opt.type === 'integer' || opt.type === 'float') {
       control = (
@@ -124,10 +126,17 @@ const Row = memo(
     } else if (opt.type === 'text') {
       control = <textarea className="cfg-text" defaultValue={typeof val === 'string' ? val : ''} aria-label={label} onBlur={(e) => e.target.value !== (val ?? '') && set(opt, e.target.value || null)} />;
     }
+    if (bare) {
+      return (
+        <div className={cls + ' cfg-cell'} data-ck={opt.var} data-assistant-highlight={marked ? opt.var : undefined} {...(tip ? bind(tip) : {})}>
+          {control}
+        </div>
+      );
+    }
     return (
       <div className={cls} data-ck={opt.var} data-assistant-highlight={marked ? opt.var : undefined} {...(tip ? bind(tip) : {})}>
         <span className="l">
-          <ColorText text={tl(opt.label)} />
+          <ColorText text={tl(opt.label).replace(/:\s*$/, '')} />
         </span>
         <span className="c">{control}</span>
       </div>
@@ -142,8 +151,23 @@ const Row = memo(
     a.val === b.val &&
     a.stored === b.stored &&
     a.ph === b.ph &&
+    a.bare === b.bare &&
     a.ctx === b.ctx,
 );
+
+/** Runs of map prefix / suffix options become one group each (drawn as a 2 x 2 grid); everything else stays a single row. */
+function groupRows(rows: CardView['rows']): Array<CardView['rows'][number] | RowView[]> {
+  const out: Array<CardView['rows'][number] | RowView[]> = [];
+  for (const r of rows) {
+    const last = out[out.length - 1];
+    if (r.kind === 'row' && isMapModSlot(r.opt)) {
+      const prefix = r.opt.var!.startsWith('MapPrefix');
+      if (Array.isArray(last) && last[0]!.opt.var!.startsWith('MapPrefix') === prefix) last.push(r);
+      else out.push([r]);
+    } else out.push(r);
+  }
+  return out;
+}
 
 function SubLabel({ text }: { text: string }) {
   const name = stripCodes(text).replace(/:\s*$/, '');
@@ -211,12 +235,12 @@ function ModBlock({ draft, committed, onChange, onCommit, onDelete, onToggle, bi
         />
         <button
           type="button"
-          className="cfg-btn sm"
+          className="cfg-ico"
+          aria-label={tr('ConfigTab.add_mod')}
           onClick={() => setPicking(true)}
           {...bind({ text: tr('ConfigTab.pick_a_modifier_from_the') })}
         >
-          <Icon name="plus" size={13} />
-          {tr('ConfigTab.add_mod')}
+          <Icon name="plus" size={14} />
         </button>
         <button type="button" className="cfg-ico del" aria-label={tr('ConfigTab.delete_mod_group')} title={tr('ConfigTab.delete_mod_group')} onClick={onDelete}>
           <Icon name="trash" size={14} />
@@ -724,7 +748,7 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
   return (
     <div className="tabroot cfg-root" data-screen-label="Configuration / Tab / Content" ref={root}>
       {tips.host}
-      <div className="cfg-tb" data-lg="panel" data-r="tab-tb">
+      <div className="cfg-tb tab-tb" data-lg="panel">
         <div ref={setBtn} className="cfg-setwrap">
           <button
             type="button"
@@ -761,11 +785,10 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
             </div>
           )}
         </div>
-        <button ref={manBtn} type="button" className="cfg-btn" data-lg="control" data-mt="manage" aria-expanded={manage} disabled={loading} onClick={() => { setSetMenu(false); setManage((v) => !v); setRen(null); }}>
+        <button ref={manBtn} type="button" className="cfg-btn" data-lg="control" data-mt="manage" aria-expanded={manage} aria-label={tr('ConfigTab.manage')} title={tr('ConfigTab.manage')} disabled={loading} onClick={() => { setSetMenu(false); setManage((v) => !v); setRen(null); }}>
           <Icon name="sliders" size={16} />
-          {tr('ConfigTab.manage')}
+          <span className="cfg-bt">{tr('ConfigTab.manage')}</span>
         </button>
-        <span className="cfg-vr" />
         <div className="cfg-search" data-lg="tile">
           <Icon name="search" size={16} />
           <input ref={search} type="text" value={q} placeholder={tr('ConfigTab.search')} aria-label={tr('ConfigTab.search_configuration')} title={tr('ConfigTab.ctrl_f')} onChange={(e) => setQ(e.target.value.slice(0, 100))} />
@@ -775,16 +798,20 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
             </button>
           )}
         </div>
-        <button type="button" className="cfg-btn" data-lg="control" aria-pressed={showAll} title={showAll ? tr('ConfigTab.hide_options_this_build_does') : tr('ConfigTab.also_show_options_this_build')} onClick={() => setShowAll((v) => !v)}>
-          {showAll ? tr('ConfigTab.hide_ineligible_configurations') : tr('ConfigTab.show_all_configurations')}
-        </button>
-        <span className="sp" />
-        <button type="button" role="switch" className={'cfg-oc' + (onlyChanged ? ' on' : '')} aria-checked={onlyChanged} title={nChanged ? tr('ConfigTab.count_options_in_this_config', { count: nChanged }) : tr('ConfigTab.every_option_in_this_config')} onClick={() => setOnlyChanged((v) => !v)}>
-          <span className="trk">
-            <span className="knob" />
-          </span>
-          {tr('ConfigTab.show_only_changed_nchanged', { nChanged })}
-        </button>
+        <div className="right">
+          <button type="button" role="switch" className={'cfg-oc' + (showAll ? ' on' : '')} aria-checked={showAll} title={showAll ? tr('ConfigTab.hide_options_this_build_does') : tr('ConfigTab.also_show_options_this_build')} onClick={() => setShowAll((v) => !v)}>
+            <span className="trk">
+              <span className="knob" />
+            </span>
+            {tr('ConfigTab.show_all_configurations')}
+          </button>
+          <button type="button" role="switch" className={'cfg-oc' + (onlyChanged ? ' on' : '')} aria-checked={onlyChanged} title={nChanged ? tr('ConfigTab.count_options_in_this_config', { count: nChanged }) : tr('ConfigTab.every_option_in_this_config')} onClick={() => setOnlyChanged((v) => !v)}>
+            <span className="trk">
+              <span className="knob" />
+            </span>
+            {tr('ConfigTab.show_only_changed_nchanged', { nChanged })}
+          </button>
+        </div>
       </div>
 
       {manage && state && (
@@ -876,7 +903,6 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
 
       <div className="cfg-body" data-r="tab-body cfg-grid" ref={scroller}>
         <nav className="cfg-nav" data-r="cfg-nav" aria-label={tr('ConfigTab.config_sections')}>
-          <span className="h">{tr('ConfigTab.sections')}</span>
           {sections.map((s) => {
             const look = SECTION_LOOK[s.title] ?? { nav: s.title, icon: 'settings', tone: 'var(--stat-neutral)' };
             return (
@@ -891,7 +917,6 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
           {loading && <div className="cfg-card cfg-hint">{tr('ConfigTab.reading_the_configuration')}</div>}
           {empty && (
             <div className="cfg-card cfg-empty" data-lg="panel">
-              <Icon name="search" size={16} />
               <span className="tx">{dq.trim() ? tr(onlyChanged ? 'h_rA_cfg.no_match_changed' : 'h_rA_cfg.no_match', { query: dq.trim() }) : tr('ConfigTab.nothing_is_changed_from_default')}</span>
               <button type="button" onClick={() => { setQ(''); setOnlyChanged(false); }}>
                 <Icon name="eye" size={14} />
@@ -908,7 +933,12 @@ export function ConfigTab({ build, engine }: ConfigTabProps) {
                   <span className="ttl-t">{lbl(c.section.title)}</span>
                   <Icon name="chevron-down" size={14} />
                 </button>
-                {!collapsed.has(c.section.title) && c.rows.map((r) => (r.kind === 'sub' ? <SubLabel key={'s' + r.opt.index} text={r.opt.label} /> : <Row key={r.opt.index} rv={r} ctx={ctx} version={version} val={state ? shownValue(r.opt, state) : undefined} stored={r.opt.var && state ? state.values[r.opt.var] : undefined} ph={r.opt.var && state ? state.placeholders[r.opt.var] : undefined} />))}
+                {!collapsed.has(c.section.title) &&
+                  groupRows(c.rows).map((g) => {
+                    const row = (r: RowView, bare?: boolean) => <Row key={r.opt.index} rv={r} ctx={ctx} version={version} val={state ? shownValue(r.opt, state) : undefined} stored={r.opt.var && state ? state.values[r.opt.var] : undefined} ph={r.opt.var && state ? state.placeholders[r.opt.var] : undefined} bare={bare} />;
+                    if (Array.isArray(g)) return <div key={'g' + g[0]!.opt.index} className="cfg-multi"><div className="cfg-cap">{tl(g[0]!.opt.label).replace(/:\s*$/, '')}</div><div className="cfg-grid4">{g.map((r) => row(r, true))}</div></div>;
+                    return g.kind === 'sub' ? <SubLabel key={'s' + g.opt.index} text={g.opt.label} /> : row(g);
+                  })}
                 {c.custom && state && !collapsed.has(c.section.title) && (
                   <ModsBuild.Provider value={buildId}>
                     <CustomMods blocks={state.customMods} onCommit={commitMods} onToast={() => undefined} bind={bind} />
