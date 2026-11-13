@@ -98,6 +98,8 @@ export interface AssistantDeps {
   wealth?: WealthAccess;
   /** Unique prices in divine orbs for the solver's wealth tier (SolveDeps.uniquePrices). */
   uniquePrices?: () => Promise<Record<string, number> | null>;
+  /** Puts the timeless jewel tables in place before a kept build is checked (SolveDeps.timeless). */
+  timeless?: () => Promise<void>;
   /** The game knowledge base. */
   kb?: KbAccess;
   /** The app language in English ("German"), undefined for English: the assistant answers in it. */
@@ -235,6 +237,7 @@ export class AssistantService {
       toolContext: () => (this.toolCtx ? { ...this.toolCtx, origin: 'panel' } : null),
       push: (state, reveal) => this.push({ kind: 'solve', state, ...(reveal ? { reveal } : {}) }),
       ...(deps.uniquePrices ? { uniquePrices: deps.uniquePrices } : {}),
+      ...(deps.timeless ? { timeless: deps.timeless } : {}),
       // AI candidate ordering requires an explicit opt-in and a verified gate.
       ...(deps.aiShortlist === true && deps.ai ? { shortlist: async (goal) => deps.ai!.state.status === 'ready' ? shortlist(goal, { engine: deps.engine, decide: this.decide }) : null } : {}),
     });

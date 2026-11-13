@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { SolveGoal } from '@pom/protocol';
+import type { KeptLadder } from '../../shared/assistant/types.js';
 
 /**
  * Kept builds (PLAN.md slice 3): a whole, proven build per exact gem, ascendancy and budget tier, shipped in resources/skeletons.
@@ -22,6 +23,8 @@ export interface KeptBuild {
   ehp: number;
   /** How far real characters of this build get, in one line with its source (the ask's number often sits above what the ladder reaches). */
   ladderNote?: string;
+  /** The numbers behind `ladderNote`: how far real characters of this gem got (a ladder sample, our engine). The row says where the ask sits when it is above the best of them. */
+  ladder?: KeptLadder;
 }
 
 interface Index { skeletons: KeptBuild[]; versions?: Record<string, number> }
@@ -62,8 +65,8 @@ export function keptFor(goal: SolveGoal): (KeptBuild & { xml: string }) | null {
   }
 }
 
-/** The goal as the kept build plays it: its class, ascendancy and level (the build is written for them). */
-export const withKept = (goal: SolveGoal, k: KeptBuild): SolveGoal => ({ ...goal, className: k.className, ascendancy: k.ascendancy, level: k.level });
+/** The goal as the kept build plays it: its class and ascendancy, and its level unless the player asked for one (the solver sets the asked level on the start build). */
+export const withKept = (goal: SolveGoal, k: KeptBuild): SolveGoal => ({ ...goal, className: k.className, ascendancy: k.ascendancy, level: goal.level ?? k.level });
 
 /** The evidence group the pack's `bySkill` holds: how many real characters play this gem version and which ascendancies (shares of that group). */
 export interface KeptEvidence { builds: number; ascendancies?: Array<{ name: string; count: number; share: number }> }

@@ -31,7 +31,7 @@
   const cancel = (el) => { if (el.getAnimations) el.getAnimations().forEach(a => { if (a.id === 'pom') a.cancel(); }); };
   const anim = (el, kf, o) => { cancel(el); const a = el.animate(kf, Object.assign({ fill: 'backwards' }, o)); a.id = 'pom'; return a; };
   const fade = (el, delay) => anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 120, delay: delay || 0 });
-  const base = (el) => el.style.transform || '';
+  const base = (el) => (el.style.transform === 'none' ? '' : el.style.transform || '');
   const isScrim = (el) => { const s = el.style; return el.tagName === 'DIV' && !el.children.length && (s.height === '3000px' || s.inset === '0px' || (s.left === '0px' && s.right === '0px')) && (/blur/.test(s.backdropFilter || s.webkitBackdropFilter || '') || /void-rgb|scrim/.test(s.background)); };
   const kindOf = (el) => {
     if (!(el instanceof HTMLElement) || off(el)) return null;

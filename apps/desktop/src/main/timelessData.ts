@@ -23,6 +23,7 @@ export interface TimelessManifest {
 }
 
 import type { TimelessInstallStatus } from '../shared/timelessStatus.js';
+import type { EngineConnection } from './engineConnection.js';
 export type { TimelessInstallStatus };
 
 /** Tables a calculation can need that the package leaves out (none: all eleven ship). */
@@ -95,6 +96,36 @@ export class TimelessInstaller {
     } catch (e) {
       this.status = { ...this.status, state: 'error', current: null, error: e instanceof Error ? e.message : String(e) };
     }
+  }
+}
+
+/**
+ * Opens the player's build in the engine. A build with a timeless jewel calculated before its table is inflated leaves the
+ * jewel out (`TimelessDataWarning`), and the sidebar showed those numbers until every table was in, then others (0.1.21:
+ * 42.14M, then 43.18M). So the open waits: the build is calculated again as each table lands, until the jewel counts or
+ * every table is in.
+ */
+export async function loadBuildWithTables(engine: Pick<EngineConnection, 'send'>, xml: string, installer: Pick<TimelessInstaller, 'ensure' | 'getStatus'> | null): Promise<string> {
+  const { buildId } = await engine.send('loadBuild', { buildXml: xml, keep: 'open' });
+  if (!installer) return buildId;
+  const warned = async () => (await engine.send('getStats', { buildId })).stats.some((s) => s.id === 'TimelessDataWarning');
+  try {
+    if (!(await warned())) return buildId;
+    let finished = false;
+    const all = installer.ensure().then(() => void (finished = true));
+    let seen = 0;
+    for (;;) {
+      const end = finished;
+      const done = installer.getStatus().done;
+      if (end || done !== seen) {
+        seen = done;
+        await engine.send('recalc', { buildId });
+        if (end || !(await warned())) return buildId;
+      }
+      await Promise.race([all, new Promise((r) => setTimeout(r, 100))]);
+    }
+  } catch {
+    return buildId; // an engine without `recalc`: the window's own recalculation (useTimelessRecalc) follows the tables
   }
 }
 

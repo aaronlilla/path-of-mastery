@@ -17,7 +17,7 @@ test('the kept build comes back with what it reaches against the ask, where the 
   assert.equal(a.runStartsFrom, 'pconc-bouncing-pathfinder-mid-league');
   assert.deepEqual(a.keptBuilds.map((b) => b.tier), ['league-start', 'mid-league']);
   const mid = a.keptBuilds[1]!;
-  assert.match(mid.line, /4\.38M DPS and 21k EHP on our engine \(DPS 146% of the ask, EHP 26% of the ask\)/);
+  assert.match(mid.line, /4\.38M DPS and 22k EHP on our engine \(DPS 146% of the ask, EHP 27% of the ask\)/);
   assert.match(mid.realCharacters!, /0 of 98 week-one characters reach 80k EHP/);
   assert.equal(a.nearestOtherSkill, undefined);
 });

@@ -30,12 +30,14 @@ const POOL = {
   ],
 };
 
-function ctx(info: Record<string, unknown>, mods: unknown[], poolFor?: (influences: string[]) => unknown) {
+function ctx(info: Record<string, unknown>, mods: unknown[], poolFor?: (influences: string[]) => unknown, beast: string[] = [], baseImplicits: string[] = []) {
   return {
     engine: {
       async send(cmd: string, p: { influences?: string[] }) {
         if (cmd === 'itemInfo') return { item: { valid: true, baseName: 'Warlock Gloves', name: 'Doom Grip', rarity: 'RARE', itemLevel: 84, canInfluence: true, influences: [], defences: { EnergyShieldBase: 83, ArmourBase: 0, EvasionBase: 0 }, ...info, mods } };
         if (cmd === 'modPool') return { pool: poolFor ? poolFor(p.influences ?? []) : { ...POOL, suffixes: POOL.suffixes.filter((m) => m.source !== 'influence' || (p.influences ?? []).includes('shaper')) } };
+        if (cmd === 'itemCraft') return { text: `Rarity: NORMAL\nWarlock Gloves\nImplicits: ${baseImplicits.length}\n${baseImplicits.join('\n')}\n` };
+        if (cmd === 'itemPool' && beast.length) return { pool: { sources: [{ id: 'BEASTCRAFT', mods: beast.map((t) => ({ lines: [t], type: 'Suffix' })) }] } };
         throw new Error(`unexpected ${cmd}`);
       },
     },
@@ -89,4 +91,57 @@ test('more than three prefixes, a base that cannot be influenced and a mod the b
 test('uniques and an engine that cannot read the item get no verdict', async () => {
   assert.deepEqual(await kinds(ctx({ rarity: 'UNIQUE' }, [line('+20% to Lightning Resistance')])), []);
   assert.deepEqual(await itemLegality({ engine: { send: async () => { throw new Error('no'); } } } as never, 'Gloves', 'x'), []);
+});
+
+const VEILED_HYBRID = hyb(['+(25-28) to Dexterity and Intelligence', '(12-15)% increased Attack Speed'], 'LocalAttackSpeedDexInt', 'veiled');
+const veiledPool = () => ({ ...POOL, suffixes: [...POOL.suffixes, VEILED_HYBRID] });
+
+test('a veiled hybrid printed as two plain lines is one suffix, not two (Fate Rain bow, pconc boots)', async () => {
+  const lines = [line('+25% to Cold Resistance'), line('+25% to Fire Resistance'), line('+27 to Dexterity and Intelligence'), line('15% increased Attack Speed')];
+  assert.deepEqual(await kinds(ctx({}, lines, veiledPool)), []);
+  // a fourth suffix beside the hybrid is still over the limit
+  assert.deepEqual(await kinds(ctx({}, [...lines, line('+25% to Chaos Resistance')], veiledPool)), ['affixLimit']);
+});
+
+test('"+1 Suffix Modifier allowed" on the base moves the limits (Cogwork Ring)', async () => {
+  const four = ['Cold', 'Fire', 'Chaos'].map((r) => line(`+25% to ${r} Resistance`)).concat(line('+25 to Strength'));
+  const implicits = [line('-1 Prefix Modifier allowed', { bucket: 'implicit' }), line('+1 Suffix Modifier allowed', { bucket: 'implicit' })];
+  assert.deepEqual(await kinds(ctx({}, four)), ['affixLimit']);
+  const own = ['-1 Prefix Modifier allowed', '+1 Suffix Modifier allowed'];
+  assert.deepEqual(await kinds(ctx({}, [...implicits, ...four], undefined, [], own)), []);
+  // the same base holds only two prefixes now
+  const prefixes = [line('+90 to maximum Life'), line('+35 to maximum Mana'), line('+25 to Armour')];
+  assert.deepEqual(await kinds(ctx({}, [...implicits, ...prefixes], undefined, [], own)), ['affixLimit']);
+});
+
+test('an "allowed" line the base does not carry moves nothing (forged or custom line on a Steel Ring)', async () => {
+  const four = ['Cold', 'Fire', 'Chaos'].map((r) => line(`+25% to ${r} Resistance`)).concat(line('+25 to Strength'));
+  assert.deepEqual(await kinds(ctx({}, [line('+1 Suffix Modifier allowed', { bucket: 'implicit' }), ...four])), ['affixLimit']);
+  assert.deepEqual(await kinds(ctx({}, [line('+1 Suffix Modifier allowed', { bucket: 'implicit', custom: true }), ...four])), ['affixLimit']);
+});
+
+// a veiled life + energy shield hybrid, and a pool without the unveiled one, so only the veiled rule decides
+const VEILED_LIFE_ES = hyb(['+(20-30) to maximum Life', '(50-60)% increased Energy Shield'], 'LocalEnergyShieldAndLife', 'veiled');
+const veiledPrefixPool = () => ({ ...POOL, prefixes: [...POOL.prefixes.filter((m) => m.stats.length === 1), VEILED_LIFE_ES] });
+
+test('plain lines outside a veiled hybrid range are separate modifiers, not its two lines', async () => {
+  const more = [line('+35 to maximum Mana'), line('+25 to Armour')];
+  // +25 life and 55% energy shield are the veiled roll: one prefix, three in all
+  assert.deepEqual(await kinds(ctx({}, [line('+25 to maximum Life'), line('55% increased Energy Shield'), ...more], veiledPrefixPool)), []);
+  // +90 life and 35% energy shield are out of range: two prefixes, four in all
+  assert.deepEqual(await kinds(ctx({}, [line('+90 to maximum Life'), line('35% increased Energy Shield'), ...more], veiledPrefixPool)), ['affixLimit']);
+});
+
+test('a plain line and a crafted line do not make one veiled hybrid; the craft still counts', async () => {
+  const mods = [line('+25 to maximum Life'), line('58% increased Energy Shield', { crafted: true }), line('+25 to Strength', { crafted: true })];
+  assert.deepEqual(await kinds(ctx({}, mods, veiledPrefixPool)), ['craftLimit']);
+});
+
+test('a beastcraft line is a suffix the base can carry, and takes a suffix slot', async () => {
+  const cat = 'Grants Level 20 Aspect of the Cat Skill';
+  assert.deepEqual(await kinds(ctx({}, [line(cat)], undefined, [cat])), []);
+  // without the beastcraft list the line is a mod the base never rolls
+  assert.deepEqual(await kinds(ctx({}, [line(cat)])), ['notOnBase']);
+  const three = ['Cold', 'Fire', 'Chaos'].map((r) => line(`+25% to ${r} Resistance`));
+  assert.deepEqual(await kinds(ctx({}, [line(cat), ...three], undefined, [cat])), ['affixLimit']);
 });

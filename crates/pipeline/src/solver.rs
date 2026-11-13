@@ -358,6 +358,12 @@ impl Assume {
         self.flasks && !self.flasks_always
     }
 
+    /// Bossing and Both: every worn flask counts as on, as for a player who presses it. Charge sustain in a fight
+    /// without kills is a notice on the row, never a score (owner rule 2026-11-12: situational things are alerts only).
+    fn worn(&self) -> bool {
+        self.sustained() && self.mode() != PlayMode::Mapping
+    }
+
     /// The solver stat for the share of time a flask-charge-spending skill part is fed under the goal's flask setting.
     fn drain_stat(&self) -> &'static str {
         match self.uptime() {
@@ -917,6 +923,8 @@ const MAIN_ON: &str = "Main skill switched on";
 const DRAIN_MAP: &str = "Solver.FlaskDrainUptimeMap";
 const GOLEM_LIMIT: &str = "ActiveGolemLimit";
 const FLASK_BROKEN: &str = "Solver.FlaskBroken";
+/// In the names when worn flasks count as on (`Assume::worn`): the worker then never cuts a flask-charge-spending part.
+const FLASKS_WORN: &str = "Solver.FlasksWorn";
 /// Filled in by the worker: 1 when the evaluated text has the "Have you Crit Recently?" switched on because the main
 /// skill all but always crits, else 0.
 const CRIT_RECENT: &str = "Solver.CritRecently";
@@ -1065,7 +1073,14 @@ impl Scorer {
         }
         // Flasks count only when sustained: the evaluation turns the others off; a tree change that loses a flask's
         // sustain is a shortfall until the build is evaluated again.
-        if goal.assume.sustained() {
+        if goal.assume.worn() {
+            // (the fight's uptimes, read only for the row's notice)
+            idx(FLASKS_WORN);
+            for n in 1..=5 {
+                idx(&goal.assume.uptime_stat(n));
+            }
+            idx(goal.assume.drain_stat());
+        } else if goal.assume.sustained() {
             limits.push(LimitDef { name: "Counted flasks are sustained".into(), check: Check::AtMost(idx(FLASK_BROKEN), 0.0), scale: 1.0, cost: false, soft: false });
             idx(FLASK_MASK);
             for n in 1..=5 {
@@ -1382,6 +1397,18 @@ thread_local! {
     static LIMIT_ONLY: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
 
+/// The text with the main socket group's gem that has a skill part on part 1 (a flask-charge-spending part unfed).
+fn unfed_text(t: &str) -> Option<String> {
+    let b = t.find("<Build ")?;
+    let n: usize = t[b..b + t[b..].find('>')?].split("mainSocketGroup=\"").nth(1)?.split('"').next()?.parse().ok()?;
+    let start = t.match_indices("<Skill ").nth(n.max(1) - 1)?.0;
+    let end = start + t[start..].find("</Skill>")?;
+    let g = start + t[start..end].match_indices("<Gem ").find(|(i, _)| t[start + i..end].split('>').next().is_some_and(|x| x.contains(" skillPart=\"")))?.0;
+    let at = g + t[g..].find(" skillPart=\"")? + " skillPart=\"".len();
+    let q = at + t[at..].find('"')?;
+    Some(format!("{}1{}", &t[..at], &t[q..]))
+}
+
 fn eval_one(session: &mut Option<Session>, cand: &Cand, names: &[&str]) -> Result<Vals, String> {
     let game = pom_calc::data::game_data();
     // Flasks count when sustained (the goal's default): the names then ask for the flask mask and shortfall.
@@ -1419,18 +1446,9 @@ fn eval_one(session: &mut Option<Session>, cand: &Cand, names: &[&str]) -> Resul
     // back to (part 1). The scored damage is the mix.
     let dr = names.iter().position(|n| *n == DRAIN_BOSS || *n == DRAIN_MAP);
     let drain_mixed = |n: &str| mixed(n) || n == "Solver.BossDPS" || n == "Solver.ClearDPS";
-    let fed = |v: &Vals| dr.and_then(|d| v[d]).filter(|u| *u < 1.0);
-    // (the text with the main socket group's gem that has a skill part on part 1)
-    let unfed = |t: &str| -> Option<String> {
-        let b = t.find("<Build ")?;
-        let n: usize = t[b..b + t[b..].find('>')?].split("mainSocketGroup=\"").nth(1)?.split('"').next()?.parse().ok()?;
-        let start = t.match_indices("<Skill ").nth(n.max(1) - 1)?.0;
-        let end = start + t[start..].find("</Skill>")?;
-        let g = start + t[start..end].match_indices("<Gem ").find(|(i, _)| t[start + i..end].split('>').next().is_some_and(|x| x.contains(" skillPart=\"")))?.0;
-        let at = g + t[g..].find(" skillPart=\"")? + " skillPart=\"".len();
-        let q = at + t[at..].find('"')?;
-        Some(format!("{}1{}", &t[..at], &t[q..]))
-    };
+    let worn = names.contains(&FLASKS_WORN);
+    let fed = |v: &Vals| dr.filter(|_| !worn).and_then(|d| v[d]).filter(|u| *u < 1.0);
+    let unfed = unfed_text;
     let finish = |v: &mut Vals, have: u8| {
         if let (Some(a), Some(b)) = (fm, fb) {
             let want = sustained_mask(v);
@@ -2674,6 +2692,10 @@ struct Solver {
     avoid: RefCell<HashSet<i64>>,
     /// The open build on the goal's terms, when the solve did not start from a blank build.
     start_xml: Option<String>,
+    /// The open build read on the search's terms (whole, as a searched row is read): what "worse than your build" compares with.
+    start_terms: Option<Vals>,
+    /// Per result id: its damage with the flask-charge-spending part unfed (`dry_damage`).
+    dry_memo: RefCell<HashMap<String, Option<f64>>>,
     /// The open build's item per slot (seeds the items layer).
     player_pieces: Vec<Option<items::Piece>>,
     /// Cost fixers the gem layer may add to keep supports a skill's cost holds back: (supports, utility skills).
@@ -2807,6 +2829,7 @@ impl Solver {
                     assumptions.push(format!("{} hold with every flask off; flasks used only when something happens to you (frozen, bleeding, a savage hit, a block, a guard skill, hitting a rare, using a life flask, a travel skill) do not count", parts.join(" and ")));
                 }
                 assumptions.push(match goal.assume.uptime() {
+                    _ if goal.assume.worn() => "Flasks for bossing: every worn flask counts as on, as for a player who presses it; when its charges would not last a boss fight without kills, the result says so in a notice".into(),
                     FlaskUptime::Mapping => format!("Flask uptime for mapping: a flask counts when kills (about {MAPPING_KILL_CHARGES} charges a second, five normal monsters), charges generated and critical strikes cover its charges per use; each result lists its flasks"),
                     FlaskUptime::Bossing => "Flask uptime for bossing: a flask counts only when the build sustains it: charges generated and gained on critical strikes over its duration cover its charges per use (no charges from kills); each result lists its flasks".into(),
                 });
@@ -2917,7 +2940,7 @@ impl Solver {
         let started = Instant::now();
         let evals = Arc::new(AtomicU64::new(0));
         let _beat = heartbeat(shared.clone(), evals.clone(), pool.pending.clone(), started, !opts.in_plan);
-        let mut s = Solver { goal, scorer, weights, names, pool, cancel, started, budget_ms, max_evals: opts.max_evals.unwrap_or(budget_ms * DEFAULT_EVALS_PER_SEC / 1000).max(1), evals, _beat, prof_pool_us: AtomicU64::new(0), prof_batches: AtomicU64::new(0), shared, session, level, points, asc_points, base_xml: reset, seed, ctx: Vec::new(), gems, main_gem, required, archive: Vec::new(), layer: "starting".into(), layers: Vec::new(), current: String::new(), assumptions, skills_open: String::new(), group_memo: RefCell::new(HashMap::default()), tree_sockets: Vec::new(), rules: ItemRules::default(), slots: Vec::new(), start_gear: Arc::new(Gear::default()), item_level: level.clamp(1, 100) as u32, weapon_types, uniques: Vec::new(), bases: RefCell::new(HashMap::default()), slot_base_memo: RefCell::new(HashMap::default()), gear_enum_memo: RefCell::new(None), gear_all_memo: RefCell::new(HashMap::default()), ranks: HashMap::default(), lead_hint: Vec::new(), plan_lead: Vec::new(), ignore_budget: std::cell::Cell::new(false), phase_end: std::cell::Cell::new(u64::MAX), start_xml, player_pieces: Vec::new(), fixers: (Vec::new(), Vec::new()), blocked: Default::default(), sustain_tried: Default::default(), totem: spell_totem(), node_memo: Default::default(), main_part: Default::default(), keystone_memo: Default::default(), banned: Default::default(), own_gems: own_gems(&xml), large_sockets: Vec::new(), cluster_ids: RefCell::new(HashMap::default()), sub_sockets: HashMap::default(), live_axes: Default::default(), cfg_items: Default::default(), cfg_flagged: Default::default(), cfg_tree: Default::default(), gens: Vec::new(), book: Default::default(), lead_gear: None, baseline: None, picked: None, rng_seed: opts.seed.unwrap_or(0), behind: Default::default(), leads_tries: Default::default(), finalizing: Default::default(), notable_reach: Default::default(), avoid: Default::default() };
+        let mut s = Solver { goal, scorer, weights, names, pool, cancel, started, budget_ms, max_evals: opts.max_evals.unwrap_or(budget_ms * DEFAULT_EVALS_PER_SEC / 1000).max(1), evals, _beat, prof_pool_us: AtomicU64::new(0), prof_batches: AtomicU64::new(0), shared, session, level, points, asc_points, base_xml: reset, seed, ctx: Vec::new(), gems, main_gem, required, archive: Vec::new(), layer: "starting".into(), layers: Vec::new(), current: String::new(), assumptions, skills_open: String::new(), group_memo: RefCell::new(HashMap::default()), tree_sockets: Vec::new(), rules: ItemRules::default(), slots: Vec::new(), start_gear: Arc::new(Gear::default()), item_level: level.clamp(1, 100) as u32, weapon_types, uniques: Vec::new(), bases: RefCell::new(HashMap::default()), slot_base_memo: RefCell::new(HashMap::default()), gear_enum_memo: RefCell::new(None), gear_all_memo: RefCell::new(HashMap::default()), ranks: HashMap::default(), lead_hint: Vec::new(), plan_lead: Vec::new(), ignore_budget: std::cell::Cell::new(false), phase_end: std::cell::Cell::new(u64::MAX), start_xml, start_terms: None, dry_memo: Default::default(), player_pieces: Vec::new(), fixers: (Vec::new(), Vec::new()), blocked: Default::default(), sustain_tried: Default::default(), totem: spell_totem(), node_memo: Default::default(), main_part: Default::default(), keystone_memo: Default::default(), banned: Default::default(), own_gems: own_gems(&xml), large_sockets: Vec::new(), cluster_ids: RefCell::new(HashMap::default()), sub_sockets: HashMap::default(), live_axes: Default::default(), cfg_items: Default::default(), cfg_flagged: Default::default(), cfg_tree: Default::default(), gens: Vec::new(), book: Default::default(), lead_gear: None, baseline: None, picked: None, rng_seed: opts.seed.unwrap_or(0), behind: Default::default(), leads_tries: Default::default(), finalizing: Default::default(), notable_reach: Default::default(), avoid: Default::default() };
         s.fixers = s.cost_fixers();
         s.setup_items(&xml)?;
         Ok(s)
@@ -3170,11 +3193,21 @@ impl Solver {
         if let Some((_, name)) = self.main_part.get().filter(|p| p.0 > 1) {
             out.push(if self.goal.assume.flasks { format!("Main skill scored on its \"{name}\" part: it adds damage from gear the build wears") } else { format!("Main skill's \"{name}\" part adds damage only from gear the build wears; flasks are off, so a flask it reads adds nothing") });
             if let Some(u) = self.scorer.names.iter().position(|x| x == self.goal.assume.drain_stat()).and_then(|k| e.vals.get(k).copied().flatten()).filter(|u| *u < 1.0) {
-                let when = if self.goal.assume.uptime() == FlaskUptime::Mapping { "while mapping".to_string() } else { format!("in a {}-second fight without kills", crate::solver_drain::FIGHT_SECS) };
-                out.push(format!("The \"{name}\" part spends flask charges: the worn life flasks feed it {}% of the time {when}; the rest of the damage is the part it falls back to", (u * 100.0).round()));
+                if self.goal.assume.worn() {
+                    // (owner rule 2026-11-12: the shown DPS stays the engine's; the notice also says what is left with the charges out)
+                    let shown = self.scorer.damage_value(&e.vals);
+                    let dry = self.dry_damage(e).filter(|d| *d < shown * (1.0 - 1e-3)).map_or(String::new(), |d| format!("; shown {} DPS, about {} when the charges are out", short_num(shown), short_num(d)));
+                    out.push(format!("Damage assumes the \"{name}\" part has flask charges every time; on a boss with no kills the worn life flasks feed it about {}% of a {}-second fight{dry}", (u * 100.0).round(), crate::solver_drain::FIGHT_SECS));
+                } else {
+                    let when = if self.goal.assume.uptime() == FlaskUptime::Mapping { "while mapping".to_string() } else { format!("in a {}-second fight without kills", crate::solver_drain::FIGHT_SECS) };
+                    out.push(format!("The \"{name}\" part spends flask charges: the worn life flasks feed it {}% of the time {when}; the rest of the damage is the part it falls back to", (u * 100.0).round()));
+                }
             }
         }
-        let Some(mask) = self.flask_mask_of(&e.vals) else { return out };
+        let worn = self.goal.assume.worn();
+        let Some(mask) = (if worn { Some(flask_flags(&e.xml)) } else { self.flask_mask_of(&e.vals) }) else { return out };
+        // (worn flasks: the ones whose charges would not last the fight, with their uptime in it)
+        let mut short = Vec::new();
         for (i, d) in self.slots.iter().enumerate() {
             if d.kind != SlotKind::Flask {
                 continue;
@@ -3185,6 +3218,16 @@ impl Solver {
             let name = p.unique_name().map(|u| u.to_string()).or_else(|| p.base().map(|b| b.name.clone())).unwrap_or_else(|| p.label.split(" (").next().unwrap_or("").to_string());
             let name = name.replace("&apos;", "'").replace("&quot;", "\"").replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&");
             let pct = (up * 100.0).min(100.0).round();
+            if worn {
+                // (only utility flasks short of charges: a life, mana or hybrid flask is pressed when needed, and an event flask's 0% comes from its event line)
+                // (the player's own and unique items carry no base, so the name lines say which kind it is)
+                let life_mana = p.xml.lines().take(4).any(|l| ["Life Flask", "Mana Flask", "Hybrid Flask"].iter().any(|k| l.contains(k)));
+                let on_event = p.xml.lines().any(|l| flask_fires_on_event(l.rsplit('}').next().unwrap_or(l)));
+                if mask & (1 << (n - 1)) != 0 && up < 0.999 && !life_mana && !on_event {
+                    short.push(format!("{name} (up {pct}% of the fight)"));
+                }
+                continue;
+            }
             let map_up = self.scorer.names.iter().position(|x| self.goal.assume.map_side() && *x == format!("Solver.FlaskUptimeMap{n}")).and_then(|k| e.vals.get(k).copied().flatten()).unwrap_or(0.0);
             out.push(if mask & (1 << (n - 1)) != 0 {
                 format!("{} ({name}) counts: sustained, {pct}% uptime", d.name)
@@ -3193,6 +3236,9 @@ impl Solver {
             } else {
                 format!("{} ({name}) does not count: {pct}% uptime {}", d.name, if self.goal.assume.uptime() == FlaskUptime::Mapping { "while mapping" } else { "without charges from kills" })
             });
+        }
+        if !short.is_empty() {
+            out.push(format!("Flask charges will not last a boss fight without kills: {}", short.join(", ")));
         }
         out
     }
@@ -3671,6 +3717,21 @@ impl Solver {
         }
     }
 
+    /// A result's damage with its flask-charge-spending part unfed (the charges out), read once per result.
+    fn dry_damage(&self, e: &Entry) -> Option<f64> {
+        if let Some(d) = self.dry_memo.borrow().get(&e.id) {
+            return *d;
+        }
+        let d = unfed_text(&e.xml).and_then(|t| {
+            let t = Arc::new(t);
+            let c = if e.start { Cand::Open(t) } else { Cand::Xml(t) };
+            self.pool.eval(vec![c], &self.names, &self.cancel).pop().flatten()
+        });
+        let d = d.map(|v| self.scorer.damage_value(&v));
+        self.dry_memo.borrow_mut().insert(e.id.clone(), d);
+        d
+    }
+
     fn flask_mask_of(&self, v: &Vals) -> Option<u8> {
         let i = self.scorer.names.iter().position(|n| n == FLASK_MASK)?;
         v.get(i).copied().flatten().map(|m| m as u8)
@@ -3774,6 +3835,10 @@ impl Solver {
         // The open build's numbers next to each result, so a result below it says so (it can be listed for meeting
         // limits the open build misses).
         let start = self.archive.iter().find(|a| a.start && !e.start);
+        // (a searched row is compared with the open build read the same way, on the search's terms, once that reading
+        // exists; the player's own config reading stays beside it)
+        let start_vals = start.map(|s| self.start_terms.as_ref().unwrap_or(&s.vals));
+        let weights: Vec<f64> = sc.targets.iter().map(|t| t.weight).collect();
         let mut below = false;
         let targets: Vec<Value> = sc
             .targets
@@ -3783,9 +3848,13 @@ impl Solver {
                 // What the sidebar shows for the same stats once the build is applied: `value` also takes off the
                 // warcry shouting time and the Mirage Archers that stay behind, so it can be lower.
                 let shown = sc.shown_value(t, &e.vals);
-                let sv = start.map(|s| sc.target_value(t, &s.vals));
+                let sv = start_vals.map(|s| sc.target_value(t, s));
                 below |= sv.is_some_and(|s| v < s * (1.0 - 1e-3));
-                json!({ "name": t.name, "metric": t.metric, "stats": t.stats.iter().map(|&k| sc.names[k].clone()).collect::<Vec<_>>(), "value": v, "shown": shown, "target": t.value, "met": t.value.is_none_or(|tv| v >= tv), "startValue": sv })
+                // (`startValue`: the open build on the search's terms; `startPlayerValue`: on the player's own config. The
+                // start row itself carries `searchValue`)
+                let player = start.map(|s| sc.target_value(t, &s.vals));
+                let search = self.start_terms.as_ref().filter(|_| e.start).map(|s| sc.target_value(t, s));
+                json!({ "name": t.name, "metric": t.metric, "stats": t.stats.iter().map(|&k| sc.names[k].clone()).collect::<Vec<_>>(), "value": v, "shown": shown, "target": t.value, "met": t.value.is_none_or(|tv| v >= tv), "startValue": sv, "startPlayerValue": player, "searchValue": search })
             })
             .collect();
         let defs = sc.deficits(&e.vals);
@@ -3843,7 +3912,7 @@ impl Solver {
             "start": e.start,
             "belowStart": below,
             // What the result changed from the open build (gems, other skills, flasks), with its score against the open build's.
-            "fromStart": start.map(|s| json!({ "changes": changes_from_start((&s.main, &s.utils, &self.flasks_of(&s.gear)), (&e.main, &e.utils, &self.flasks_of(&e.gear))), "scoreGain": e.score - s.score })),
+            "fromStart": start.map(|s| json!({ "changes": changes_from_start((&s.main, &s.utils, &self.flasks_of(&s.gear)), (&e.main, &e.utils, &self.flasks_of(&e.gear))), "scoreGain": e.score - self.start_terms.as_ref().map_or(s.score, |v| sc.score(v, &weights).0) })),
             "assumptions": self.entry_assumptions(e),
             "bossBreakdown": self.boss_breakdown_text(e),
             "bossChips": e.boss_chips,
@@ -5474,6 +5543,20 @@ impl Solver {
     fn run(&mut self) -> Result<(), String> {
         let cands = self.candidates()?;
         self.archive_start()?;
+        // The open build as a whole state, read on the search's terms at once: every row's "worse than your build" compares
+        // with this reading, and it joins the finals below.
+        let mut start_whole = None;
+        if let Some(x) = self.start_xml.clone().filter(|_| self.seed.is_some()) {
+            match self.frozen_state(&x) {
+                Ok(st) => {
+                    let t: Vec<String> = self.scorer.targets.iter().map(|t| format!("{} {}", t.name, short_num(self.scorer.target_value(t, &st.vals)))).collect();
+                    self.assumptions.push(format!("Your build is searched as a whole build too (its tree, gems, auras, flasks and items; a change kept only when the score rises). On the search's terms it reads {}", t.join(", ")));
+                    self.start_terms = Some(st.vals.clone());
+                    start_whole = Some(st);
+                }
+                Err(e) => self.assumptions.push(format!("Your build did not seed the search as a whole build: {e}")),
+            }
+        }
         let b = self.budget_ms;
         // Soft limits count a fifth until cut 1 (PLAN 5d).
         self.scorer.ramp = 0.2;
@@ -5594,18 +5677,11 @@ impl Solver {
         let mut picked: Vec<State> = pool.into_iter().take(3).collect();
         // The open build as a whole (tree, gems, auras, curses, flasks, items) is a final too: the refinement and kicks
         // below keep a change to it only when the score rises, and its rows name what changed (`fromStart`).
-        if let Some(x) = self.start_xml.clone().filter(|_| self.seed.is_some()) {
-            match self.frozen_state(&x) {
-                Ok(mut st) => {
-                    (st.score, st.viol) = self.score(&st.vals);
-                    let t: Vec<String> = self.scorer.targets.iter().map(|t| format!("{} {}", t.name, short_num(self.scorer.target_value(t, &st.vals)))).collect();
-                    self.assumptions.push(format!("Your build is searched as a whole build too (its tree, gems, auras, flasks and items; a change kept only when the score rises). On the search's terms it reads {}", t.join(", ")));
-                    self.archive_add(&st)?;
-                    // (first, so it gets its share of the refinement before the time runs out)
-                    picked.insert(0, st);
-                }
-                Err(e) => self.assumptions.push(format!("Your build did not seed the search as a whole build: {e}")),
-            }
+        if let Some(mut st) = start_whole {
+            (st.score, st.viol) = self.score(&st.vals);
+            self.archive_add(&st)?;
+            // (first, so it gets its share of the refinement before the time runs out)
+            picked.insert(0, st);
         }
         let n = picked.len();
         for (k, mut st) in picked.into_iter().enumerate() {
@@ -5798,6 +5874,110 @@ mod tests {
         assert!(changes_from_start((&m, &u, &fl), (&m, &u, &fl)).is_empty());
         let (m2, u2, fl2) = (v(&["Poisonous Concoction", "Momentum"]), v(&["Grace"]), f(&[("Flask 1", "Divine Life Flask"), ("Flask 2", "Jade Flask")]));
         assert_eq!(changes_from_start((&m, &u, &fl), (&m2, &u2, &fl2)), vec!["main link: Void Manipulation out", "main link: Momentum in", "other skills: Despair out", "Flask 2: Silver Flask -> Jade Flask"]);
+    }
+
+    const FLICKER_BOSS: &str = r#"{"skill":"Flicker Strike","level":90,"assume":{"playMode":"bossing"},"targets":[{"name":"DPS","metric":"dps"},{"name":"EHP","metric":"ehp"}]}"#;
+
+    /// Bossing (owner rule 2026-11-12, charge sustain is an alert only): a worn flask counts as on whether or not its charges
+    /// last a fight without kills, so a sustained flask scores no higher than the same flask unsustained; the row says
+    /// which flasks would run dry, and no limit holds the build back for it.
+    #[test]
+    fn bossing_counts_worn_flasks_and_alerts_on_sustain() {
+        let granite = |ring: &str| {
+            blank_build_xml(90).replace(
+                "<Items activeItemSet=\"1\" useSecondWeaponSet=\"nil\">
+		<ItemSet useSecondWeaponSet=\"nil\" id=\"1\" />",
+                &format!("<Items activeItemSet=\"1\" useSecondWeaponSet=\"nil\"><Item id=\"1\">Rarity: NORMAL
+Granite Flask
+Item Level: 90
+LevelReq: 27
+Implicits: 0</Item><Item id=\"2\">Rarity: RARE
+Test Ring
+Iron Ring
+Item Level: 90
+LevelReq: 1
+Implicits: 0
+{ring}</Item><ItemSet useSecondWeaponSet=\"nil\" id=\"1\"><Slot name=\"Flask 1\" itemId=\"1\" active=\"true\"/><Slot name=\"Ring 1\" itemId=\"2\"/></ItemSet>"),
+            )
+        };
+        let (dry, fed) = (granite("+10 to Dexterity"), granite("Flasks gain 30 Charges every 3 seconds"));
+        let g: Goal = serde_json::from_str(FLICKER_BOSS).unwrap();
+        let (sc, _) = Scorer::new(&g.settle()).unwrap();
+        let has = |n: &str| sc.names.iter().any(|x| x == n);
+        assert!(has(FLASKS_WORN) && has("Solver.FlaskUptime1") && !has(FLASK_MASK) && !sc.limits.iter().any(|l| l.name.contains("sustained")));
+        let worn = ["Armour", "Solver.FlaskUptime1", FLASKS_WORN];
+        let old = ["Armour", "Solver.FlaskUptime1", FLASK_MASK, FLASK_BROKEN];
+        let read = |x: &str, names: &[&str]| eval_one(&mut None, &Cand::Xml(Arc::new(x.to_string())), names).unwrap();
+        let (a, b) = (read(&dry, &worn), read(&fed, &worn));
+        println!("uptime dry {:?} fed {:?}; armour worn {:?} / {:?}; sustain model {:?} / {:?}", a[1], b[1], a[0], b[0], read(&dry, &old)[0], read(&fed, &old)[0]);
+        assert!(a[1].unwrap() < 0.999 && b[1].unwrap() >= 0.999, "one flask runs dry, the other lasts");
+        assert_eq!(a[0], b[0], "a worn flask counts the same, sustained or not");
+        assert!(read(&dry, &old)[0].unwrap() < read(&fed, &old)[0].unwrap(), "the sustain model (mapping) still tells them apart");
+        // the alert: a real bossing build whose utility flasks would not last
+        let mut s = solver_on_flicker(FLICKER_BOSS);
+        s.candidates().unwrap();
+        s.archive_start().unwrap();
+        let row = s.entry_json(0, &s.archive[0]);
+        let notes: Vec<&str> = row["assumptions"].as_array().unwrap().iter().filter_map(|v| v.as_str()).collect();
+        println!("{notes:#?}");
+        assert!(notes.iter().any(|n| n.starts_with("Flask charges will not last a boss fight without kills: ")), "{notes:?}");
+        assert!(!row["limits"].as_array().unwrap().iter().any(|l| l["name"].as_str().is_some_and(|n| n.contains("sustained"))));
+        // the skill part's notice: the damage shown (charges every time) and the damage with the charges out
+        let x = std::fs::read_to_string(format!("{}/testdata/pconc-assassin-player.xml", env!("CARGO_MANIFEST_DIR"))).unwrap().replace(r#"<Slot name="Flask 2" itemId="11" active="true"/><Slot name="Flask 3" itemId="12" active="true"/>"#, "");
+        let goal: Goal = serde_json::from_str(r#"{"skill":"Poisonous Concoction","level":90,"assume":{"playMode":"bossing"},"targets":[{"name":"DPS","metric":"dps"},{"name":"EHP","metric":"ehp"}]}"#).unwrap();
+        let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
+        let mut s = Solver::new(x.clone(), goal, Options::default(), shared, Arc::new(AtomicBool::new(false))).unwrap();
+        s.candidates().unwrap();
+        s.archive_start().unwrap();
+        // (a whole evaluation names the part the solver scores)
+        s.frozen_state(&x).unwrap();
+        let row = s.entry_json(0, &s.archive[0]);
+        let part: Vec<String> = row["assumptions"].as_array().unwrap().iter().filter_map(|v| v.as_str()).filter(|n| n.starts_with("Damage assumes")).map(String::from).collect();
+        println!("{part:#?}");
+        assert!(part.len() == 1 && part[0].contains("; shown ") && part[0].contains(" when the charges are out"), "{part:?}");
+    }
+
+    /// The boss-fight charge notice names only utility flasks that run dry for lack of charges: not a life flask, and not a
+    /// flask the event line ("Used when you ...") keeps at 0%.
+    #[test]
+    fn dry_flask_notice_skips_life_and_event_flasks() {
+        let goal: Goal = serde_json::from_str(FLICKER_BOSS).unwrap();
+        let xml = std::fs::read_to_string(format!("{}/testdata/finish-flicker.xml", env!("CARGO_MANIFEST_DIR"))).unwrap().replacen("Ruby Flask", "Divine Life Flask", 1);
+        let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
+        let mut s = Solver::new(xml, goal, Options::default(), shared, Arc::new(AtomicBool::new(false))).unwrap();
+        s.candidates().unwrap();
+        s.archive_start().unwrap();
+        let row = s.entry_json(0, &s.archive[0]);
+        let notes: Vec<&str> = row["assumptions"].as_array().unwrap().iter().filter_map(|v| v.as_str()).collect();
+        let n = notes.iter().find(|n| n.starts_with("Flask charges will not last a boss fight without kills: ")).expect("the notice");
+        println!("{n}");
+        assert!(n.contains("Taste of Hate"), "{n}");
+        assert!(!n.contains("Divine Life") && !n.contains("Bismuth") && !n.contains("Topaz"), "{n}");
+    }
+
+    /// "Worse than your build" compares like with like: a searched row against the open build read on the search's
+    /// terms, not on the player's own config; the start row carries both readings.
+    #[test]
+    fn below_start_compares_on_the_search_terms() {
+        let mut s = solver_on_flicker(FLICKER_BOSS);
+        s.candidates().unwrap();
+        s.archive_start().unwrap();
+        let si = s.archive.iter().position(|a| a.start).unwrap();
+        let k = s.scorer.targets.iter().position(|t| t.metric == "bossdps").unwrap();
+        let scale = |v: &Vals, f: f64| v.iter().map(|x| x.map(|y| y * f)).collect::<Vals>();
+        let player = s.archive[si].vals.clone();
+        // (the same build reads a third on the search's terms; the row reads half)
+        s.start_terms = Some(scale(&player, 0.3));
+        let a = &s.archive[si];
+        let e = Entry { id: "row".into(), honest: None, boss_chips: Vec::new(), clear: None, xml: a.xml.clone(), vals: scale(&player, 0.5), score: 0.0, viol: 0.0, label: "row".into(), class_name: String::new(), asc_name: None, points: 0, asc_points: 0, main: Vec::new(), utils: Vec::new(), bandit: String::new(), gear: a.gear.clone(), start: false, parts: Arc::default(), switches: Vec::new(), offers: Vec::new(), lead: None };
+        let row = s.entry_row(1, &e);
+        let t = &row["targets"][k];
+        println!("row {t}");
+        let f = |j: &Value| j.as_f64().unwrap();
+        assert!(f(&t["startPlayerValue"]) > f(&t["value"]) && f(&t["value"]) > f(&t["startValue"]), "{t}");
+        assert_eq!(row["belowStart"], json!(false), "better than the start on the search's terms");
+        let own = s.entry_row(0, &s.archive[si]);
+        assert!((f(&own["targets"][k]["searchValue"]) - s.scorer.target_value(&s.scorer.targets[k], s.start_terms.as_ref().unwrap())).abs() < 1e-6, "{}", own["targets"][k]);
     }
 
     #[test]

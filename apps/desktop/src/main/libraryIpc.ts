@@ -1,4 +1,5 @@
 import type { TimelessInstallStatus } from '../shared/timelessStatus.js';
+import { loadBuildWithTables, type TimelessInstaller } from './timelessData.js';
 import { app, BrowserWindow, dialog, ipcMain, net, shell } from 'electron';
 import { readFile, writeFile } from 'node:fs/promises';
 import type { EngineStatus } from '@pom/protocol';
@@ -51,6 +52,8 @@ export interface LibraryIpcDeps {
   updateAvailable: () => Promise<UpdateOffer>;
   timelessStatus: () => TimelessInstallStatus;
   timelessInstall: () => TimelessInstallStatus;
+  /** The tables' installer (null when the folder of plain tables is given); a build's open waits for the tables it needs. */
+  timelessInstaller: () => TimelessInstaller | null;
   /** The layer versions running now (they change when an update is applied). */
   versions?: () => { engine: string; interface: string };
   /** Set when accounts are on: told after each change so cloud sync follows. */
@@ -195,8 +198,7 @@ export function registerLibraryIpc(deps: LibraryIpcDeps): void {
   };
   handle(IPC.ENGINE_OPEN, async (xml: string): Promise<EngineBuildSummary> => {
     // The player's open build: the engine never closes it to make room for drafts or scratch copies.
-    const { buildId } = await engine.send('loadBuild', { buildXml: xml, keep: 'open' });
-    return summaryOf(buildId);
+    return summaryOf(await loadBuildWithTables(engine, xml, deps.timelessInstaller()));
   });
   handle(IPC.ENGINE_SUMMARY, (buildId: string) => summaryOf(buildId));
 

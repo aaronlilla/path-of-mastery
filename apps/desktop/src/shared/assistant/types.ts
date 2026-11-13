@@ -353,7 +353,7 @@ export interface SolveState {
   /** The run this is (1, then +1 per "Keep improving"). */
   block?: number;
   /** The run started from a kept build (PLAN.md slice 3): its first row is that build, complete and checked, so it can be applied while the search runs. Absent for a blank or Keep-improving start. */
-  startFrom?: { label: string; level: number; gearDivines: number };
+  startFrom?: { label: string; level: number; gearDivines: number; ladder?: KeptLadder };
   /** The per-lead results the AI reads after a stall (each lead as it stalls, and once when every lead has stalled). */
   replan?: string;
   /** One key per Solve update: the panel sends each key's `replan` to the AI once. */
@@ -386,6 +386,15 @@ export interface SolveDetails {
 /** How sure a number on the record is. */
 export type NumberStatus = 'computed' | 'conditional' | 'estimated' | 'unknown' | 'failed';
 export interface AssessedFinding { id: string; hard: boolean; text: string; fix?: string }
+/** How far real characters of a kept build's gem get on the ladder (our engine's numbers): the Solve row says so when the ask is above the best of them. */
+export interface KeptLadder {
+  /** What the numbers were measured on, in one line (provenance; the row's own line does not print it). */
+  sample: string;
+  /** Characters in the sample. */
+  count: number;
+  ehp?: { median: number; best: number };
+  dps?: { median: number; best: number };
+}
 export interface AssessedFix { what: string; why: string; delta: string }
 /**
  * The shared candidate record (MAX-AGENT-STEP1.md): frozen when a solver result is assessed. `xmlHash` is the engine's record id
@@ -400,6 +409,8 @@ export interface AssessedCandidate {
   sourceRevision: string;
   sidebar?: { stat: string; label: string; value: number; cull: number };
   findings: AssessedFinding[];
+  /** Things that depend on how the player plays (flask charges on a boss): told apart from `findings`, never part of the verdict or of what the AI repairs. */
+  notices?: string[];
   verdict: 'ready' | 'fix' | 'objections' | 'notReady' | 'unresolved';
   /** One plain sentence behind the verdict. */
   why: string;

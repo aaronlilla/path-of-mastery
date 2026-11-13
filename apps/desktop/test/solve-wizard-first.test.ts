@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { SolveGoal } from '@pom/protocol';
+import type { SolveGoal, SolveWealth } from '@pom/protocol';
 import { SOLVE_TOOLS, SolveManager } from '../src/main/assistant/solve.js';
 import { goalOfAsk, readBuildAsk } from '../src/main/assistant/solveAsk.js';
-import { answerQuestion, canRun, solveQuestions, usualLevel } from '../src/shared/assistant/solveQuestions.js';
+import { answerQuestion, canRun, solveQuestions, usualLevel, followLevel } from '../src/shared/assistant/solveQuestions.js';
 import type { AssistantEngine, ToolContext } from '../src/main/assistant/tools.js';
 
 // The form opens from the words at once; the AI's plan that arrives later never undoes the player's answers or a running solve.
@@ -75,4 +75,15 @@ test('the questions: budget and focus first, ascendancy and gem version only wit
   assert.equal(answerQuestion(g, 'ascendancy', 'Pathfinder').className, 'Ranger');
   assert.equal(solveQuestions({ ...g, ascendancy: 'Trickster' }, { ascendancies: [{ name: 'Pathfinder', share: 1 }] }).length, 2);
   assert.equal(usualLevel({ skill: 'x', wealth: 'league-start' }), 88);
+});
+
+test('the level box follows the wealth tier on a blank build until the player sets a level', () => {
+  const g = (wealth: SolveWealth, level?: number): SolveGoal => ({ skill: 'Boneshatter', wealth, ...(level ? { level } : {}) });
+  // blank build: level not owned yet. Mid-league kept builds are level 95, and keptFor needs goal level in [95, 100]
+  assert.equal(followLevel(false, 90, g('mid-league')), 95);
+  assert.equal(followLevel(false, 90, g('league-start')), 88);
+  // the player typed 92: wealth never touches it
+  assert.equal(followLevel(true, 92, g('mid-league')), 92);
+  // a goal that carries level 90 wins over the tier
+  assert.equal(followLevel(false, 90, g('mid-league', 90)), 90);
 });

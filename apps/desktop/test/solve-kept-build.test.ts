@@ -27,7 +27,7 @@ function rig() {
       return {};
     },
   } as unknown as AssistantEngine;
-  const m = new SolveManager({ engine, open: () => ({ buildId: 'b1', buildKey: 'k1', name: 'x' }), proposals: {} as never, tree: {} as never, push: () => undefined, pollMs: 5 });
+  const m = new SolveManager({ engine, open: () => ({ buildId: 'b1', buildKey: 'k1', name: 'x' }), proposals: {} as never, tree: {} as never, push: () => undefined, pollMs: 5, timeless: async () => void (await new Promise((r) => setTimeout(r, 20)), calls.push({ cmd: 'tables', args: {} })) });
   return { m, calls };
 }
 
@@ -64,6 +64,15 @@ test("the kept row stays on screen while the search's own solve has not listed i
   await m.stop();
 });
 
+test('the level the player asked for wins over the kept build\'s own: level 100 still starts from the level 95 build', async () => {
+  const { m, calls } = rig();
+  await m.run(goal({ level: 100 }));
+  assert.deepEqual(calls.filter((c) => c.cmd === 'solveStart').map((c) => c.args.goal.level), [100, 100]);
+  assert.equal(m.state.goal?.level, 100);
+  assert.equal(m.state.startFrom?.level, 95);
+  await m.stop();
+});
+
 test('league start takes the league start build; a level 88 box is fine, level 90 at mid league is not', () => {
   assert.equal(keptFor(goal({ wealth: 'league-start', level: 88 }))?.level, 85);
   assert.equal(keptFor(goal({ level: 95 }))?.tier, 'mid-league');
@@ -85,4 +94,12 @@ test('no kept build for the plain gem, another ascendancy, or a rich budget: the
 test('the wizard evidence has both gem versions for the skill', () => {
   const v = keptEvidence();
   assert.ok(v['Poisonous Concoction of Bouncing']!.builds > v['Poisonous Concoction']!.builds);
+});
+
+test('a kept build is loaded only after the timeless jewel tables are in place', async () => {
+  const { m, calls } = rig();
+  await m.run(goal({}));
+  const at = (cmd: string) => calls.findIndex((c) => c.cmd === cmd);
+  assert.deepEqual([at('tables') >= 0, at('tables') < at('loadBuild')], [true, true]);
+  await m.stop();
 });

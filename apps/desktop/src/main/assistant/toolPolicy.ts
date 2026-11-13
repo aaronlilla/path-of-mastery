@@ -17,7 +17,7 @@ export const TOOL_SCOPES: Readonly<Record<string, AiScope>> = Object.freeze({
   searchGame: 'mcp:read', lookupGame: 'mcp:read', patchChanges: 'mcp:read', getMechanic: 'mcp:read', kbStatus: 'mcp:read',
   getLevelingGuide: 'mcp:read', explainGuideStep: 'mcp:read', proposeLevelingSkill: 'mcp:propose',
   startSolve: 'mcp:propose', getSolve: 'mcp:read', stopSolve: 'mcp:propose', addLeads: 'mcp:propose', applySolveResult: 'mcp:propose',
-  openSolveDraft: 'mcp:propose', askPlayer: 'mcp:propose', checkBuild: 'mcp:read',
+  openSolveDraft: 'mcp:propose', askPlayer: 'mcp:propose', checkBuild: 'mcp:read', priceSlots: 'mcp:read',
   getBuildFilterStages: 'mcp:read', showInApp: 'mcp:read', explainLootItem: 'mcp:read', proposeBuildFilterChange: 'mcp:propose',
   bestUnique: 'mcp:read', spendPoints: 'mcp:read', takeNode: 'mcp:read',
   bestSupport: 'mcp:read', diagnoseBuild: 'mcp:read', buildPatterns: 'mcp:read', keptBuilds: 'mcp:read', setPlayerProfile: 'mcp:propose',
@@ -28,7 +28,7 @@ export const PANEL_ONLY_TOOLS: ReadonlySet<string> = new Set(['applySolveResult'
 
 /** Tools the selected-document gate always closes for outside clients (the panel keeps some of them). */
 export const UNRELATED_TOOLS = new Set(['compareBuilds', 'listLibrary', 'listSharedItems', 'equipSharedItem', 'listCharacters',
-  'importCharacter', 'getWealth', 'searchTrade', 'upgradeCandidates', 'startSolve', 'getSolve', 'stopSolve', 'addLeads', 'applySolveResult', 'openSolveDraft', 'askPlayer']);
+  'importCharacter', 'getWealth', 'searchTrade', 'upgradeCandidates', 'startSolve', 'getSolve', 'stopSolve', 'addLeads', 'applySolveResult', 'openSolveDraft', 'askPlayer', 'priceSlots']);
 
 /** Scope approval never authorizes the legacy account-wide mutation tools. */
 export function externalToolAllowed(name: string): boolean {

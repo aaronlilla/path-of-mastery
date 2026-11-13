@@ -266,6 +266,7 @@
 .ap .sv-keep { align-self: flex-start; }
 .ap .sv-wip { color: var(--text-muted); }
 .ap .sv-item { padding-left: 10px; border-left: 2px solid rgba(var(--line-rgb), .14); }
+.ap .sv-notice { margin-top: 4px; }
 .ap .sv-res { gap: 7px; }
 .ap .sv-rh { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .ap .sv-rh > b { flex: none; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(var(--accent-rgb), .14); color: var(--gold-text); font-size: 11.5px; }
@@ -282,7 +283,7 @@
 .ap .sv-assume { font-size: 12px; color: var(--text-faint); line-height: 1.45; }
 .ap .sv-res .card.change { padding: 10px 0 0; border: 0; background: none; border-top: 1px solid rgba(var(--line-rgb), .08); border-radius: 0; }
 .ap .sv-foot { flex: none; padding: 10px 16px 12px; border-top: 1px solid rgba(var(--line-rgb), .06); display: flex; }
-.ap .sv-run { flex: 1; justify-content: center; height: 36px; font-size: 13.5px; }
+.ap .sv-run { flex: 1 1 auto; justify-content: center; height: 36px; font-size: 13.5px; }
 .ap .sv-foot:has(.sv-why) { flex-direction: column; gap: 6px; }
 .ap .sv-why { font-size: 12px; color: var(--warning-text); text-align: center; }
 .ap .sv-wealth.need > span:first-child { color: var(--warning-text); font-weight: 600; }

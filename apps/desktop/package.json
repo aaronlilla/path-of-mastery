@@ -1,6 +1,6 @@
 {
   "name": "@pom/desktop",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "private": true,
   "description": "Path of Mastery desktop app (Electron)",
   "type": "module",

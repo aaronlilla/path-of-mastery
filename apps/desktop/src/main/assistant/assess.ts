@@ -86,6 +86,7 @@ async function check(ctx: ToolContext, i: AssessInput, rec: AssessedCandidate): 
   const oldShort = new Set((await unmetGems(ctx, i.liveBuildId)).map((g) => g.key));
   const fixes: AssessedFix[] = [];
   const found: AssessedFinding[] = [];
+  const notices: string[] = [];
   const auditEdits: ToolEdit[] = [];
   let fixedXml = i.xml;
   await withScratch(ctx, i.xml, async (b) => {
@@ -139,11 +140,16 @@ async function check(ctx: ToolContext, i: AssessInput, rec: AssessedCandidate): 
 
     // What a player would fault at a glance, judged on the build Apply sets (after the fixes above).
     const player = await playerObjections(ctx, b, fixedXml);
-    for (const o of player.found) if (!found.some((f) => f.text === o.text)) found.push({ id: `objection:${o.n}:${found.length}`, hard: o.blocks, text: o.text });
+    // what depends on how the player plays is a notice beside the list: not a finding, so never a reason for "needs fixes" and never repaired
+    for (const o of player.found) {
+      if (o.notice) notices.push(o.text);
+      else if (!found.some((f) => f.text === o.text)) found.push({ id: `objection:${o.n}:${found.length}`, hard: o.blocks, text: o.text });
+    }
     if (player.failed.length) found.push({ id: 'objectionsFailed', hard: false, text: `Player check ${player.failed.join(', ')} could not run.` });
   });
 
   rec.findings = found;
+  if (notices.length) rec.notices = notices;
   rec.fixes = fixes;
   const blockers = found.filter((f) => f.hard && !f.fix);
   if (blockers.length) {

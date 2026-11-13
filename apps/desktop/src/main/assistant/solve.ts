@@ -123,6 +123,8 @@ export interface SolveDeps {
   toolContext?: () => ToolContext | null;
   /** Jev's shortlist for a goal: the order the solver tests candidates in. Null or absent: today's order. */
   shortlist?: (goal: SolveGoal) => Promise<SolvePriority | null>;
+  /** Puts the timeless jewel tables in place (the app inflates them on first need); a kept build with such a jewel is "Not ready" without them. */
+  timeless?: () => Promise<void>;
 }
 
 export class SolveError extends Error {}
@@ -174,6 +176,7 @@ export class SolveManager {
       return this.s;
     }
     if (from === 'assistant') this.asked = null;
+    this.launchSeq++; // a Run still waiting on its first engine call belongs to the old goal
     const round = from === 'assistant' && this.s.status === 'stalled' && this.s.buildKey === o.buildKey ? (this.s.round ?? 1) + 1 : 1;
     if (this.s.status === 'running') await this.stop(false);
     this.set(
@@ -206,6 +209,7 @@ export class SolveManager {
   private warmPrices(goal: SolveGoal): void {
     const kept = keptFor(goal);
     const prices = this.deps.toolContext?.()?.prices;
+    if (kept) void this.deps.timeless?.().catch(() => undefined);
     if (!kept || !prices || this.warmed.has(kept.id)) return;
     this.warmed.add(kept.id);
     const names = [...new Set(readEquipped(kept.xml).filter((i) => /unique/i.test(i.rarity) && i.name).map((i) => i.name))];
@@ -260,30 +264,34 @@ export class SolveManager {
     const kept = startXml ? null : keptFor(asked);
     const g = kept ? withKept(asked, kept) : asked;
     const seedXml = startXml ?? kept?.xml;
-    const startFrom = kept ? { label: `Kept build, ${kept.tier === 'league-start' ? 'league start' : 'mid league'}`, level: kept.level, gearDivines: kept.gearDivines } : undefined;
-    await this.cancelEngine();
+    const startFrom = kept ? { label: `Kept build, ${kept.tier === 'league-start' ? 'league start' : 'mid league'}`, level: kept.level, gearDivines: kept.gearDivines, ...(kept.ladder ? { ladder: kept.ladder } : {}) } : undefined;
+    // Stop, a new goal, another build or a newer launch bumps launchSeq: from then on this launch starts nothing, sets nothing and cancels what it already started.
+    const token = await this.cancelEngine();
+    const stale = () => token !== this.launchSeq;
     const timeBudgetMs = opts.timeBudgetMs ?? this.s.timeBudgetMs;
     const cpu = opts.cpu ?? this.s.cpu;
     const threads = threadsFor(cpu);
     let priority: SolvePriority | null = null;
     if (this.deps.shortlist && !kept) {
+      if (stale()) return this.s;
       this.set({ buildKey: o.buildKey, goal: g, timeBudgetMs, cpu, status: 'shortlisting', snapshot: null, error: undefined });
       priority = await this.deps.shortlist(g).catch(() => null);
     }
     const uniquePrices = await this.deps.uniquePrices?.().catch(() => null);
+    if (stale()) return this.s;
     const runPatch = { buildKey: o.buildKey, goal: g, timeBudgetMs, cpu, status: 'running' as const, error: undefined, question: undefined, block, startFrom };
-    const token = this.launchSeq;
     let seed = seedXml;
     let shown: SolveSnapshot | null = null;
     this.keptRow = null;
     if (kept) {
       this.records.clear();
       this.resultRec.clear();
-      const first = await this.keptFirstRow(kept.xml, g, uniquePrices, (snap, id) => {
+      await this.deps.timeless?.().catch(() => undefined);
+      const first = await this.keptFirstRow(kept.xml, g, uniquePrices, stale, (snap, id) => {
         this.solveId = id;
         this.set({ ...runPatch, snapshot: snap });
       }).catch(() => null);
-      if (token !== this.launchSeq) return this.s;
+      if (stale()) return this.s;
       if (first) {
         seed = first.xml;
         shown = first.snap;
@@ -294,13 +302,18 @@ export class SolveManager {
     const from = seed ? (await this.deps.engine.send('loadBuild', { buildXml: seed })).buildId : o.buildId;
     let solveId: string;
     try {
+      if (stale()) return this.s;
       const options = { ...(timeBudgetMs ? { timeBudgetMs } : {}), ...(block > 1 ? { seed: block - 1 } : {}), ...(threads ? { threads } : {}) };
       ({ solveId } = await this.deps.engine.send('solveStart', { buildId: from, goal: { ...g, ...(priority ? { priority } : {}), ...(uniquePrices ? { uniquePrices } : {}) }, options }));
     } catch (e) {
-      if (this.s.status === 'shortlisting') this.set({ status: 'ready' });
+      if (!stale() && this.s.status === 'shortlisting') this.set({ status: 'ready' });
       throw e;
     } finally {
       if (seed) await this.deps.engine.send('closeBuild', { buildId: from }).catch(() => undefined);
+    }
+    if (stale()) {
+      await this.deps.engine.send('solveCancel', { solveId }).catch(() => undefined);
+      return this.s;
     }
     this.solveId = solveId;
     if (!kept) {
@@ -319,26 +332,34 @@ export class SolveManager {
    * The kept build's own start row, listed and checked while the CPU is still free (under a running search one assessment takes tens of seconds). Returns the row's text and snapshot,
    * or null when the engine gives no row in time (the search then starts from the kept file and the row is checked when the player opens it).
    */
-  private async keptFirstRow(xml: string, goal: SolveGoal, uniquePrices: Record<string, number> | null | undefined, show: (snap: SolveSnapshot, id: string) => void): Promise<{ xml: string; snap: SolveSnapshot } | null> {
+  private async keptFirstRow(xml: string, goal: SolveGoal, uniquePrices: Record<string, number> | null | undefined, stale: () => boolean, show: (snap: SolveSnapshot, id: string) => void): Promise<{ xml: string; snap: SolveSnapshot } | null> {
     const { buildId } = await this.deps.engine.send('loadBuild', { buildXml: xml });
     let id: string;
     try {
+      if (stale()) return null;
       ({ solveId: id } = await this.deps.engine.send('solveStart', { buildId, goal: { ...goal, ...(uniquePrices ? { uniquePrices } : {}) }, options: { ...{ maxEvals: 1 }, threads: 1 } }));
     } finally {
       await this.deps.engine.send('closeBuild', { buildId }).catch(() => undefined);
     }
-    for (const until = Date.now() + 10_000; Date.now() < until; await new Promise((r) => setTimeout(r, 200))) {
-      const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 });
-      const at = snap.results.findIndex((r) => r.start);
-      if (at >= 0) {
-        show(snap, id);
-        await this.assess(at).catch(() => undefined);
-        return { xml: await this.resultXml(at), snap };
+    // The probe is cancelled on every way out: the search runs on another scratch build, so the engine would keep it (and, with plan leads, its idle thread) until it exits.
+    try {
+      for (const until = Date.now() + 10_000; Date.now() < until; await new Promise((r) => setTimeout(r, 200))) {
+        if (stale()) return null;
+        const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 });
+        if (stale()) return null;
+        const at = snap.results.findIndex((r) => r.start);
+        if (at >= 0) {
+          show(snap, id);
+          await this.assess(at).catch(() => undefined);
+          if (stale()) return null;
+          return { xml: await this.resultXml(at), snap };
+        }
+        if (snap.error || snap.done) break;
       }
-      if (snap.error || snap.done) break;
+      return null;
+    } finally {
+      await this.deps.engine.send('solveCancel', { solveId: id }).catch(() => undefined);
     }
-    await this.deps.engine.send('solveCancel', { solveId: id }).catch(() => undefined);
-    return null;
   }
 
   private schedule(): void {
@@ -376,12 +397,14 @@ export class SolveManager {
     }
   }
 
-  private async cancelEngine(): Promise<void> {
-    this.launchSeq++;
+  /** Returns the new launch number (taken before any await, so a later cancel always makes it stale). */
+  private async cancelEngine(): Promise<number> {
+    const seq = ++this.launchSeq;
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
     // (stalled: the engine may be idle waiting for leads; it still holds the solve)
     if (this.solveId && (this.s.status === 'running' || this.s.status === 'stalled')) await this.deps.engine.send('solveCancel', { solveId: this.solveId }).catch(() => undefined);
+    return seq;
   }
 
   /** The AI's new or replacement leads, into the running solve (they join its lead loop); a solve that already ended starts again with them. */
@@ -788,6 +811,9 @@ function solver(ctx: ToolContext): SolveManager {
 const round = (v: number) => (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100);
 
 /** A record as the AI reads it: the verdict, what a player would fault (`blocks`: cannot be made or used in game), the fixes the assessment made with their engine change, the targets after them, and how much of the kit has a market price. */
+/** One player-check line as checkBuild hands it to the AI; a notice stays flagged so it is not read as a fault. */
+export const objectionLine = (x: { n: number; text: string; blocks?: boolean; notice?: boolean }) => ({ n: x.n, text: x.text, ...(x.blocks ? { blocks: true } : {}), ...(x.notice ? { notice: true } : {}) });
+
 export function recordView(rec: AssessedCandidate) {
   return {
     verdict: rec.verdict,
@@ -962,6 +988,7 @@ export const SOLVE_TOOLS: ToolDef[] = [
         d.startAllocated = (await ctx.engine.send('treeState', { buildId: open.buildId })).tree.allocated;
         d.lines.push(...(await solveLayers(openXml, a.xml, ctx.tree, a.assumptions)).layers.map((l) => l.text));
         d.kinds.add('setXml');
+        if (a.rec.verdict === 'notReady') d.notReady = a.rec.why;
         return {
           draftId: d.id,
           name: d.name,
@@ -975,7 +1002,7 @@ export const SOLVE_TOOLS: ToolDef[] = [
     name: 'checkBuild',
     chip: 'Check as a player',
     description:
-      "What a seasoned player would fault in the open build or a draft (draftId): the player checks (reservation, sustain, accuracy, resist caps, flasks, auras, a craft or item that cannot exist in game, weapon, ...) and the audit's fatal findings with their ready edits. Run it on a draft after your edits to see what is left. Each line is a fault to fix with an edit, unless it only describes how the build is played (flask charges, kills, uptime): that is a notice, left as it is.",
+      "What a seasoned player would fault in the open build or a draft (draftId): the player checks (reservation, sustain, accuracy, resist caps, flasks, auras, a craft or item that cannot exist in game, weapon, ...) and the audit's fatal findings with their ready edits. Run it on a draft after your edits to see what is left. Each line is a fault to fix with an edit, unless it only describes how the build is played (flask charges, kills, uptime): that is a notice (notice: true), left as it is.",
     shape: { draftId: z.string().max(20).optional() },
     run: async (args, ctx) => {
       const b = need(ctx, args);
@@ -983,7 +1010,7 @@ export const SOLVE_TOOLS: ToolDef[] = [
       const o = await playerObjections(ctx, b.buildId, xml);
       const a = await auditBuild(ctx, b.buildId, xml);
       return {
-        objections: o.found.map((x) => ({ n: x.n, text: x.text, ...(x.blocks ? { blocks: true } : {}) })),
+        objections: o.found.map(objectionLine),
         ...(o.failed.length ? { couldNotRun: o.failed } : {}),
         auditFatal: a.findings.filter((f) => f.fatal).map((f) => ({ id: f.id, text: f.shown, ...(f.fix ? { fix: f.fix } : {}), ...(f.edits?.length ? { edits: f.edits } : {}) })),
         note: 'Nothing was changed. A check that could not run (couldNotRun) is not a pass.',

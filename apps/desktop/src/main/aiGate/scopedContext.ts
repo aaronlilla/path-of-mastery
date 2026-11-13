@@ -75,7 +75,7 @@ const BUILD_COMMANDS = new Set<CommandName>(['getBuildXml', 'getStats', 'getBrea
 const MUTATIONS = new Set<CommandName>(['edit', 'undo', 'nodePowerStart', 'nodePowerStep', 'timelessStart', 'timelessStep', 'timelessCancel']);
 const FILTER_TOOLS = new Set(['getLootFilter', 'findLootItems', 'listLootTiers', 'proposeLootRules']);
 /** The panel's own unrelated tools: its solve (set up, run, read, stop), and trade searches about the selected build's own gear (they read no other document). */
-const PANEL_OPEN = new Set(['startSolve', 'getSolve', 'stopSolve', 'addLeads', 'openSolveDraft', 'askPlayer', 'searchTrade', 'upgradeCandidates']);
+const PANEL_OPEN = new Set(['startSolve', 'getSolve', 'stopSolve', 'addLeads', 'openSolveDraft', 'askPlayer', 'searchTrade', 'upgradeCandidates', 'priceSlots']);
 /** Tools this gate closes for the app's own panel, so the panel never offers them (upgradeCandidates used to end the turn). */
 export const panelClosed = (tool: string): boolean => UNRELATED_TOOLS.has(tool) && !PANEL_OPEN.has(tool) && !PANEL_ONLY_TOOLS.has(tool);
 

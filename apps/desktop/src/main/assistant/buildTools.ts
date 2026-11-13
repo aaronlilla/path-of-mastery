@@ -28,6 +28,7 @@ import { checkChange, isPureQuestion, namedByPlayer } from './gate.js';
 import { respecCost } from './wealthPrices.js';
 import { DIAGNOSE_TOOLS } from './diagnose.js';
 import { auditBuild, auditChange, auditForAnswer, mainCount, withScaledCount } from './audit.js';
+import { playerObjections } from './objections.js';
 import {
   changeRows,
   deltasOf,
@@ -80,6 +81,17 @@ export interface Draft {
   /** One plain line per edit made, for the card. */
   lines: string[];
   kinds: Set<string>;
+  /** Opened from a solve row assessed "not ready" (openSolveDraft): proposeDraft applies it only once checkBuild's blocking lines are gone. */
+  notReady?: string;
+}
+
+/** What still makes a draft not ready, as checkBuild reads it: blocking player checks (5, 6, 17), a blocking check that could not run, the audit's fatal findings. */
+async function notReadyLeft(ctx: ToolContext, buildId: string): Promise<string[]> {
+  const xml = await xmlOf(ctx, buildId);
+  const o = await playerObjections(ctx, buildId, xml);
+  const fatal = await auditBuild(ctx, buildId, xml).then((a) => a.findings.filter((f) => f.fatal).map((f) => f.shown), () => ['the build audit could not run']);
+  const unrun = o.failed.filter((n) => n === 5 || n === 6 || n === 17).map((n) => `player check ${n} could not run`);
+  return [...o.found.filter((x) => x.blocks).map((x) => x.text), ...fatal, ...unrun];
 }
 
 /** Drafts live in engine sessions; only the newest few are kept (each one holds a calculated build in memory). */
@@ -846,6 +858,11 @@ export const PARITY_TOOLS: ToolDef[] = [
       if (open.buildKey !== d.baseKey) throw new ToolError('The draft was made from another build. Open that build, or start a new draft.');
       const openXml = await xmlOf(ctx, open.buildId);
       if (xmlHash(openXml) !== d.baseHash) throw new ToolError('The open build changed after the draft started, so the draft is out of date. Start a new draft.');
+      // a "not ready" solve row cannot be applied, as in the panel, until the repair has cleared what blocked it
+      if (d.notReady) {
+        const left = await notReadyLeft(ctx, d.buildId);
+        if (left.length) throw new ToolError(`This draft is not ready, so it cannot be applied: ${left[0]}${left.length > 1 ? ` (and ${left.length - 1} more)` : ''}. Repair it first: fix each blocking line with editDraft, run checkBuild with this draftId, then call proposeDraft again.`);
+      }
       // the repairs a single change gets, made on the draft itself: a requirement the draft broke, then (unless the draft
       // already loses heavily, which a fold-in would hide) old shortfalls and a skill that no longer pays its mana
       const full = fullDps(d.startStats);

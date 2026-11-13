@@ -12,14 +12,12 @@ import { tr } from './i18n';
 
 interface ChangeEntry {
   version: string;
-  date: string;
   groups: { tag: string; items: string[] }[];
 }
 
 const CHANGELOG: ChangeEntry[] = [
   {
-    version: '0.1.0',
-    date: tr('h_rb_Dlg.date'),
+    version: '',
     groups: [
       {
         tag: tr('h_rb_Dlg.tag_new'),
@@ -58,8 +56,8 @@ export function AboutDialog({ version, engineVersion, interfaceVersion, platform
   const query = q.trim().toLowerCase();
   const log = useMemo(
     () =>
-      CHANGELOG.map((c) => ({ ...c, groups: c.groups.map((g) => ({ ...g, items: g.items.filter((i) => !query || i.toLowerCase().includes(query) || g.tag.toLowerCase().includes(query)) })).filter((g) => g.items.length) })).filter((c) => c.groups.length),
-    [query],
+      CHANGELOG.map((c) => ({ ...c, version, groups: c.groups.map((g) => ({ ...g, items: g.items.filter((i) => !query || i.toLowerCase().includes(query) || g.tag.toLowerCase().includes(query)) })).filter((g) => g.items.length) })).filter((c) => c.groups.length),
+    [query, version],
   );
   const help = HELP.filter((h) => !query || h.head.toLowerCase().includes(query) || h.body.toLowerCase().includes(query));
   return (
@@ -113,7 +111,6 @@ export function AboutDialog({ version, engineVersion, interfaceVersion, platform
               <section key={c.version} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: `${i === 0 ? 0 : 16}px 0 ${i === log.length - 1 ? 0 : 16}px`, borderTop: i === 0 ? 'none' : '1px solid rgba(var(--line-rgb),.07)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ font: "600 20px/1.2 'Cormorant Garamond',serif", color: 'var(--text-display)' }}>{tr('Dialogs.version_version', { version: c.version })}</span>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{c.date}</span>
                 </div>
                 {c.groups.map((g) => (
                   <div key={g.tag} className="chg">

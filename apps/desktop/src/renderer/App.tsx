@@ -20,6 +20,7 @@ import { AboutDialog, ConfirmDialog, InfoDialog, MoveDialog, NameDialog, NewBuil
 import { areaDocs, buildDocs, settingsDocs, type SettingsSection } from './search/shellDocs';
 import { CloseGuardDialog, setCloseBlock, setRestartSaver } from './closeGuard';
 import { UpdateCenter } from './updates/UpdateCenter';
+import { takePlace } from './updates/restartPlace';
 import { ErrorBoundary } from './ErrorBoundary';
 import { ImportDialog } from './ImportDialog';
 import { SaveFailedDialog, SettingsPathDialog, UpdateAvailableDialog } from './FailureDialogs';
@@ -508,6 +509,7 @@ function AppInner() {
       if (!s) return;
       if (s.buildId) {
         const r = await window.pom.lib.read(s.buildId);
+        if (handoffRef.current.buildId) return; // the player opened a build while this one was read: theirs stays
         if (r.ok) {
           await openById(s.buildId);
           if (s.tab && tabVisible(s.tab)) setTab(s.tab);
@@ -515,6 +517,7 @@ function AppInner() {
       }
       if (s.area) setArea(s.area);
     };
+    void w.__pomRestoreState(takePlace()); // the place stashed by Restart now (updates/restartPlace.ts); null on a normal start
     return () => {
       delete w.__pomCaptureState;
       delete w.__pomRestoreState;

@@ -24,7 +24,12 @@ export interface Question {
   suggested?: string;
   /** Run stays disabled until every required question has an answer. */
   required: boolean;
+  /** Ascendancy of a named class: the most played ascendancy of the skill when it belongs to another class (shown as information, never picked). */
+  elsewhere?: { name: string; share: number };
 }
+
+/** A build with no gems, no items and no tree points: only then may the panel pick the most played ascendancy for a goal that names none. */
+export const isBlankBuild = (xml: string): boolean => !/<Gem\b|<Item\b/.test(xml) && !/\bnodes="[^"]+"/.test(xml);
 
 /** What the evidence table knows for the skill: ascendancies by share of builds (0..1), and every version of the gem with its build count. */
 export interface QuestionEvidence {
@@ -42,8 +47,15 @@ export function solveQuestions(goal: SolveGoal | null, ev: QuestionEvidence = {}
     { id: 'budget', text: 'How rich are you?', options: WEALTH.map(([value, label]) => ({ value, label })), answer: goal?.wealth ?? null, required: true },
     { id: 'focus', text: 'What is it for?', options: FOCUS.map(([value, label]) => ({ value, label })), answer: goal?.assume?.playMode ?? null, required: true },
   ];
-  const asc = [...(ev.ascendancies ?? [])].sort((a, b) => b.share - a.share).slice(0, 4);
-  if (goal && !goal.ascendancy && asc.length) {
+  const all = [...(ev.ascendancies ?? [])].sort((a, b) => b.share - a.share);
+  // A class the player named wins: only its ascendancies are offered and none is picked for them; the most played elsewhere is information only.
+  const named = goal?.className ? CLASSES.find((c) => c.name.toLowerCase() === goal.className!.toLowerCase()) : undefined;
+  if (goal && !goal.ascendancy && named && all.length) {
+    const own = named.ascendancies.map((n) => all.find((a) => a.name === n) ?? { name: n, share: 0 }).sort((a, b) => b.share - a.share);
+    const top = all[0]!;
+    qs.push({ id: 'ascendancy', text: 'Which ascendancy?', options: own.map((a) => ({ value: a.name, label: a.name })), answer: null, required: false, ...(named.ascendancies.includes(top.name) ? {} : { elsewhere: { name: top.name, share: top.share } }) });
+  } else if (goal && !goal.ascendancy && all.length) {
+    const asc = all.slice(0, 4);
     qs.push({ id: 'ascendancy', text: 'Which ascendancy?', options: asc.map((a, i) => ({ value: a.name, label: a.name, ...(i === 0 ? { note: `most played, ${pct(a.share)}` } : {}) })), answer: null, suggested: asc[0]!.name, required: false });
   }
   const typed = (goal?.skill ?? '').toLowerCase();
@@ -68,11 +80,25 @@ export function answerQuestion(goal: SolveGoal, id: QuestionId, value: string): 
   return { ...goal, ascendancy: value, ...(cls ? { className: cls } : {}) };
 }
 
+/**
+ * The class and ascendancy the form starts with when the goal names neither: the open build's own when it is not blank (an "improve my build" ask never moves class),
+ * else, on a blank build, the most played (`suggested`, shown as picked with its one-tap change: `picked`). Null leaves the form as it is.
+ */
+export function preselect(goal: SolveGoal, open: { className: string; ascendClassName: string; xml: string }, suggested?: string): { className: string; ascendancy: string; picked: boolean } | null {
+  if (goal.className || goal.ascendancy) return null;
+  if (!isBlankBuild(open.xml)) return open.className ? { className: open.className, ascendancy: open.ascendClassName === 'None' ? '' : open.ascendClassName, picked: false } : null;
+  if (!suggested) return null;
+  return { className: answerQuestion(goal, 'ascendancy', suggested).className ?? '', ascendancy: suggested, picked: true };
+}
+
 /** The level box: what the goal says, else the tier's usual one (league start 85 to 90, every other tier 95), else null and the panel keeps the open build's. Never a question. */
 export function usualLevel(goal: SolveGoal | null): number | null {
   if (goal?.level) return goal.level;
   return goal?.wealth ? (goal.wealth === 'league-start' ? 88 : 95) : null;
 }
+
+/** The level the form shows: its own once the player, the open build or an earlier goal set it (`own`), else `usualLevel` of the goal. */
+export const followLevel = (own: boolean, level: number, goal: SolveGoal): number => (own ? level : usualLevel(goal) ?? level);
 
 // ---- the evidence the questions read, from the shipped real-builds pack (resources/buildpatterns/patterns.json) ----
 

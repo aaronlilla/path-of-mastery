@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { UpdateNotice, UpdateStatus } from '../../shared/update.js';
 import { saveAllForRestart } from '../closeGuard';
+import { dropPlace, stashPlace } from './restartPlace';
 import { Dialog, Icon, useToast } from '../ui';
 import { fromMain, tr } from '../i18n';
 
@@ -112,9 +113,11 @@ export async function restartToUpdate(onError: (text: string) => void): Promise<
     if (!gate.ok) return onError(tr('updates_UpdateCenter.could_not_apply_the_update', { error: gate.error })), false;
     if (!gate.value.ok) return onError(fromMain('ml_io_update', gate.value.reason)), false;
     if (!(await saveAllForRestart())) return false;
+    // An interface update swaps the page and hands its place over itself; an app or engine restart loses it, so stash it.
+    if (current.kind !== 'interface') stashPlace((window as unknown as { __pomCaptureState?: () => unknown }).__pomCaptureState?.());
     const r = await window.pom.update.restart();
-    if (!r.ok) return onError(tr('updates_UpdateCenter.could_not_restart_error', { error: r.error })), false;
-    if (!r.value.ok) return onError(fromMain('ml_io_update', r.value.reason)), false;
+    if (!r.ok) return dropPlace(), onError(tr('updates_UpdateCenter.could_not_restart_error', { error: r.error })), false;
+    if (!r.value.ok) return dropPlace(), onError(fromMain('ml_io_update', r.value.reason)), false;
     done = true;
     return true;
   } finally {

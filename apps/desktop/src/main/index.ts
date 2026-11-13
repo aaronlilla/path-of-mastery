@@ -486,6 +486,7 @@ async function main(): Promise<void> {
     buildsDir,
     getWindow: () => (window.isDestroyed() ? null : window),
     timelessStatus: timelessStatusNow,
+    timelessInstaller: () => timelessInstaller,
     versions: () => ({ engine: shownVersion(engineHotSwap.getCurrentVersion(), STAMPED_VERSIONS.engine), interface: shownVersion(interfaceSwap.getCurrentVersion(), STAMPED_VERSIONS.interface) }),
     timelessInstall: () => {
       if (timelessInstaller) void timelessInstaller.ensure();
@@ -669,6 +670,7 @@ async function main(): Promise<void> {
     prices: wealthPriceSource(wealth),
     trade: wealthTradeSource(wealth),
     uniquePrices: async () => uniqueDivines(wealth),
+    timeless: async () => timelessInstaller?.ensure(),
     library: {
       async save(name, xml) {
         const e = await store.create('', name, xml);

@@ -3,6 +3,7 @@
 // one line in player words. The assessment reads the list for its verdict: a check with `blocks` (5, 6, 17) means "not ready"
 // (cannot be made or used in game), any other means "objections" (needs fixes, still applicable).
 import { auditBuild } from './audit.js';
+import { buildLegality } from './legality.js';
 import { readItems } from '../../shared/itemsXml.js';
 import { recoveryOf } from './playerSense.js';
 import { gemCatalog } from './gemFit.js';
@@ -16,6 +17,8 @@ export interface Objection {
   text: string;
   /** The build cannot be made or used in game: the verdict is "not ready". */
   blocks: boolean;
+  /** Depends on how the player plays (flask charges come from kills): a notice beside the list, never a fault, never repaired (owner rule, 2026-11-12). */
+  notice?: boolean;
 }
 
 export interface ObjectionResult {
@@ -64,7 +67,7 @@ const LIFE_FLASK = /\bLife Flask\b/;
 const flasksOf = (xml: string) => readEquipped(xml).filter((i) => /^Flask \d$/.test(i.slot));
 
 // 2. More than two life flasks.
-function lifeFlasks(xml: string): Objection[] {
+export function lifeFlasks(xml: string): Objection[] {
   const flasks = flasksOf(xml);
   const life = flasks.filter((i) => LIFE_FLASK.test(`${i.name}\n${i.base}`));
   if (life.length <= 2) return [];
@@ -72,13 +75,13 @@ function lifeFlasks(xml: string): Objection[] {
   return [{ n: 2, blocks: false, text: `${plural(life.length, 'life flask')} and ${utility ? plural(utility, 'utility flask') : 'no utility flasks'}: more than two life flasks leaves no room for the utility flasks (movement, armour, evasion, damage) a player runs.` }];
 }
 
-// 3. A flask enchant that stops a flask gaining charges; a main skill that spends charges faster than the flasks gain them.
-function flaskCharges(xml: string, stats: Record<string, Scalar>): Objection[] {
+// 3. A flask enchant that stops a flask gaining charges (a fault). A main skill that spends charges faster than the flasks gain them is a notice only.
+export function flaskCharges(xml: string, stats: Record<string, Scalar>): Objection[] {
   const out: Objection[] = [];
   const stuck = flasksOf(xml).filter((i) => /Gains no Charges during Effect/i.test(i.text));
   if (stuck.length) out.push({ n: 3, blocks: false, text: `${plural(stuck.length, 'flask')} (${stuck.map((i) => i.slot).join(', ')}) carry the enchant "Gains no Charges during Effect": they do not refill while they work.` });
   const up = Math.min(num(stats, 'FlaskDrainUptime') || 1, num(stats, 'FlaskDrainUptimeMap') || 1);
-  if (num(stats, 'FlaskDrainSpent') > num(stats, 'FlaskDrainGained') && up < FLASK_UP) out.push({ n: 3, blocks: false, text: `The main skill spends flask charges faster than the flasks gain them: the flasks are up ${pct(up)} of a fight.` });
+  if (num(stats, 'FlaskDrainSpent') > num(stats, 'FlaskDrainGained') && up < FLASK_UP) out.push({ n: 3, blocks: false, notice: true, text: `Flask charges come from kills: against a boss the flasks would be up about ${pct(up)} of the fight.` });
   return out;
 }
 
@@ -300,7 +303,12 @@ export async function playerObjections(ctx: ToolContext, buildId: string, xml: s
   if (!failed.includes(3)) await run(3, () => flaskCharges(xml, stats));
   await run(4, () => idleAscendancy(ctx, buildId, xml));
   await run(5, () => socketColours(ctx, xml));
-  await run(6, () => illegalCrafts(ctx, xml));
+  // the whole item check too (craft limit, affix limits, one mod per group, influence); a slot the craft check already faulted is not faulted twice for a craft
+  await run(6, async () => {
+    const own = await illegalCrafts(ctx, xml);
+    const more = (await buildLegality(ctx, xml)).issues.filter((i) => !(i.kind === 'notOnBase' && own.some((o) => o.text.startsWith(`${i.slot}:`))));
+    return [...own, ...more.map((i) => ({ n: 6, blocks: true, text: `${i.slot}: ${i.text}` }))];
+  });
   if (!failed.includes(7)) await run(7, () => landsOnTarget(gems));
   if (!failed.includes(8)) await run(8, () => handCastCurses(gems));
   if (!failed.includes(9)) await run(9, () => leansOnConfig(ctx, buildId, xml, gems));

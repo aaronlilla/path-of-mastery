@@ -1,8 +1,9 @@
 import type { SolveGoal, SolveResultSummary, SolveSnapshot, SolveWealth } from '@pom/protocol';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { AssessedCandidate, Proposal, SolveCpu, SolveDetails, SolveItemRules, SolveState } from '../../shared/assistant/types.js';
+import type { AssessedCandidate, KeptLadder, Proposal, SolveCpu, SolveDetails, SolveItemRules, SolveState } from '../../shared/assistant/types.js';
+import { keptGaps } from '../../shared/assistant/keptGap.js';
 import { CLASSES } from '../../shared/buildXml.js';
-import { answerQuestion, solveQuestions, standing, type AskEvidence } from '../../shared/assistant/solveQuestions.js';
+import { answerQuestion, preselect, solveQuestions, standing, followLevel, type AskEvidence } from '../../shared/assistant/solveQuestions.js';
 import { tileGap } from '../../shared/dpsTile.js';
 import { compactNumber } from '../format';
 import { useGameInfo } from '../gameData';
@@ -73,6 +74,8 @@ interface Form {
   className: string;
   ascendancy: string;
   level: number;
+  /** The level is the open build's, the player's or a goal's. False (blank build, nothing typed): it follows the wealth tier. */
+  levelOwn: boolean;
   targets: Array<{ name: string; metric: string; value: string }>;
   resistsOn: boolean;
   resists: number;
@@ -102,6 +105,7 @@ function defaultForm(build: OpenBuild): Form {
     className: '',
     ascendancy: '',
     level: build.info.level >= 2 ? build.info.level : 90,
+    levelOwn: build.info.level >= 2,
     targets: [
       { name: 'DPS', metric: 'dps', value: '' },
       { name: 'EHP', metric: 'ehp', value: '' },
@@ -124,6 +128,11 @@ function defaultForm(build: OpenBuild): Form {
     timeBudgetMs: 0,
     cpu: 'normal',
   };
+}
+
+/** Picking wealth moves a level the player never set to the tier's usual one (league start 88, else 95). */
+export function withWealth(f: Form, wealth: SolveWealth | ''): Form {
+  return { ...f, wealth, level: f.levelOwn ? f.level : followLevel(f.levelOwn, f.level, { skill: f.skill, ...(wealth ? { wealth } : {}) }) };
 }
 
 /** "1.5M", "50k", "1,200,000" -> a number. */
@@ -169,7 +178,8 @@ export function fromGoal(g: SolveGoal, st: SolveState, base: Form): Form {
     skill: g.skill,
     className: g.className ?? '',
     ascendancy: g.ascendancy ?? '',
-    level: g.level ?? base.level,
+    level: g.level ?? followLevel(!!base.levelOwn, base.level, g),
+    levelOwn: !!base.levelOwn || (g.level != null && g.level !== base.level), // the form's own level echoed back by main is not the player's
     targets: g.targets?.length ? g.targets.map((t) => ({ name: t.name, metric: t.metric ?? 'dps', value: t.value ? compactNumber(t.value) : '' })) : base.targets,
     resistsOn: g.limits?.resists !== null,
     resists: g.limits?.resists ?? 75,
@@ -406,18 +416,22 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
   }, [skillKey]);
   const ev = evRead.skill === skillKey ? evRead.ev : null;
   // The ascendancy question stays on screen after the app picked one for this skill (the model hides it once the goal holds one).
-  const [ascAsked, setAscAsked] = useState('');
-  const asked = ascAsked === skillKey;
-  const { ascendancy: _own, ...goalNoAsc } = toGoal(form);
-  const qs = solveQuestions(asked ? goalNoAsc : toGoal(form), ev ?? undefined);
-  // The most played ascendancy is picked once per skill, so Run works at once; one tap picks another (never again overridden).
+  // `cls`: the class the player had named when the question was answered ('' when the class came from the answer), so the options stay as they were.
+  const [ascAsked, setAscAsked] = useState<{ skill: string; cls: string }>({ skill: '', cls: '' });
+  const asked = ascAsked.skill === skillKey;
+  const { ascendancy: _own, className: _cls, ...goalNoAsc } = toGoal(form);
+  const qGoal = asked ? { ...goalNoAsc, ...(ascAsked.cls ? { className: ascAsked.cls } : {}) } : toGoal(form);
+  const qs = solveQuestions(qGoal, ev ?? undefined);
+  // Once per skill, when the goal names no class: the open build's own class (not blank), else on a blank build the most played ascendancy, shown picked; one tap picks another (never again overridden).
   const autoAsc = useRef('');
   const suggestedAsc = qs.find((q) => q.id === 'ascendancy')?.suggested;
   useEffect(() => {
-    if (!suggestedAsc || started || autoAsc.current === skillKey) return;
+    if (started || autoAsc.current === skillKey) return;
+    const p = preselect(toGoal(form), { ...build.info, xml: build.xml }, suggestedAsc);
+    if (!p) return;
     autoAsc.current = skillKey;
-    setAscAsked(skillKey);
-    setForm((f) => { const g = answerQuestion(toGoal(f), 'ascendancy', suggestedAsc); return { ...f, ascendancy: g.ascendancy ?? f.ascendancy, className: g.className ?? f.className }; });
+    if (p.picked) setAscAsked({ skill: skillKey, cls: '' });
+    setForm((f) => (f.className || f.ascendancy ? f : { ...f, className: p.className, ascendancy: p.ascendancy }));
   }, [suggestedAsc, started, skillKey]);
   const snap = st && st.buildKey === build.id ? st.snapshot : null;
   const results = snap?.results ?? [];
@@ -477,7 +491,7 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
   const wealthRow = (
     <div className={'sv-q' + (form.wealth ? '' : ' need')}>
       <b>{tr('assistant_SolvePanel.wealth')} <small>{tr('assistant_SolvePanel.required')}</small></b>
-      <Segmented ariaLabel={tr('assistant_SolvePanel.wealth')} value={form.wealth} onChange={(v) => set('wealth', v)} options={WEALTH} />
+      <Segmented ariaLabel={tr('assistant_SolvePanel.wealth')} value={form.wealth} onChange={(v) => setForm((f) => withWealth(f, v))} options={WEALTH} />
       <span className="sv-sub">{form.wealth ? WEALTH_HINT[form.wealth] : tr('assistant_SolvePanel.pick_one_nothing_is_chosen_for')}</span>
     </div>
   );
@@ -497,8 +511,9 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
     return (
       <div className="sv-q" key={q.id}>
         <b>{tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem' : 'assistant_SolvePanel.q_ascendancy')}</b>
-        <Segmented ariaLabel={tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem' : 'assistant_SolvePanel.q_ascendancy')} value={cur} onChange={(v) => { if (q.id === 'ascendancy') setAscAsked(skillKey); setForm((f) => { const g = answerQuestion(toGoal(f), q.id, v); return q.id === 'gem' ? { ...f, skill: g.skill } : { ...f, ascendancy: g.ascendancy ?? '', className: g.className ?? f.className }; }); }} options={q.options.map((o) => ({ value: o.value, label: o.label }))} />
+        <Segmented ariaLabel={tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem' : 'assistant_SolvePanel.q_ascendancy')} value={cur} onChange={(v) => { if (q.id === 'ascendancy') setAscAsked({ skill: skillKey, cls: qGoal.className ?? '' }); setForm((f) => { const g = answerQuestion(toGoal(f), q.id, v); return q.id === 'gem' ? { ...f, skill: g.skill } : { ...f, ascendancy: g.ascendancy ?? '', className: g.className ?? f.className }; }); }} options={q.options.map((o) => ({ value: o.value, label: o.label }))} />
         {top && <span className="sv-sub">{tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem_note' : 'assistant_SolvePanel.q_asc_note', { name: top.label, pct: pctOf(top.note), skill: form.skill.trim() })}</span>}
+        {q.elsewhere && <span className="sv-sub">{tr('assistant_SolvePanel.q_asc_elsewhere', { name: q.elsewhere.name, pct: `${Math.round(q.elsewhere.share * 100)}%`, skill: form.skill.trim(), cls: form.className })}</span>}
       </div>
     );
   });
@@ -518,7 +533,7 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
     if (tok === 'class') return <Select ariaLabel={tr('assistant_SolvePanel.class')} width="100%" value={form.className} onChange={(v) => set('className', v)} options={[{ value: '', label: tr('assistant_SolvePanel.solver_picks') }, ...CLASSES.map((c) => ({ value: c.name, label: c.name }))]} />;
     if (tok === 'asc') return <Select ariaLabel={tr('assistant_SolvePanel.ascendancy_2')} width="100%" value={form.ascendancy} onChange={(v) => set('ascendancy', v)} options={[{ value: '', label: tr('assistant_SolvePanel.solver_picks') }, ...CLASSES.flatMap((c) => c.ascendancies.map((x) => ({ value: x, label: x, hint: c.name })))]} />;
     if (tok === 'skill') return <input className="input" list="sv-skills" value={form.skill} onChange={(e) => set('skill', e.target.value)} placeholder={tr('assistant_SolvePanel.any_active_skill_gem')} aria-label={tr('assistant_SolvePanel.main_skill')} autoFocus />;
-    if (tok === 'level') return <input className="input" type="number" min={1} max={100} value={form.level} onChange={(e) => set('level', Math.max(1, Math.min(100, Number(e.target.value) || 1)))} aria-label={tr('assistant_SolvePanel.level')} autoFocus />;
+    if (tok === 'level') return <input className="input" type="number" min={1} max={100} value={form.level} onChange={(e) => setForm((f) => ({ ...f, level: Math.max(1, Math.min(100, Number(e.target.value) || 1)), levelOwn: true }))} aria-label={tr('assistant_SolvePanel.level')} autoFocus />;
     if (tok === 'items') {
       return (
         <>
@@ -623,7 +638,7 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
           <h4>{tr('assistant_SolvePanel.goal')}</h4>
           <div className={'sv-row sv-wealth' + (form.wealth ? '' : ' need')}>
             <span>{tr('assistant_SolvePanel.how_rich_are_you')}</span>
-            <Segmented ariaLabel={tr('assistant_SolvePanel.how_rich_are_you_2')} value={form.wealth} onChange={(v) => set('wealth', v)} options={WEALTH} />
+            <Segmented ariaLabel={tr('assistant_SolvePanel.how_rich_are_you_2')} value={form.wealth} onChange={(v) => setForm((f) => withWealth(f, v))} options={WEALTH} />
             <span className="sv-sub">{form.wealth ? WEALTH_HINT[form.wealth] : tr('assistant_SolvePanel.required_sets_which_gear_the_solver')}</span>
           </div>
           <label className="sv-row">
@@ -652,7 +667,7 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
             </label>
             <label className="sv-row">
               <span>{tr('assistant_SolvePanel.level')}</span>
-              <input className="input" type="number" min={1} max={100} value={form.level} onChange={(e) => set('level', Math.max(1, Math.min(100, Number(e.target.value) || 1)))} aria-label={tr('assistant_SolvePanel.level')} />
+              <input className="input" type="number" min={1} max={100} value={form.level} onChange={(e) => setForm((f) => ({ ...f, level: Math.max(1, Math.min(100, Number(e.target.value) || 1)), levelOwn: true }))} aria-label={tr('assistant_SolvePanel.level')} />
             </label>
           </div>
         </section>
@@ -779,10 +794,10 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
                 {tr('assistant_SolvePanel.solve_keep_improving')}
               </button>
             )}
-            {keptI >= 0 && <ResultRow key={`kept-${keptI}`} r={results[keptI]!} i={keptI} n={1} best={picks[0] === keptI} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />}
+            {keptI >= 0 && <ResultRow key={`kept-${keptI}`} r={results[keptI]!} i={keptI} n={1} best={picks[0] === keptI} keptLabel={keptLabel} ladder={st?.startFrom?.ladder} a={a} configOn={form.configOn} onOffer={toggleOffer} />}
             {picked.length > 0 && (
               <>
-                <ResultRow key={`p0-${picked[0]}`} r={results[picked[0]!]!} i={picked[0]!} n={keptI >= 0 ? 2 : 1} best={picks[0] !== keptI} running={running} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+                <ResultRow key={`p0-${picked[0]}`} r={results[picked[0]!]!} i={picked[0]!} n={keptI >= 0 ? 2 : 1} best={picks[0] !== keptI} running={running} keptLabel={keptLabel} ladder={st?.startFrom?.ladder} a={a} configOn={form.configOn} onOffer={toggleOffer} />
                 {picked.length > 1 && <h4 className="sv-sub-h">{tr('assistant_SolvePanel.other_directions_compared_with_1')}</h4>}
                 {picked.slice(1).map((pi, k) => (
                   <AltRow key={`p${k + 1}-${pi}`} r={results[pi]!} i={pi} n={k + (keptI >= 0 ? 3 : 2)} best={results[picked[0]!]!} tag={tagOf(results[pi]!, picked.map((x) => results[x]!))} running={running} a={a} configOn={form.configOn} onOffer={toggleOffer} />
@@ -798,7 +813,7 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
               </details>
             )}
             {picks.length === 0 && results.map((r, i) => i === keptI ? null : (
-              <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} lazy={i > 0} running={running} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+              <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} lazy={i > 0} running={running} keptLabel={keptLabel} ladder={st?.startFrom?.ladder} a={a} configOn={form.configOn} onOffer={toggleOffer} />
             ))}
             {snap?.assumptions && snap.assumptions.length > 0 && <div className="sv-assume">{tr('assistant_SolvePanel.assumed')} {snap.assumptions.join(' · ')}</div>}
           </section>
@@ -998,6 +1013,9 @@ function AssessLine({ a }: { a: AssessedCandidate | undefined }) {
       {a.fixes.map((f) => (
         <div key={f.what} className="sv-block">{tr('assistant_SolvePanel.fix_line', { what: f.what })}{f.delta ? ` (${f.delta})` : ''}</div>
       ))}
+      {a.notices?.map((t) => (
+        <div key={t} className="sv-block sv-notice" data-notice>{tr('assistant_SolvePanel.notice_label')} {t}</div>
+      ))}
       {coverage !== null && divines !== null && (
         <div className="sv-block" data-price>
           {tr('assistant_SolvePanel.price_line', { cost: divines < 0.1 ? tr('assistant_SolvePanel.price_under') : tr(divines === 1 ? 'assistant_SolvePanel.price_divine' : 'assistant_SolvePanel.price_divines', { value: divines }), pct: Math.round(coverage * 100), rest: unpriced.length ? tr('assistant_SolvePanel.price_none_for', { names: unpriced.join(', ') }) : '' })}
@@ -1008,7 +1026,7 @@ function AssessLine({ a }: { a: AssessedCandidate | undefined }) {
 }
 
 /** `running`: the solve is still going, so the row is a work in progress: no assessment, no Apply. `lazy`: not the top pick, assessed when the player opens it. */
-export function ResultRow({ r, i, n, best = false, running = false, lazy = false, keptLabel, a, configOn = [], onOffer }: { r: SolveResultSummary; i: number; n?: number; best?: boolean; running?: boolean; lazy?: boolean; keptLabel?: string; a: Assistant; configOn?: string[]; onOffer?: (key: string) => void }) {
+export function ResultRow({ r, i, n, best = false, running = false, lazy = false, keptLabel, ladder, a, configOn = [], onOffer }: { r: SolveResultSummary; i: number; n?: number; best?: boolean; running?: boolean; lazy?: boolean; keptLabel?: string; ladder?: KeptLadder; a: Assistant; configOn?: string[]; onOffer?: (key: string) => void }) {
   const toast = useToast();
   const [details, setDetails] = useState<SolveDetails | null>(null);
   const [show, setShow] = useState<'open' | 'compare' | null>(null);
@@ -1116,6 +1134,7 @@ export function ResultRow({ r, i, n, best = false, running = false, lazy = false
         )}
       </div>
       {block &&<div className="sv-block">{block}</div>}
+      {r.start && keptGaps(ladder, r.targets).map((g) => <div key={g.name} className="sv-block">{tr('assistant_SolvePanel.kept_gap', { count: g.count, asked: compactNumber(g.asked), name: g.name, median: compactNumber(g.median), best: compactNumber(g.best) })}</div>)}
       {below.length > 0 && <div className="sv-block">{tr('assistant_SolvePanel.below_your_build')} {below.join(', ')}</div>}
       {r.honest?.flagged && <div className="sv-block">{r.honest.text}</div>}
       {running ? <div className="sv-block sv-wip" data-verdict="running">{askPercent(r) === null ? tr('assistant_SolvePanel.solve_in_progress') : tr('assistant_SolvePanel.solve_in_progress_pct', { pct: askPercent(r) })}</div> : (details?.assessed || !lazy) && <AssessLine a={details?.assessed} />}

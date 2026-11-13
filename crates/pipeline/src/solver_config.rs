@@ -1535,19 +1535,24 @@ mod tests {
         // (put on by hand: the item choice now refuses it beside a skill that spends the charge; the cap is the fallback
         // for a build that wears one anyway)
         g.pieces[f] = Some(items::unique_piece(&rot));
+        // (evaluated with Rotgut off, as before bossing counted worn flasks as on: the stock read below is the config's own)
+        let n: usize = s.slots[f].name.rsplit(' ').next().and_then(|x| x.parse().ok()).unwrap();
+        g.flask_mask = 0x1f & !(1 << (n - 1));
         st.gear = Arc::new(g);
         s.rebase(&mut st).unwrap();
-        // (drunk: every flask in the evaluation's mask)
-        let k = s.scorer.names.iter().position(|x| x == FLASK_MASK).expect("the mask is read");
-        let mut v = st.vals.clone();
-        v[k] = Some(0x1f as f64);
-        let c = s.config_for(&st, &v);
+        // (drunk: every flask in the build's mask; bossing counts worn flasks as on, so the gear's mask is the one read)
+        let masked = |m: u8| {
+            let mut t = st.clone();
+            let mut g = (*t.gear).clone();
+            g.flask_mask = m;
+            t.gear = Arc::new(g);
+            t
+        };
+        let c = s.config_for(&masked(0x1f), &st.vals);
         let o = c.on.iter().find(|o| o.key == "overrideFrenzyCharges");
         assert!(o.is_some_and(|o| o.xml.contains(r#"number="1""#)), "stock {:?}", c.on.iter().map(|o| (&o.key, &o.reason)).collect::<Vec<_>>());
         // (a Rotgut the evaluation never drinks consumes nothing)
-        let n: usize = s.slots[f].name.rsplit(' ').next().and_then(|x| x.parse().ok()).unwrap();
-        v[k] = Some((0x1f & !(1 << (n - 1))) as f64);
-        let c = s.config_for(&st, &v);
+        let c = s.config_for(&masked(0x1f & !(1 << (n - 1))), &st.vals);
         let o = c.on.iter().find(|o| o.key == "overrideFrenzyCharges");
         assert!(!o.is_some_and(|o| o.xml.contains(r#"number="1""#)), "an undrunk flask capped the stock: {:?}", o.map(|o| &o.reason));
     }
@@ -1580,7 +1585,8 @@ mod tests {
     /// the evaluation's mix, so the switch stays off unless the evaluation counted the flask as sustained.
     #[test]
     fn part_time_flask_is_not_a_full_time_source() {
-        let mut s = solver_for(r#"{"skill":"Flicker Strike","className":"Templar","level":90,"targets":[{"name":"DPS","metric":"boss"}],"assume":{"playMode":"bossing","flasks":true}}"#);
+        // (single-target mapping: bossing counts every worn flask as on, Assume::worn)
+        let mut s = solver_for(r#"{"skill":"Flicker Strike","className":"Templar","level":90,"targets":[{"name":"DPS","metric":"boss"}],"assume":{"playMode":"mapping","flasks":true}}"#);
         let mut st = state(&mut s, vec![], vec![]);
         let fi = (0..s.slots.len()).rev().find(|&k| s.slots[k].kind == SlotKind::Flask && !s.slots[k].locked).unwrap();
         let n: usize = s.slots[fi].name.rsplit(' ').next().unwrap().parse().unwrap();
