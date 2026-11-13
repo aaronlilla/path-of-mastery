@@ -338,9 +338,9 @@ export const PLAN_TOOLS: ToolDef[] = [
     chip: 'Plan budget',
     description:
       'For "what should I spend my currency on" once the player has said a budget: the best buys for it (several slots searched on the trade site, each put on the build by the engine, best gain per chaos first, never over the budget), each with its price, its own engine change and its trade link, and the total against the budget. The app already put each on a one-tap card. Name each item by its shown line.',
-    shape: {},
-    async run(_args, ctx) {
-      const r = await budgetSpend(ctx);
+    shape: { draftId: z.string().max(20).optional().describe('Plan the spend on a draft (openSolveDraft, startDraft) instead of the open build.') },
+    async run(args, ctx) {
+      const r = await budgetSpend(ctx, args);
       if (!r) return { untrustedData: true, buildChanged: false, spend: null, note: 'No listing within the budget beats what the build has, or no budget is stated. Say so plainly; do not invent a buy.' };
       return { untrustedData: true, buildChanged: false, spend: r.spend, note: 'Name each spend.items entry as its placeholder ({{ref:spend.items[i].shown}}) with its link ({{ref:spend.items[i].link}}), and its costs ({{ref:spend.items[i].costs}}) right after it when present, then say spend.totalShown the same way. When spend.levelNote is present, say it ({{ref:spend.levelNote}}) and never call the numbers a level 100 plan or provisional. Never write a Costs line of your own or from another result: the costs of a buy belong to its own entry, and only what went in is a cost of the change. Each is already a one-tap card. Do not add numbers of your own. The fixes already in are named in the app first line: give their gain in one sentence and never list them again one by one. Keep the answer to the gain of what went in, the buys, the total and at most one caveat. Never advise a fix that is already in ("prioritize the mana fix" after it went in): it is done. spend.items go biggest gain first: write every entry as its own placeholder line, the first one first and never folded into your own words ("buy the rings as a pair" with no names, prices or numbers), and only the first one may be called the biggest gain.' + (r.spend.weak ? ' No single buy adds more than 3% damage or effective HP: say plainly that this budget buys only small gains, and that the real fixes are the ones already in (never call a bought fix free).' : '') };
     },
@@ -540,25 +540,26 @@ export function pickBuy(candidates: Array<Record<string, unknown>>): Record<stri
 export interface SpendResult { spend: { items: Array<{ slot: string; name: string; shown: string; link: string | null; chaos: number; costs?: string }>; totalShown: string; budgetChaos: number; weak: boolean; levelNote?: string }; offers: Array<{ title: string; edits: ToolEdit[] }> }
 const spendJobs = new Map<string, { at: number; text: string; result: Promise<SpendResult | null> }>();
 
-export function budgetSpend(ctx: ToolContext): Promise<SpendResult | null> {
-  const open = need(ctx);
+export function budgetSpend(ctx: ToolContext, args?: Record<string, unknown>): Promise<SpendResult | null> {
+  const open = need(ctx, args);
   const hit = spendJobs.get(open.buildKey);
   if (hit && hit.text === turnAsk.text && Date.now() - hit.at < 120_000) return hit.result;
-  const result = computeSpend(ctx).catch((e) => { planLog('spend.error', { message: String(e instanceof Error ? e.message : e) }); return null; });
+  const result = computeSpend(ctx, args).catch((e) => { planLog('spend.error', { message: String(e instanceof Error ? e.message : e) }); return null; });
   spendJobs.set(open.buildKey, { at: Date.now(), text: turnAsk.text, result });
   return result;
 }
 
-async function computeSpend(ctx: ToolContext): Promise<SpendResult | null> {
+async function computeSpend(ctx: ToolContext, args?: Record<string, unknown>): Promise<SpendResult | null> {
+  const draft = typeof args?.draftId === 'string' ? { draftId: args.draftId } : {};
   if (!runner) return null;
   const slots = ['Ring 1', 'Amulet', 'Belt'];
   // what the engine says the build needs most decides how the listings are ranked: a resistance under its cap is a defence problem (effective HP), else damage
-  const now = await statMap(ctx, need(ctx).buildId).catch(() => ({} as Record<string, number | string | boolean | null>));
+  const now = await statMap(ctx, need(ctx, args).buildId).catch(() => ({} as Record<string, number | string | boolean | null>));
   const underCap = ['Cold', 'Fire', 'Lightning', 'Chaos'].some((e) => typeof now[`${e}Resist`] === 'number' && typeof now[`${e}ResistMax`] === 'number' && (now[`${e}Resist`] as number) < (now[`${e}ResistMax`] as number) - 1 && (e !== 'Chaos' || (now.ChaosResist as number) < 60));
   const rank = underCap ? 'ehp' : 'dps';
   planLog('spend.rank', { rank });
   const found = await Promise.race([
-    Promise.all(slots.map(async (slot) => ({ slot, r: (await Promise.resolve(runner!('upgradeCandidates', { slot, rank })).catch(() => null)) as { candidates?: Array<Record<string, unknown>>; link?: string; chaosPerDivine?: number } | null }))),
+    Promise.all(slots.map(async (slot) => ({ slot, r: (await Promise.resolve(runner!('upgradeCandidates', { slot, rank, ...draft })).catch(() => null)) as { candidates?: Array<Record<string, unknown>>; link?: string; chaosPerDivine?: number } | null }))),
     new Promise<Array<{ slot: string; r: null }>>((res) => setTimeout(() => res([]), 14_000)),
   ]);
   const cpd = found.map((f) => Number(f.r?.chaosPerDivine ?? 0)).find((x) => x > 0) ?? 0;
@@ -569,7 +570,8 @@ async function computeSpend(ctx: ToolContext): Promise<SpendResult | null> {
   if (!budget || budget <= 0 || !cands.length) return null;
   // the fixes the app already put in that are bought (prisms, an Enlighten) come out of the same budget, an unpriced one said as such
   // (178c of prisms and Enlighten 3 were left out of "2.04 div of your 5 div")
-  const mine = auto.get(need(ctx).buildKey);
+  // the plan the app applied to the open build is not the draft's
+  const mine = args?.draftId ? undefined : auto.get(need(ctx).buildKey);
   await mine?.applied.catch(() => null);
   const bought = ((mine?.plan as { fixes?: Array<{ use: string; buy?: { gem?: string; price?: unknown } }> } | undefined)?.fixes ?? []).filter((f) => mine!.used.includes(f.use) && f.buy);
   // a gem the price book had not loaded at plan time (the gem category comes last) is priced again now, at its level (Enlighten 3 unpriced)
@@ -596,9 +598,9 @@ async function computeSpend(ctx: ToolContext): Promise<SpendResult | null> {
   // the buys are compared at the level the player says the character is ("I'm level 92" read against the level-100 file)
   const lvl = askedLevel(turnAsk.text);
   const lvEdits: ToolEdit[] = lvl ? [{ kind: 'setLevel', level: lvl } as ToolEdit] : [];
-  const base = lvl ? await trial(ctx, lvEdits).catch(() => null) : null;
+  const base = lvl ? await trial(ctx, lvEdits, args).catch(() => null) : null;
   const atLevel = async (edits: ToolEdit[]) => {
-    const t = await trial(ctx, [...lvEdits, ...edits]);
+    const t = await trial(ctx, [...lvEdits, ...edits], args);
     return base ? { ...t, deltas: rebaseDeltas(t.deltas, base.deltas) } : t;
   };
   if (takeAcc) {

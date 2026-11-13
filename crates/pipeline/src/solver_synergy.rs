@@ -418,7 +418,7 @@ fn ref_solver(skill: &str, mode: &str, threads: usize) -> Result<Solver, String>
     });
     let goal: Goal = serde_json::from_value(goal).map_err(|e| e.to_string())?;
     // (an eval budget, not the clock: the same data builds the same base on a busy machine)
-    let opts = Options { time_budget_ms: Some(600_000), max_evals: Some(400_000), threads: Some(threads), seed: None };
+    let opts = Options { time_budget_ms: Some(600_000), max_evals: Some(400_000), threads: Some(threads), seed: None, in_plan: false };
     let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
     let mut s = Solver::new(blank_build_xml(90), goal, opts, shared, Arc::new(AtomicBool::new(false)))?;
     s.names = Arc::new(s.names.iter().cloned().chain(DEAD_OUTS.iter().map(|x| x.to_string())).collect());

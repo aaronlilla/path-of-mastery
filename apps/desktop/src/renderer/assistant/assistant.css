@@ -263,6 +263,9 @@
 .ap .sv-chip.offer[aria-pressed="true"] { border-style: solid; }
 .ap .sv-prog { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .ap .sv-prog.bad { color: var(--negative-text); }
+.ap .sv-keep { align-self: flex-start; }
+.ap .sv-wip { color: var(--text-muted); }
+.ap .sv-item { padding-left: 10px; border-left: 2px solid rgba(var(--line-rgb), .14); }
 .ap .sv-res { gap: 7px; }
 .ap .sv-rh { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .ap .sv-rh > b { flex: none; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(var(--accent-rgb), .14); color: var(--gold-text); font-size: 11.5px; }

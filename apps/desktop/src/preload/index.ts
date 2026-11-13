@@ -53,6 +53,7 @@ import type {
   SolveState,
   Thread,
 } from '../shared/assistant/types.js';
+import type { AskEvidence } from '../shared/assistant/solveQuestions.js';
 import type {
   BaseVersionInfo,
   ClientLogInfo,
@@ -264,7 +265,10 @@ export interface PomBridge {
     solveGoal(goal: SolveGoal, opts: { timeBudgetMs?: number; cpu?: SolveCpu }): Promise<Result<SolveState>>;
     solveRun(goal: SolveGoal, opts: { timeBudgetMs?: number; cpu?: SolveCpu }): Promise<Result<SolveState>>;
     solveStop(): Promise<Result<SolveState>>;
+    /** "Keep improving": keep searching from the best build so far. */
+    solveContinue(): Promise<Result<SolveState>>;
     solveDetails(index: number): Promise<Result<SolveDetails>>;
+    solveEvidence(skill: string): Promise<Result<AskEvidence | null>>;
     /** One apply/undo card for a result; it arrives in the thread like any suggestion. */
     solveCard(ref: number | string): Promise<Result<Proposal>>;
   };
@@ -547,7 +551,9 @@ const bridge: PomBridge = {
     solveGoal: (goal, opts) => inv(IPC.SOLVE_GOAL, goal, opts),
     solveRun: (goal, opts) => inv(IPC.SOLVE_RUN, goal, opts),
     solveStop: () => inv(IPC.SOLVE_STOP),
+    solveContinue: () => inv(IPC.SOLVE_CONTINUE),
     solveDetails: (index) => inv(IPC.SOLVE_DETAILS, index),
+    solveEvidence: (skill) => inv(IPC.SOLVE_EVIDENCE, skill),
     solveCard: (ref) => inv(IPC.SOLVE_CARD, ref),
     onPush: (listener) => {
       const handler = (_e: Electron.IpcRendererEvent, payload: AssistantPush) => listener(payload);

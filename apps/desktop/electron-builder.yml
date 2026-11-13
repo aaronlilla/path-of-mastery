@@ -37,6 +37,11 @@ extraResources:
   # What real current-league builds use: aggregated counts, no names.
   - from: resources/buildpatterns
     to: buildpatterns
+  # Kept builds the Solve starts from (one whole build per gem, ascendancy and budget tier).
+  - from: resources/skeletons
+    to: skeletons
+    # Only what the app reads; the skeleton .json files are work notes and stay out of the package.
+    filter: ["index.json", "census.json", "*.xml"]
   # Atlas catalogs and their source evidence, and the qualified starter pack.
   # Both live at the repository root, next to engine-data.
   - from: ../../resources/atlas

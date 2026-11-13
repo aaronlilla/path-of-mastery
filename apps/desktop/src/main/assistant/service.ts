@@ -62,6 +62,7 @@ import type { AssistantEngine, Scalar, ToolContext } from './tools.js';
 import { BUILD_TOOLS as TOOLS, DraftStore, type LibraryAccess } from './buildTools.js';
 import { asksMaxHit, maxHitFacts } from './playerSense.js';
 import { SolveManager } from './solve.js';
+import { goalOfAsk, readBuildAsk } from './solveAsk.js';
 import type { CharacterImportAccess, SharedItemsAccess, WealthAccess } from './appTools.js';
 import { GemColours, TreeData } from './treeData.js';
 import { xmlHash } from './buildReaders.js';
@@ -628,6 +629,8 @@ export class AssistantService {
       await this.syncToolServer();
       if (!this.routing.has(turnId) || this.stopped) return;
       if (!loot && req.buildKey !== this.context?.buildKey) throw new AiDenied('REVISION_CONFLICT');
+      if (!loot && !req.skipRouter) await this.openWizardEarly(req.text);
+      if (!this.routing.has(turnId) || this.stopped) return;
       const r = !loot && !req.skipRouter ? await this.route(req, turnId) : null;
       if (!this.routing.delete(turnId)) return;
       if (r) {
@@ -641,6 +644,18 @@ export class AssistantService {
       later({ type: 'error', turnId, error: turnFailure(e, 'start of the turn') });
     });
     return { turnId };
+  }
+
+  /** A build ask with a skill and a number to reach opens the Solve form filled at once, before the router and the AI turn. Never throws: the AI turn opens it as before. */
+  private async openWizardEarly(text: string): Promise<void> {
+    try {
+      if (isAppMessage(text) || !this.toolCtx) return;
+      const { gems } = await this.toolCtx.engine.send('gemCatalog', {} as Record<string, never>);
+      const ask = readBuildAsk(text, gems.filter((g) => !g.support && !g.legacy).map((g) => g.name));
+      if (ask) await this.solve.openFromAsk(text, goalOfAsk(ask));
+    } catch {
+      // no engine yet, or no build open
+    }
   }
 
   /** Jev's decision for a player message: an instant reply, or null to ask Claude. */
@@ -921,6 +936,7 @@ ${withNotes.text}` } : withNotes);
       if (this.runs.get(turnId) !== run) return;
       this.runs.delete(turnId); this.turnBindings.delete(turnId); this.cancelledTurns.delete(turnId);
       this.endTurn(turnId);
+      void this.solve.turnEnded(req.text).catch(() => undefined);
     });
     if (!this.gateTimer) {
       this.gateTimer = setInterval(() => {

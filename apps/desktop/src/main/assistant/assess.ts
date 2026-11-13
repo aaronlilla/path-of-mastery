@@ -8,6 +8,7 @@ import { auditBuild } from './audit.js';
 import { readEquipped, xmlHash } from './buildReaders.js';
 import { unmetGems } from './gemFit.js';
 import { lostBuffs } from './itemFit.js';
+import { playerObjections } from './objections.js';
 import { applyEdits, buildWarnings, fixManaShortfall, fixOldShortfalls, fixRequirements, guardBreaks, sideEffects } from './playerSense.js';
 import { statMap, withScratch, xmlOf, type Scalar, type ToolContext, type ToolEdit } from './tools.js';
 
@@ -18,6 +19,24 @@ export interface AssessInput {
   liveBuildId: string;
   liveXml: string;
   sidebar?: AssessedCandidate['sidebar'];
+  /** The row's targets as the solver read them (value, the engine stats each reads, the ask): read again after the fixes. */
+  targets?: Array<{ name: string; metric?: string; stats: string[]; value: number; shown?: number; target: number | null }>;
+}
+
+/** "1.2M", "62k". */
+const short = (v: number): string => (Math.abs(v) >= 1e6 ? `${+(v / 1e6).toFixed(2)}M` : Math.abs(v) >= 1e3 ? `${Math.round(v / 1e3)}k` : `${Math.round(v)}`);
+
+/** Each target after the fixes: the solver's value moved by what the target's own stat did under them (the solver's config can differ from the engine's, so the ratio is carried, not the engine's absolute number). */
+function goalAfter(targets: NonNullable<AssessInput['targets']>, start: Record<string, Scalar>, after: Record<string, Scalar>): NonNullable<AssessedCandidate['goal']> {
+  return targets.flatMap((t) => {
+    if (t.target === null) return [];
+    // The solver's own measures (Solver.BossDPS) are not engine stats: a damage target follows the engine's damage stat.
+    const damage = num(start, 'FullDPS') > 0 ? 'FullDPS' : 'CombinedDPS';
+    const stat = t.stats.find((s) => num(start, s) > 0) ?? (/^(dps|bossdps|dot|hit|boss|full|clear)$/.test(t.metric ?? '') ? damage : undefined);
+    const before = t.shown ?? t.value;
+    const now = stat && num(start, stat) > 0 ? before * (num(after, stat) / num(start, stat)) : before;
+    return [{ name: t.name, target: t.target, before: Math.round(before), after: Math.round(now), met: now >= t.target }];
+  });
 }
 
 /** The engine's record id for a result: the sha256 of its build text (solver.rs xml_hash). Fetch by this id; a list index moves on a re-sort. */
@@ -44,7 +63,8 @@ async function priceOf(ctx: ToolContext, xml: string, rec: AssessedCandidate): P
   const uniques = [...new Set(readEquipped(xml).filter((i) => /unique/i.test(i.rarity) && i.name).map((i) => i.name))];
   if (!uniques.length) return;
   try {
-    const r = await ctx.prices?.lookup(uniques);
+    // a slow price feed (46 s measured in the app, cold) must not hold the verdict: the lookup goes on and fills the cache for the next check
+    const r = await Promise.race([ctx.prices?.lookup(uniques), new Promise<undefined>((res) => setTimeout(() => res(undefined), 2500))]);
     if (!r || !r.chaosPerDivine) return;
     let divines = 0;
     const unpriced: string[] = [];
@@ -105,7 +125,22 @@ async function check(ctx: ToolContext, i: AssessInput, rec: AssessedCandidate): 
     for (const t of sideEffects(live, after, wl, wr).hard) found.push({ id: `side:${found.length}`, hard: wr.includes(t) && !wl.includes(t), text: wr.includes(t) ? t : `Against your build: ${t}` });
     for (const t of guardBreaks(live, after, false)) found.push({ id: `guard:${found.length}`, hard: false, text: `Against your build: ${t}` });
     for (const t of (await lostBuffs(ctx, i.liveBuildId, i.liveXml, i.xml)).lines) found.push({ id: `buff:${found.length}`, hard: false, text: t });
-    if (fixes.length) fixedXml = await xmlOf(ctx, b);
+    if (fixes.length) {
+      fixedXml = await xmlOf(ctx, b);
+      // A fix can leave a problem in place or make one: audit the fixed text again. What the first audit already listed as unfixable is not listed twice.
+      const listed = new Set(audit.findings.filter((f) => !(f.fatal && f.fix && f.edits?.length)).map((f) => f.id));
+      for (const f of (await auditBuild(ctx, b, fixedXml)).findings) if (f.fatal && !listed.has(f.id)) found.push({ id: `after:${f.id}`, hard: true, text: f.shown });
+    }
+    // The goal again, on the build Apply sets: a fix that costs damage can drop a target the row met.
+    if (i.targets?.length) {
+      rec.goal = goalAfter(i.targets, start, after);
+      for (const g of rec.goal) if (!g.met && g.before >= g.target) found.push({ id: `goal:${found.length}`, hard: false, text: `After the fixes ${g.name} is ${short(g.after)}, under the ${short(g.target)} asked (it was ${short(g.before)}).` });
+    }
+
+    // What a player would fault at a glance, judged on the build Apply sets (after the fixes above).
+    const player = await playerObjections(ctx, b, fixedXml);
+    for (const o of player.found) if (!found.some((f) => f.text === o.text)) found.push({ id: `objection:${o.n}:${found.length}`, hard: o.blocks, text: o.text });
+    if (player.failed.length) found.push({ id: 'objectionsFailed', hard: false, text: `Player check ${player.failed.join(', ')} could not run.` });
   });
 
   rec.findings = found;
@@ -114,6 +149,10 @@ async function check(ctx: ToolContext, i: AssessInput, rec: AssessedCandidate): 
   if (blockers.length) {
     rec.verdict = 'notReady';
     rec.why = `${blockers[0]!.text}${blockers.length > 1 ? ` (and ${blockers.length - 1} more)` : ''}`;
+  } else if (found.some((f) => f.id.startsWith('objection:'))) {
+    const o = found.filter((f) => f.id.startsWith('objection:'));
+    rec.verdict = 'objections';
+    rec.why = `${o[0]!.text}${o.length > 1 ? ` (and ${o.length - 1} more)` : ''}`;
   } else if (fixes.length) {
     rec.verdict = 'fix';
     rec.why = `${fixes.length} fix${fixes.length === 1 ? '' : 'es'}.`;
@@ -145,6 +184,8 @@ export async function assessCandidate(ctx: ToolContext, i: AssessInput): Promise
   let xml = i.xml;
   try {
     xml = await check(ctx, i, rec);
+    // The record is the text Apply sets: its id comes from that text (the result's own hash stays in xmlHash).
+    rec.id = resultHash(xml);
   } catch (e) {
     rec.status.checks = 'failed';
     rec.why = `The checks could not run: ${e instanceof Error ? e.message : String(e)}`;

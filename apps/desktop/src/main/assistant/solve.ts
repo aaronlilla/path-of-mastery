@@ -10,13 +10,16 @@ import { cardTile } from '../../shared/dpsTile.js';
 import { CLASSES, parseXml, type XmlNode } from '../../shared/buildXml.js';
 import { readSpecSummaries } from '../../shared/treeSets.js';
 import { assessCandidate, resultHash } from './assess.js';
-import { opensWizard, prefillFromAsk } from './solveAsk.js';
+import { keepAnswers, opensWizard, prefillFromAsk, sameAsk } from './solveAsk.js';
+import { keptFor, withKept } from './skeletons.js';
 import { readConfig, readEquipped, readSkills, xmlHash } from './buildReaders.js';
 import type { ProposalStore } from './proposals.js';
-import { changeRows, pickChanges, ToolError, type AssistantEngine, type Scalar, type ToolContext, type ToolDef } from './tools.js';
+import { auditBuild } from './audit.js';
+import { playerObjections } from './objections.js';
+import { changeRows, deltasOf, need, pickChanges, statMap, ToolError, xmlOf, type AssistantEngine, type Scalar, type ToolContext, type ToolDef } from './tools.js';
 import type { TreeData } from './treeData.js';
 
-/** No time cap: a run goes until every target is met or the leads are proven out; Stop ends it. */
+/** "Until done" (0) by default: a solve ends on its result (every target met, or the search stopped gaining); the timed entries stay for a player who picks one. */
 export const DEFAULT_SOLVE_BUDGET_MS = 0;
 export const NEED_MODE = 'Pick what the build is for to run: mapping, bossing or both.';
 export const NEED_WEALTH = 'Pick how rich you are to run: league start, mid league, rich or mirror.';
@@ -58,10 +61,11 @@ export function replanText(round: number, end: SolveEnd): string {
 }
 
 /** What the AI reads when leads stall while the others run (or every lead has stalled and the solver waits): one line per lead. */
+const IDLE_HEAD = 'Solve update: every lead has stalled and the solver is waiting for you.';
 export function stallText(stalls: SolveStall[], idle: boolean): string {
   const lines = stalls.map((l) => `- ${l.name}: ${l.values.map((v) => `${v.name} ${short(v.value)} of ${short(v.need)}`).join(', ') || 'no build yet'}${l.limiting ? `; limited by ${l.limiting}` : ''}; ${l.moreTimeHelps ? 'more time would help' : 'more time would not help'}.`);
   return [
-    idle ? 'Solve update: every lead has stalled and the solver is waiting for you. Stalled leads:' : 'Solve update: these leads stalled short of the goal while the others keep running:',
+    idle ? `${IDLE_HEAD} Stalled leads:` : 'Solve update: these leads stalled short of the goal while the others keep running:',
     ...lines,
     farOffLine(stalls.flatMap((l) => l.values)),
     idle
@@ -79,18 +83,22 @@ export function gapLines(snap: SolveSnapshot | null): string[] {
 }
 
 /**
- * The one turn the AI gets when a solve ends (met or out of leads; not Stop): read the assessed builds, explain the options, offer one.
+ * The one turn the AI gets when a solve ends (met, stopped gaining, or the player's Stop; not the AI's own stop): read the assessed builds, explain the options, offer one.
  * On a target miss it also gets the frontier answer: best at X is Y, Z needs about N, buy these first (planBudget, upgradeCandidates).
  */
-export function finishText(snap: SolveSnapshot): string {
+export function finishText(snap: SolveSnapshot, stopped = false): string {
   const gaps = gapLines(snap);
-  const head = `Solve update: the solve finished with ${snap.results.length} build${snap.results.length === 1 ? '' : 's'}.`;
-  if (!gaps.length) return [head, 'Every target is met. Call getSolve and read the builds with their verdicts (ready, needs a fix, not ready) and price coverage. In a few lines say what the options are and what each trades, recommend one, and offer to apply it. Do not call applySolveResult until the player says yes.'].join('\n');
+  const n = `${snap.results.length} build${snap.results.length === 1 ? '' : 's'}`;
+  const end = endOf(snap);
+  const head = stopped ? `Solve update: the player stopped the solve with ${n} so far.` : end?.reason === 'stalled' ? `Solve update: the solve stopped gaining and ended with ${n}.` : `Solve update: the solve finished with ${n}.`;
+  const held = (end?.leads ?? []).filter((l) => l.limiting).map((l) => `${l.name}: ${l.limiting}`);
+  if (!gaps.length) return [head, 'Every target is met. Do the closing steps from your instructions: getSolve, openSolveDraft on the best pick, checkBuild, repair what a player would fix, checkBuild again. Then in a few lines say what you fixed, what is left, what the repaired build reaches and what it costs, and offer to apply it. Do not call proposeDraft or applySolveResult until the player says yes.'].join('\n');
   return [
     head,
     `The best build misses: ${gaps.join('; ')}.`,
+    held.length ? `What holds each lead back: ${held.join('; ')}.` : '',
     farOffLine((snap.results[snap.picks?.[0] ?? 0]?.targets ?? []).filter((t) => t.target).map((t) => ({ name: t.name, value: t.shown ?? t.value, need: t.target! }))),
-    'Call getSolve, then planBudget and upgradeCandidates (the weakest slot, within the stated budget) and answer as the frontier: "the best at your budget is Y; the target needs about N more; buy these first", every number a placeholder, every buy with its price and engine gain from those tools and never one they do not list. Offer to apply the best build. Do not call applySolveResult until the player says yes.',
+    'Call getSolve, then planBudget and upgradeCandidates (the weakest slot, within the stated budget) and answer as the frontier: "the best at your budget is Y; the target needs about N more; buy these first", every number a placeholder, every buy with its price and engine gain from those tools and never one they do not list. Say what this search reached and what limits it, never that the goal cannot be reached. Tell them Keep improving searches on from the best build. Before you offer it, do the closing steps from your instructions on the best build: openSolveDraft, checkBuild, repair what a player would fix, checkBuild again, and say what you fixed and what is left. Offer to apply the repaired build. Do not call proposeDraft or applySolveResult until the player says yes.',
   ].filter(Boolean).join('\n');
 }
 
@@ -126,6 +134,12 @@ export class SolveManager {
   /** Stalled lead ids already sent to the AI in a Solve update, and whether the idle wait was told (per solve). */
   private told = new Set<number>();
   private idleTold = false;
+  /** Bumped when a solve is cancelled, so a launch still waiting on the kept build's first row does not start its search after a Stop. */
+  private launchSeq = 0;
+  /** The kept build's own start row (snapshot and text) from its first, one-try solve: kept on screen, and served by `resultXml`, until the search's own solve lists the same row. */
+  private keptRow: { snap: SolveSnapshot; id: string; xml: string } | null = null;
+  /** The player's message the form was opened from, so the AI's late plan for it merges into the form instead of replacing it. */
+  private asked: string | null = null;
 
   constructor(private readonly deps: SolveDeps) {}
 
@@ -153,13 +167,15 @@ export class SolveManager {
   /** Puts a goal in the Solve form. Nothing runs until `run` (the player's Run button, or "go"). */
   async setGoal(goal: SolveGoal, opts: { timeBudgetMs?: number; cpu?: SolveCpu } = {}, from: 'panel' | 'assistant' = 'panel', notes: string[] = []): Promise<SolveState> {
     const o = this.open();
+    this.warmPrices(goal);
     // A panel edit on the open build only updates the stored goal ("go" runs it); results on screen stay, a running solve is untouched.
     if (from === 'panel' && this.s.buildKey === o.buildKey && this.s.status !== 'ready' && this.s.status !== 'idle') {
       this.set({ goal, ...(opts.timeBudgetMs ? { timeBudgetMs: opts.timeBudgetMs } : {}), ...(opts.cpu ? { cpu: opts.cpu } : {}) });
       return this.s;
     }
+    if (from === 'assistant') this.asked = null;
     const round = from === 'assistant' && this.s.status === 'stalled' && this.s.buildKey === o.buildKey ? (this.s.round ?? 1) + 1 : 1;
-    if (this.s.status === 'running') await this.stop();
+    if (this.s.status === 'running') await this.stop(false);
     this.set(
       {
         buildKey: o.buildKey,
@@ -175,6 +191,9 @@ export class SolveManager {
         status: 'ready',
         snapshot: null,
         error: undefined,
+        block: undefined,
+        startFrom: undefined,
+        question: undefined,
         from,
       },
       from === 'assistant',
@@ -182,37 +201,144 @@ export class SolveManager {
     return this.s;
   }
 
+  /** The kept build's unique prices, asked for while the player is still answering the questions, so its first check on Run does not wait on a cold price feed. */
+  private warmed = new Set<string>();
+  private warmPrices(goal: SolveGoal): void {
+    const kept = keptFor(goal);
+    const prices = this.deps.toolContext?.()?.prices;
+    if (!kept || !prices || this.warmed.has(kept.id)) return;
+    this.warmed.add(kept.id);
+    const names = [...new Set(readEquipped(kept.xml).filter((i) => /unique/i.test(i.rarity) && i.name).map((i) => i.name))];
+    void Promise.resolve(prices.lookup(names)).catch(() => this.warmed.delete(kept.id));
+  }
+
+  /** Opens the form from a build ask read from the player's words, before the AI has answered. Never starts a run; a solve in progress is left alone. */
+  async openFromAsk(request: string, goal: SolveGoal): Promise<void> {
+    if (this.s.status === 'running' || this.s.status === 'shortlisting' || this.s.status === 'stalled') return;
+    await this.setGoal(goal, {}, 'assistant');
+    this.asked = request;
+  }
+
+  /** The message the form (or the run started from it) belongs to, for the AI's goal that arrives for it; undefined once it does not. */
+  askedFor(request?: string): string | undefined {
+    const live = this.asked && this.s.buildKey === this.deps.open()?.buildKey && this.s.goal && (this.s.status === 'ready' || this.s.status === 'running' || this.s.status === 'shortlisting');
+    return live && (!request || sameAsk(this.asked!, request)) ? this.asked! : undefined;
+  }
+
+  /** The AI's goal (already holding the player's answers, see keepAnswers) for the ask the form was opened from; a run already started goes on untouched (the plan waits for the next run). */
+  mergeLate(goal: SolveGoal, opts: { timeBudgetMs?: number; cpu?: SolveCpu } = {}, notes: string[] = []): SolveState {
+    if (this.s.status !== 'ready') {
+      this.set({ goal, notes: notes.length ? notes : undefined });
+      return this.s;
+    }
+    this.set({ goal, ...(opts.timeBudgetMs ? { timeBudgetMs: opts.timeBudgetMs } : {}), ...(opts.cpu ? { cpu: opts.cpu } : {}), goalRev: this.s.goalRev + 1, modeStated: !!goal.assume?.playMode, notes: notes.length ? notes : undefined, from: 'assistant' }, true);
+    return this.s;
+  }
+
   /** Starts the search on the open build, with the goal given or the one in the form. */
   async run(goal?: SolveGoal, opts: { timeBudgetMs?: number; cpu?: SolveCpu } = {}): Promise<SolveState> {
+    return this.launch(goal, opts, 1);
+  }
+
+  /** "Keep improving": another run that starts from the best build so far (the engine keeps its tree and items as the start and lists it as a row, so nothing found is lost) with the next seed. */
+  async keepImproving(): Promise<SolveState> {
     const o = this.open();
-    const g = goal ?? (this.s.buildKey === o.buildKey ? this.s.goal : null);
-    if (!g?.skill?.trim()) throw new SolveError('The goal needs a main skill first.');
-    if (!g.wealth) throw new SolveError(NEED_WEALTH);
-    if (!g.assume?.playMode) throw new SolveError(NEED_MODE);
+    const snap = this.s.snapshot;
+    if (!this.solveId || this.s.buildKey !== o.buildKey || !this.s.goal || (this.s.status !== 'done' && this.s.status !== 'stopped') || !snap?.results.length) throw new SolveError('Keep improving needs a finished solve with a result on the open build.');
+    const xml = await this.resultXml(snap.picks?.[0] ?? 0);
+    return this.launch(this.s.goal, {}, (this.s.block ?? 1) + 1, xml);
+  }
+
+  /** One run of search for `goal` (`block` counts Keep improving: 1, 2, ...); `startXml` (Keep improving) is the build it starts from instead of the open build. */
+  private async launch(goal: SolveGoal | undefined, opts: { timeBudgetMs?: number; cpu?: SolveCpu }, block: number, startXml?: string): Promise<SolveState> {
+    const o = this.open();
+    const asked = goal ?? (this.s.buildKey === o.buildKey ? this.s.goal : null);
+    if (!asked?.skill?.trim()) throw new SolveError('The goal needs a main skill first.');
+    if (!asked.wealth) throw new SolveError(NEED_WEALTH);
+    if (!asked.assume?.playMode) throw new SolveError(NEED_MODE);
+    // A kept build for this gem, ascendancy and tier is the start (PLAN.md slice 3): the first row is a whole, checked build. Keep improving starts from its own best instead.
+    const kept = startXml ? null : keptFor(asked);
+    const g = kept ? withKept(asked, kept) : asked;
+    const seedXml = startXml ?? kept?.xml;
+    const startFrom = kept ? { label: `Kept build, ${kept.tier === 'league-start' ? 'league start' : 'mid league'}`, level: kept.level, gearDivines: kept.gearDivines } : undefined;
     await this.cancelEngine();
     const timeBudgetMs = opts.timeBudgetMs ?? this.s.timeBudgetMs;
     const cpu = opts.cpu ?? this.s.cpu;
     const threads = threadsFor(cpu);
     let priority: SolvePriority | null = null;
-    if (this.deps.shortlist) {
+    if (this.deps.shortlist && !kept) {
       this.set({ buildKey: o.buildKey, goal: g, timeBudgetMs, cpu, status: 'shortlisting', snapshot: null, error: undefined });
       priority = await this.deps.shortlist(g).catch(() => null);
     }
     const uniquePrices = await this.deps.uniquePrices?.().catch(() => null);
+    const runPatch = { buildKey: o.buildKey, goal: g, timeBudgetMs, cpu, status: 'running' as const, error: undefined, question: undefined, block, startFrom };
+    const token = this.launchSeq;
+    let seed = seedXml;
+    let shown: SolveSnapshot | null = null;
+    this.keptRow = null;
+    if (kept) {
+      this.records.clear();
+      this.resultRec.clear();
+      const first = await this.keptFirstRow(kept.xml, g, uniquePrices, (snap, id) => {
+        this.solveId = id;
+        this.set({ ...runPatch, snapshot: snap });
+      }).catch(() => null);
+      if (token !== this.launchSeq) return this.s;
+      if (first) {
+        seed = first.xml;
+        shown = first.snap;
+        this.keptRow = { snap: first.snap, id: first.snap.results.find((r) => r.start)?.id ?? '', xml: first.xml };
+      }
+    }
+    // The solver copies the build text at start, so the scratch copy can be closed at once.
+    const from = seed ? (await this.deps.engine.send('loadBuild', { buildXml: seed })).buildId : o.buildId;
     let solveId: string;
     try {
-      ({ solveId } = await this.deps.engine.send('solveStart', { buildId: o.buildId, goal: { ...g, ...(priority ? { priority } : {}), ...(uniquePrices ? { uniquePrices } : {}) }, options: { ...(timeBudgetMs ? { timeBudgetMs } : {}), ...(threads ? { threads } : {}) } }));
+      const options = { ...(timeBudgetMs ? { timeBudgetMs } : {}), ...(block > 1 ? { seed: block - 1 } : {}), ...(threads ? { threads } : {}) };
+      ({ solveId } = await this.deps.engine.send('solveStart', { buildId: from, goal: { ...g, ...(priority ? { priority } : {}), ...(uniquePrices ? { uniquePrices } : {}) }, options }));
     } catch (e) {
       if (this.s.status === 'shortlisting') this.set({ status: 'ready' });
       throw e;
+    } finally {
+      if (seed) await this.deps.engine.send('closeBuild', { buildId: from }).catch(() => undefined);
     }
     this.solveId = solveId;
-    this.records.clear();
+    if (!kept) {
+      this.records.clear();
+      this.resultRec.clear();
+    }
     this.told = new Set();
     this.idleTold = false;
-    this.set({ buildKey: o.buildKey, goal: g, timeBudgetMs, cpu, status: 'running', snapshot: null, error: undefined });
+    // The kept row stays on screen until the search's first poll replaces it (same build, same id: its check carries over).
+    this.set({ ...runPatch, snapshot: shown });
     this.schedule();
     return this.s;
+  }
+
+  /**
+   * The kept build's own start row, listed and checked while the CPU is still free (under a running search one assessment takes tens of seconds). Returns the row's text and snapshot,
+   * or null when the engine gives no row in time (the search then starts from the kept file and the row is checked when the player opens it).
+   */
+  private async keptFirstRow(xml: string, goal: SolveGoal, uniquePrices: Record<string, number> | null | undefined, show: (snap: SolveSnapshot, id: string) => void): Promise<{ xml: string; snap: SolveSnapshot } | null> {
+    const { buildId } = await this.deps.engine.send('loadBuild', { buildXml: xml });
+    let id: string;
+    try {
+      ({ solveId: id } = await this.deps.engine.send('solveStart', { buildId, goal: { ...goal, ...(uniquePrices ? { uniquePrices } : {}) }, options: { ...{ maxEvals: 1 }, threads: 1 } }));
+    } finally {
+      await this.deps.engine.send('closeBuild', { buildId }).catch(() => undefined);
+    }
+    for (const until = Date.now() + 10_000; Date.now() < until; await new Promise((r) => setTimeout(r, 200))) {
+      const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 });
+      const at = snap.results.findIndex((r) => r.start);
+      if (at >= 0) {
+        show(snap, id);
+        await this.assess(at).catch(() => undefined);
+        return { xml: await this.resultXml(at), snap };
+      }
+      if (snap.error || snap.done) break;
+    }
+    await this.deps.engine.send('solveCancel', { solveId: id }).catch(() => undefined);
+    return null;
   }
 
   private schedule(): void {
@@ -225,8 +351,10 @@ export class SolveManager {
     const id = this.solveId;
     if (!id || this.s.status !== 'running') return;
     try {
-      const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 });
+      let snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 });
       if (id !== this.solveId || this.s.status !== 'running') return;
+      // the search lists its start row a second or two after it starts: the kept row stays on screen meanwhile instead of vanishing
+      if (this.keptRow && !snap.results.length) snap = { ...snap, results: this.keptRow.snap.results, picks: this.keptRow.snap.picks };
       // A planned run that stalls goes back to the AI for new leads (the panel sends `replan` as a chat turn); met or unplanned ends.
       const end = endOf(snap);
       const planned = !!planOf(this.s.goal)?.leads.length;
@@ -249,6 +377,7 @@ export class SolveManager {
   }
 
   private async cancelEngine(): Promise<void> {
+    this.launchSeq++;
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
     // (stalled: the engine may be idle waiting for leads; it still holds the solve)
@@ -269,19 +398,33 @@ export class SolveManager {
 
   /** Ends a planned run the AI has no credible leads left for: its reason plus the best build's misses, in the panel. */
   async finish(why: string): Promise<SolveState> {
-    if (this.s.status === 'running' || this.s.status === 'stalled') await this.stop();
+    if (this.s.status === 'running' || this.s.status === 'stalled') await this.stop(false);
     this.set({ status: 'done', replan: undefined, replanKey: undefined, verdict: { why, gaps: gapLines(this.s.snapshot) } });
     return this.s;
   }
 
-  /** Stops the search; the results found so far stay. */
-  async stop(): Promise<SolveState> {
+  /** Stops the search; the results found so far stay. The player's Stop gives the AI its one closing turn (`closing`); the AI's own stop does not. */
+  async stop(closing = true): Promise<SolveState> {
     // stalled: waiting on the AI's next leads (the engine idles); Stop ends the loop there too
     if ((this.s.status !== 'running' && this.s.status !== 'stalled') || !this.solveId) return this.s;
+    const id = this.solveId;
+    const ends = closing && this.s.status === 'running';
     await this.cancelEngine();
-    const snap = await this.deps.engine.send('solveStep', { solveId: this.solveId, budgetMs: 0 }).catch(() => this.s.snapshot);
-    this.set({ status: 'stopped', snapshot: snap, replan: undefined, replanKey: undefined });
+    const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 }).catch(() => this.s.snapshot);
+    // The same key as a run's own end: one closing turn per solve, whichever way it ends.
+    const update = ends && snap?.results.length ? { replan: finishText(snap, true), replanKey: `${id}:finish` } : { replan: undefined, replanKey: undefined };
+    this.set({ status: 'stopped', snapshot: snap, ...update });
     return this.s;
+  }
+
+  /** An assistant turn ended. When it answered "every lead has stalled" and added no lead (the run still waits), the run ends here with its closing turn instead of waiting for ever. */
+  async turnEnded(text: string): Promise<void> {
+    const id = this.solveId;
+    if (!id || this.s.status !== 'stalled' || !this.s.snapshot?.idle || !text.includes(IDLE_HEAD)) return;
+    await this.cancelEngine();
+    const snap = await this.deps.engine.send('solveStep', { solveId: id, budgetMs: 0 }).catch(() => this.s.snapshot);
+    if (id !== this.solveId || this.s.status !== 'stalled') return;
+    this.set({ status: 'done', snapshot: snap, ...(snap?.results.length ? { replan: finishText(snap), replanKey: `${id}:finish` } : { replan: undefined, replanKey: undefined }) });
   }
 
   /** The open build changed: a solve belongs to the build it was started on, so another build drops it. */
@@ -290,8 +433,10 @@ export class SolveManager {
     if (this.s.buildKey === null || buildKey === null || this.s.buildKey === buildKey) return;
     void this.cancelEngine();
     this.solveId = null;
+    this.asked = null;
     this.records.clear();
-    this.set({ ...IDLE, goalRev: this.s.goalRev, timeBudgetMs: this.s.timeBudgetMs, cpu: this.s.cpu });
+    this.resultRec.clear();
+    this.set({ ...IDLE, block: undefined, question: undefined, goalRev: this.s.goalRev, timeBudgetMs: this.s.timeBudgetMs, cpu: this.s.cpu });
   }
 
   private resultCount(): number {
@@ -304,6 +449,7 @@ export class SolveManager {
     if (!Number.isInteger(index) || index < 0 || index >= this.resultCount()) throw new SolveError(`There is no result ${index}; the solve has ${this.resultCount()}.`);
     // By the record id, so a re-sort between the list and the fetch cannot hand back another build; the text must hash to that id.
     const id = this.s.snapshot?.results[index]?.id;
+    if (id && id === this.keptRow?.id) return this.keptRow.xml;
     if (!id) return (await this.deps.engine.send('solveResult', { solveId: this.solveId, index })).xml;
     const { xml } = await this.deps.engine.send('solveResult', { solveId: this.solveId, id });
     if (resultHash(xml) !== id) throw new SolveError('The solver returned a different build than result ' + (index + 1) + ' of the list. Open the result again.');
@@ -312,6 +458,8 @@ export class SolveManager {
 
   /** Assessed records by id, frozen when a result is assessed. Apply takes an id from here, never a result's index, which a re-sort moves. */
   private records = new Map<string, { rec: AssessedCandidate; xml: string; title: string; summary: string; assumptions: string[] }>();
+  /** The engine's id of a result (the hash of its text) to the id of its record (the hash of the text Apply sets, which differs when fixes were made). */
+  private resultRec = new Map<string, string>();
 
   /** One assessment at a time: each opens scratch builds and the engine keeps only six (it drops the oldest), so rows asked together would close each other's copies. */
   private assessChain: Promise<unknown> = Promise.resolve();
@@ -327,12 +475,12 @@ export class SolveManager {
     const o = this.open();
     const xml = await this.resultXml(index);
     const liveXml = (await this.deps.engine.send('getBuildXml', { buildId: o.buildId })).buildXml;
-    const hit = this.records.get(resultHash(xml));
+    const hit = this.records.get(this.resultRec.get(resultHash(xml)) ?? '');
     if (hit && hit.rec.sourceRevision === xmlHash(liveXml)) return { ...hit, liveXml };
     const r = this.s.snapshot?.results[index];
     const sidebar = await this.tileOf(xml).catch(() => undefined);
     const ctx = this.deps.toolContext?.() ?? ({ engine: this.deps.engine, open: this.deps.open, proposals: this.deps.proposals, tree: this.deps.tree, origin: 'panel' } as ToolContext);
-    const { rec, xml: applyXml } = await assessCandidate(ctx, { solveId: this.solveId!, xml, liveBuildId: o.buildId, liveXml, ...(sidebar ? { sidebar } : {}) });
+    const { rec, xml: applyXml } = await assessCandidate(ctx, { solveId: this.solveId!, xml, liveBuildId: o.buildId, liveXml, ...(sidebar ? { sidebar } : {}), ...(r?.targets ? { targets: r.targets } : {}) });
     // The card shows the build Apply sets: with fixes, its tile is read from the fixed text.
     if (applyXml !== xml) {
       const t = await this.tileOf(applyXml).catch(() => undefined);
@@ -346,7 +494,35 @@ export class SolveManager {
       assumptions: [...(r?.assumptions ?? []), ...(this.s.snapshot?.assumptions ?? [])],
     };
     this.records.set(rec.id, entry);
+    this.resultRec.set(rec.xmlHash, rec.id);
     return { ...entry, liveXml };
+  }
+
+  /** Result `index` as the assessment leaves it: the build with the listed fixes (`xml`), its record, and the open build's text. */
+  fixedResult(index: number) {
+    return this.assess(index);
+  }
+
+  /** What the checks found for the rows the AI reads: the picks (or the first three rows), assessed now when the panel has not done it yet. */
+  async checked(): Promise<Map<number, ReturnType<typeof recordView>>> {
+    const out = new Map<number, ReturnType<typeof recordView>>();
+    const snap = this.s.snapshot;
+    if (!this.solveId || !snap?.results.length) return out;
+    for (const i of (snap.picks?.length ? snap.picks : snap.results.map((_, k) => k)).slice(0, 3)) {
+      if (snap.results[i]?.start) continue;
+      try {
+        out.set(i, recordView((await this.assess(i)).rec));
+      } catch {
+        // the row stays unchecked: no verdict is better than a wrong one
+      }
+    }
+    return out;
+  }
+
+  /** The assistant's one question, as buttons in the panel. */
+  ask(text: string, options: string[]): SolveState {
+    this.set({ question: { text, options } }, true);
+    return this.s;
   }
 
   /** A result next to the open build: what changes per layer and the engine's stat deltas (nothing is changed). */
@@ -393,6 +569,8 @@ export class SolveManager {
       a = { ...e, liveXml: (await this.deps.engine.send('getBuildXml', { buildId: o.buildId })).buildXml };
     }
     if (xmlHash(a.liveXml) !== a.rec.sourceRevision) throw new SolveError('The open build changed after this card was drawn, so its numbers are out of date. Open the result again.');
+    // "Not ready" cannot be made or used in game: no card, so nothing can apply it.
+    if (a.rec.verdict === 'notReady') throw new SolveError(`${a.title} is not ready, so it cannot be applied: ${a.rec.why}`);
     const d = (await this.view(a)).out;
     return store.create({
       buildId: buildId ?? o.buildId,
@@ -576,7 +754,7 @@ export const SolveGoalSchema = z.object({
     .enum(['league-start', 'mid-league', 'rich', 'mirror'])
     .optional()
     .describe(
-      "How rich the player is; it limits the gear the solver may use. league-start: normal rares, bench crafts, essences, cheap uniques. mid-league: + one influence, low eldritch implicits, fossils, cluster jewels, uniques up to about 1 divine. rich: + two influences, top eldritch, one corruption implicit, uniques up to about 20 divines. mirror: everything. Set it ONLY when the player says how rich they are (or their budget); never guess. If they did not, leave it out and ask them in your reply. The solve cannot run without it.",
+      "How rich the player is; it limits the gear the solver may use. league-start: normal rares, bench crafts, essences, cheap uniques. mid-league: + one influence, low eldritch implicits, fossils, cluster jewels, any priced unique within the whole-build budget of about 10 divines. rich: + two influences, top eldritch, one corruption implicit, uniques up to about 20 divines. mirror: everything. Set it ONLY when the player says how rich they are (or their budget); never guess. If they did not, leave it out and ask them in your reply. The solve cannot run without it.",
     ),
   plan: z
     .object({
@@ -609,8 +787,20 @@ function solver(ctx: ToolContext): SolveManager {
 
 const round = (v: number) => (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100);
 
-/** The solve as the assistant reads it: progress and one compact row per trade-off build. */
-export function solveView(st: SolveState) {
+/** A record as the AI reads it: the verdict, what a player would fault (`blocks`: cannot be made or used in game), the fixes the assessment made with their engine change, the targets after them, and how much of the kit has a market price. */
+export function recordView(rec: AssessedCandidate) {
+  return {
+    verdict: rec.verdict,
+    why: rec.why,
+    ...(rec.findings.length ? { findings: rec.findings.map((f) => ({ text: f.text, ...(f.hard && !f.fix ? { blocks: true } : {}), ...(f.fix ? { fix: f.fix } : {}) })) } : {}),
+    ...(rec.fixes.length ? { fixesMade: rec.fixes.map((f) => ({ what: f.what, change: f.delta })) } : {}),
+    ...(rec.goal?.length ? { targetsAfterFixes: rec.goal } : {}),
+    price: rec.price.coverage === null ? null : { divines: rec.price.divines, uniquesPriced: Math.round(rec.price.coverage * 100), ...(rec.price.unpriced.length ? { unpriced: rec.price.unpriced } : {}) },
+  };
+}
+
+/** The solve as the assistant reads it: progress and one compact row per trade-off build; `checked` adds each assessed row's record. */
+export function solveView(st: SolveState, checked?: Map<number, ReturnType<typeof recordView>>) {
   const snap = st.snapshot;
   return {
     status: st.status,
@@ -646,6 +836,7 @@ export function solveView(st: SolveState) {
             ...(r.checks?.some((c) => c.status === 'unmet') ? { basicsMissing: r.checks.filter((c) => c.status === 'unmet').map((c) => `${c.label} (${c.level})`) } : {}),
             blocking: r.blocking ? (r.blocking.kind === 'limit' ? `limit: ${r.blocking.name}` : `target: ${r.blocking.name}`) : null,
             mainLink: r.gems.main,
+            ...(checked?.get(i) ? { assessed: checked.get(i) } : {}),
           })),
         }
       : {}),
@@ -700,7 +891,7 @@ export const SOLVE_TOOLS: ToolDef[] = [
     name: 'startSolve',
     chip: 'Set up solve',
     description:
-      "Turns the player's request and your build plan (goal.plan) into a build solver goal, opens it in the Solve panel. The panel asks Wealth and Mapping/Bossing/Both every time, filled from the player's own words, and the solve starts when the player presses Run. There is no time limit: it runs until every target is met or the leads are proven out. The solver tests your leads first, then searches class/ascendancy, gems, tree and items for builds that reach the targets within the hard limits.",
+      "Turns the player's request and your build plan (goal.plan) into a build solver goal, opens it in the Solve panel. The panel asks Wealth and Mapping/Bossing/Both every time, filled from the player's own words, and the solve starts when the player presses Run. It runs until every target is met within the hard limits, or until the search stops gaining, then ends by itself with an answer; the player can press Keep improving to search on from the best build. The solver tests your leads first, then searches class/ascendancy, gems, tree and items for builds that reach the targets within the hard limits.",
     shape: {
       goal: SolveGoalSchema,
       timeBudgetSeconds: z.number().int().min(10).max(3600).optional().describe('Only when the player asks for a time limit.'),
@@ -712,11 +903,16 @@ export const SOLVE_TOOLS: ToolDef[] = [
         const s = solver(ctx);
         if (typeof args.request === 'string' && !opensWizard(args.request)) return { note: 'This is a one-item or fix ask, not a build ask: answer it with the item and build tools. Do not open the Solve panel.' };
         const parsed = SolveGoalSchema.parse(args.goal) as SolveGoal;
+        // The app keeps the player's message itself: the checks below run even when `request` is left out.
+        const request = typeof args.request === 'string' ? args.request : s.askedFor();
+        const merge = s.askedFor(request) !== undefined;
         // Tier and mode come from the player's own words only; the panel shows them filled and the player presses Run.
-        const goal = typeof args.request === 'string' ? prefillFromAsk(args.request, namedOnly(args.request, parsed)) : parsed;
+        const read = request !== undefined ? prefillFromAsk(request, namedOnly(request, parsed)) : parsed;
+        const goal = merge ? keepAnswers(s.state.goal!, read) : read;
         const opts = { ...(typeof args.timeBudgetSeconds === 'number' ? { timeBudgetMs: args.timeBudgetSeconds * 1000 } : {}), ...(args.cpu === 'gentle' || args.cpu === 'normal' ? { cpu: args.cpu as SolveCpu } : {}) };
-        const notes = typeof args.request === 'string' ? droppedConstraints(args.request, goal) : [];
-        await s.setGoal(goal, opts, 'assistant', notes);
+        const notes = request !== undefined ? droppedConstraints(request, goal) : [];
+        if (merge) s.mergeLate(goal, opts, notes);
+        else await s.setGoal(goal, opts, 'assistant', notes);
         const warn = notes.length ? ` The panel warns: ${notes.join(' ')} Fix the goal with startSolve if that was a mistake.` : '';
         return { ...solveView(s.state), note: 'The goal and your plan are in the Solve panel with Wealth and Mapping/Bossing/Both filled only from what the player said; the rest stay blank. Nothing runs until the player checks them and presses Run: show your plan as a short list and tell them in one line to check the questions and press Run. Do not ask them in chat.' + warn };
       }),
@@ -742,16 +938,76 @@ export const SOLVE_TOOLS: ToolDef[] = [
     name: 'getSolve',
     chip: 'Read solve',
     description:
-      'The current solve: status, progress (layer, elapsed, evaluations) and up to 8 trade-off builds, each with its target values, whether every hard limit is met and what blocks the goal. Report them as a compact table, one row per build, with placeholders for the numbers.',
+      'The current solve: status, progress (layer, elapsed, evaluations) and up to 8 trade-off builds, each with its target values, whether every hard limit is met and what blocks the goal. The picks (or the first three rows) also carry `assessed`: the verdict (ready, fix, objections = needs fixes but can be applied, notReady = cannot be made or used in game and cannot be applied), what a player would fault, the fixes already made with their engine change, the targets after them and the price cover. Report them as a compact table, one row per build, with placeholders for the numbers.',
     shape: {},
-    run: async (_args, ctx) => solveView(solver(ctx).state),
+    run: async (_args, ctx) => {
+      const s = solver(ctx);
+      return solveView(s.state, await s.checked());
+    },
+  },
+  {
+    name: 'openSolveDraft',
+    chip: 'Open result as draft',
+    description:
+      "Opens result `index` of the solve (an index from getSolve) as a draft with the assessment's fixes already in. Read it, run checkBuild with its draftId, repair what is edit-sized with editDraft and the ranking tools (bestSupport, bestUnique, spendPoints, takeNode, planBudget and upgradeCandidates all take draftId), run checkBuild again, then offer it with proposeDraft: one card and one Undo, compared with the player's open build. The open build is not touched. A 'not ready' row opens and is repaired the same way. Its numbers are the engine's on the draft.",
+    shape: { index: z.number().int().min(0).max(7) },
+    run: (args, ctx) =>
+      unsolved(async () => {
+        if (!ctx.drafts) throw new ToolError('Drafts are not available here.');
+        const open = need(ctx);
+        const a = await solver(ctx).fixedResult(Number(args.index));
+        const openXml = await xmlOf(ctx, open.buildId);
+        const d = await ctx.drafts.create(a.xml, { name: a.title, from: 'open', baseKey: open.buildKey, baseHash: xmlHash(openXml) }, await statMap(ctx, open.buildId));
+        // The card compares with the open build, not with the result: its start is the open build's tree and numbers, and the first lines say what the result changes.
+        d.startAllocated = (await ctx.engine.send('treeState', { buildId: open.buildId })).tree.allocated;
+        d.lines.push(...(await solveLayers(openXml, a.xml, ctx.tree, a.assumptions)).layers.map((l) => l.text));
+        d.kinds.add('setXml');
+        return {
+          draftId: d.id,
+          name: d.name,
+          assessed: recordView(a.rec),
+          changesFromOpenBuild: changeRows(pickChanges(deltasOf(d.startStats, await statMap(ctx, d.buildId)), 10)),
+          note: 'The draft is this result with its listed fixes. Nothing in the open build changed. Repair with editDraft, check with checkBuild, then offer it with proposeDraft.',
+        };
+      }),
+  },
+  {
+    name: 'checkBuild',
+    chip: 'Check as a player',
+    description:
+      "What a seasoned player would fault in the open build or a draft (draftId): the player checks (reservation, sustain, accuracy, resist caps, flasks, auras, a craft or item that cannot exist in game, weapon, ...) and the audit's fatal findings with their ready edits. Run it on a draft after your edits to see what is left. Each line is a fault to fix with an edit, unless it only describes how the build is played (flask charges, kills, uptime): that is a notice, left as it is.",
+    shape: { draftId: z.string().max(20).optional() },
+    run: async (args, ctx) => {
+      const b = need(ctx, args);
+      const xml = await xmlOf(ctx, b.buildId);
+      const o = await playerObjections(ctx, b.buildId, xml);
+      const a = await auditBuild(ctx, b.buildId, xml);
+      return {
+        objections: o.found.map((x) => ({ n: x.n, text: x.text, ...(x.blocks ? { blocks: true } : {}) })),
+        ...(o.failed.length ? { couldNotRun: o.failed } : {}),
+        auditFatal: a.findings.filter((f) => f.fatal).map((f) => ({ id: f.id, text: f.shown, ...(f.fix ? { fix: f.fix } : {}), ...(f.edits?.length ? { edits: f.edits } : {}) })),
+        note: 'Nothing was changed. A check that could not run (couldNotRun) is not a pass.',
+      };
+    },
+  },
+  {
+    name: 'askPlayer',
+    chip: 'Ask the player',
+    description:
+      "Asks the player ONE short question as two or three buttons in the Solve panel, only when the answer changes which build is made (which ascendancy, which defence style, a must-use item the words hint at). Never for what the Solve form already holds (budget, mapping or bossing, targets, level, class) and never for something a tool can read. The tap comes back as the player's next message. Write the question in one line in your reply too, then end the turn.",
+    shape: { question: z.string().min(5).max(160), options: z.array(z.string().min(1).max(40)).min(2).max(3) },
+    run: (args, ctx) =>
+      unsolved(async () => {
+        solver(ctx).ask(String(args.question), args.options as string[]);
+        return { asked: true, note: 'The buttons are in the panel. End your turn with the question in one line; do not answer it yourself.' };
+      }),
   },
   {
     name: 'stopSolve',
     chip: 'Stop solve',
     description: 'Stops the running solve. The builds found so far stay readable and can still be applied. With verdict it ends a stalled run you have no credible leads left for: the panel shows your reason and the best build\'s misses (gaps).',
-    shape: { verdict: z.string().min(1).max(400).optional().describe('Only when no credible lead is left: in player terms, why the goal cannot be reached at this wealth.') },
-    run: (args, ctx) => unsolved(async () => (typeof args.verdict === 'string' ? solveView(await solver(ctx).finish(args.verdict)) : solveView(await solver(ctx).stop()))),
+    shape: { verdict: z.string().min(1).max(400).optional().describe('Only when no credible lead is left: in player terms, what this search reached and what limits it, in player terms.') },
+    run: (args, ctx) => unsolved(async () => (typeof args.verdict === 'string' ? solveView(await solver(ctx).finish(args.verdict)) : solveView(await solver(ctx).stop(false)))),
   },
   {
     name: 'applySolveResult',

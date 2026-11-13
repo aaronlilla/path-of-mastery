@@ -1434,7 +1434,7 @@ impl Solver {
     }
 
     /// The enabled socket groups of `xml`: the main group (main skill first) and one utility entry per other group.
-    fn gems_of(&self, xml: &str) -> (Vec<&'static str>, Vec<&'static str>) {
+    pub(super) fn gems_of(&self, xml: &str) -> (Vec<&'static str>, Vec<&'static str>) {
         let Ok(doc) = roxmltree::Document::parse(xml) else { return Default::default() };
         let Some(skills) = crate::edit::elements(doc.root_element(), "Skills").next() else { return Default::default() };
         let main_at = tag_attr(xml, "Build", "mainSocketGroup").and_then(|v| v.parse::<usize>().ok()).unwrap_or(1);

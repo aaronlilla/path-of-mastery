@@ -79,7 +79,7 @@ test('pconc request: the plan goes to the solver, it starts at once, a stall re-
   assert.equal(m.state.status, 'ready');
   await m.setGoal({ ...m.state.goal!, assume: { playMode: 'mapping' } }, {}, 'panel');
   assert.equal(m.state.status, 'ready', 'answering the panel does not start the solve');
-  await m.run();
+  await m.run(undefined, { timeBudgetMs: 0 }); // Until done
   assert.equal(m.state.status, 'running');
   const sent = goals[0] as SolveGoal & { plan?: typeof plan };
   assert.equal(sent.className, undefined, 'the open build\'s class is not the plan');

@@ -151,8 +151,9 @@ pub fn preset_min_ratio(presets: &[PresetHit], o: Out) -> f64 {
 }
 
 /// A wind-up this many times the median of every preset's (data `bossSkills` `speed`, ms) is long: Atziri Flameblast's
-/// 25 s against a 2.07 s median (cutoff 8.3 s; Maven Memory Game's 7.5 s and the rest, 1-3.5 s, count).
-const LONG_WINDUP: f64 = 4.0;
+/// 25 s against a 2.07 s median (cutoff 7.2 s; Maven Memory Game's 7.5 s is a pattern the player follows, so it is
+/// long too; the rest, 1-3.5 s, count).
+const LONG_WINDUP: f64 = 3.5;
 
 /// A boss skill preset whose wind-up is long enough to walk out of: its one-shot chip still shows,
 /// but it does not count against "Survives every boss skill" or the score.
@@ -220,7 +221,8 @@ pub fn preset_names() -> Vec<String> {
     list.as_array().into_iter().flatten().filter_map(|e| e.get("val").and_then(|v| v.as_str())).filter(|v| *v != "None").map(String::from).collect()
 }
 
-/// A chip per preset whose hit one-shots the build ("needs +8k Cold max hit"). `eval` evaluates the build under a
+/// A chip per preset whose hit one-shots the build ("needs +8k Cold max hit"); a long wind-up preset reads "Mechanic: ...,
+/// watch it and walk out of it" and does not fail the survive limit. `eval` evaluates the build under a
 /// preset and returns its weakest type; None (a degen preset, nothing evaluated) makes no chip. Info only: the score
 /// reads the Pinnacle hit.
 pub fn boss_chips(presets: &[String], eval: &dyn Fn(&str) -> Option<Worst>) -> Vec<String> {
@@ -228,7 +230,8 @@ pub fn boss_chips(presets: &[String], eval: &dyn Fn(&str) -> Option<Worst>) -> V
         .iter()
         .filter_map(|p| {
             let w = eval(p)?;
-            (w.ratio < 1.0).then(|| format!("One-shot by {p} (needs +{:.0}k {} max hit)", (w.boss_hit - w.max_hit) / 1000.0, DMG_TYPES[w.ty]))
+            let gap = format!("needs +{:.0}k {} max hit", (w.boss_hit - w.max_hit) / 1000.0, DMG_TYPES[w.ty]);
+            (w.ratio < 1.0).then(|| if long_windup(p) { format!("Mechanic: {p}, watch it and walk out of it ({gap})") } else { format!("One-shot by {p} ({gap})") })
         })
         .collect()
 }
@@ -247,18 +250,21 @@ mod tests {
         m
     }
 
-    /// Atziri Flameblast (25 s wind-up in the data) shows its chip but does not count against the
-    /// survive limit; the other presets (Maven Memory Game 7.5 s, the rest 1-3.5 s) still do.
+    /// Atziri Flameblast (25 s) and Maven Memory Game (7.5 s) show a mechanic chip but do not count against the
+    /// survive limit; the other presets (1-3.5 s) still do.
     #[test]
     fn long_windup_preset_does_not_count() {
-        assert!(long_windup("Atziri Flameblast"));
-        for p in preset_names().iter().filter(|p| *p != "Atziri Flameblast") {
+        assert!(long_windup("Atziri Flameblast") && long_windup("Maven Memory Game"));
+        for p in preset_names().iter().filter(|p| *p != "Atziri Flameblast" && *p != "Maven Memory Game") {
             assert!(!long_windup(p), "{p} counted as a long wind-up");
         }
         let m = outs(&[]);
         let fb = [PresetHit { name: "Atziri Flameblast".into(), hit: [0.0, 80_000.0, 0.0, 0.0, 0.0], pen: [0.0; 5] }];
         assert_eq!(preset_shortfall(&fb, &|k| m.get(k).copied()), 0.0, "Flameblast still counts against the limit");
         let w = Worst { ratio: 0.5, ty: 1, boss_hit: 80_000.0, max_hit: 40_000.0 };
+        let mg = [PresetHit { name: "Maven Memory Game".into(), hit: [0.0, 80_000.0, 0.0, 0.0, 0.0], pen: [0.0; 5] }];
+        assert_eq!(preset_shortfall(&mg, &|k| m.get(k).copied()), 0.0, "Memory Game is a mechanic, not a shortfall");
+        assert_eq!(boss_chips(&["Maven Memory Game".to_string()], &|_| Some(w)), vec!["Mechanic: Maven Memory Game, watch it and walk out of it (needs +40k Fire max hit)".to_string()]);
         assert_eq!(boss_chips(&["Atziri Flameblast".to_string()], &|_| Some(w)).len(), 1, "the chip still shows");
     }
 

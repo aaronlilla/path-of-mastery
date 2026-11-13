@@ -350,6 +350,10 @@ export interface SolveState {
   snapshot: SolveSnapshot | null;
   /** Plan round: 1 for the AI's first plan, +1 per re-plan after a stall. */
   round?: number;
+  /** The run this is (1, then +1 per "Keep improving"). */
+  block?: number;
+  /** The run started from a kept build (PLAN.md slice 3): its first row is that build, complete and checked, so it can be applied while the search runs. Absent for a blank or Keep-improving start. */
+  startFrom?: { label: string; level: number; gearDivines: number };
   /** The per-lead results the AI reads after a stall (each lead as it stalls, and once when every lead has stalled). */
   replan?: string;
   /** One key per Solve update: the panel sends each key's `replan` to the AI once. */
@@ -361,6 +365,8 @@ export interface SolveState {
   from?: 'panel' | 'assistant';
   /** Things the player asked for that the assistant's goal left out; shown above Run. */
   notes?: string[];
+  /** One question the assistant asks as up to three buttons (askPlayer); a tap goes back as the player's next message. Gone when a goal is set or a run starts. */
+  question?: { text: string; options: string[] };
 }
 
 /** One trade-off build next to the open build: its change per layer and the engine's stat deltas. */
@@ -382,8 +388,9 @@ export type NumberStatus = 'computed' | 'conditional' | 'estimated' | 'unknown' 
 export interface AssessedFinding { id: string; hard: boolean; text: string; fix?: string }
 export interface AssessedFix { what: string; why: string; delta: string }
 /**
- * The shared candidate record (MAX-AGENT-STEP1.md): frozen when a solver result is assessed. `id` is the engine's record id
- * (the sha256 of the result's build text, = `xmlHash`); the result is fetched by it, never by list index.
+ * The shared candidate record (MAX-AGENT-STEP1.md): frozen when a solver result is assessed. `xmlHash` is the engine's record id
+ * (the sha256 of the result's build text); `id` is the sha256 of the text Apply sets (the result with the listed fixes; the same
+ * as `xmlHash` when nothing was fixed). Apply takes `id`, never a list index.
  */
 export interface AssessedCandidate {
   id: string;
@@ -393,11 +400,39 @@ export interface AssessedCandidate {
   sourceRevision: string;
   sidebar?: { stat: string; label: string; value: number; cull: number };
   findings: AssessedFinding[];
-  verdict: 'ready' | 'fix' | 'notReady' | 'unresolved';
+  verdict: 'ready' | 'fix' | 'objections' | 'notReady' | 'unresolved';
   /** One plain sentence behind the verdict. */
   why: string;
   fixes: AssessedFix[];
+  /** Each target read again on the fixed build (the solver's value moved by what the fixes did to it). */
+  goal?: Array<{ name: string; target: number; before: number; after: number; met: boolean }>;
   /** Divines of the priced uniques; coverage = priced uniques / uniques (null when the kit has none or no prices are loaded). */
   price: { divines: number | null; coverage: number | null; unpriced: string[] };
   status: Record<string, NumberStatus>;
+}
+
+/** What one rare slot costs in game (the price lane): the must-have mods as a trade search, the price with its date, and the recipes. */
+export interface SlotBill {
+  slot: string;
+  item: string;
+  /** false: the item cannot exist in game, so nothing is searched and the build is "not ready". */
+  legal: boolean;
+  issues: string[];
+  /** The mods the build loses numbers without, as searched (min is 90% of the roll). */
+  mustHave: Array<{ text: string; min?: number; loss: string }>;
+  /** Mods the trade site has no search id for: the price then covers fewer mods than the item has. */
+  notSearchable: string[];
+  price:
+    | { status: 'live'; total: number; divines: number | null; cheapestDivines: number | null; listings: Array<{ asked: string; divine: number | null; ageMinutes: number | null }>; /** Must-have mods left out of the search because nothing listed all of them: the price then covers fewer mods. */ dropped: string[]; at: number; link: string }
+    | { status: 'range'; lowDivines: number; highDivines: number; date: string }
+    | { status: 'none-listed' | 'no-session' | 'rate-limited' | 'failed' | 'refused'; message: string };
+  /** Cheaper routes: an essence that forces a must-have mod, a bench craft that stands in for a listing mod. */
+  recipes: Array<{ kind: 'essence' | 'bench'; what: string; chaos: number | null; note: string; cheaper: boolean | null }>;
+}
+export interface PriceBill {
+  slots: SlotBill[];
+  /** Sum of the priced slots; `priced` of `of` rare slots counted. Rares only: uniques are priced in `AssessedCandidate.price`. */
+  divines: number | null;
+  priced: number;
+  of: number;
 }

@@ -2,6 +2,7 @@ import type { SolveGoal, SolveResultSummary, SolveSnapshot, SolveWealth } from '
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AssessedCandidate, Proposal, SolveCpu, SolveDetails, SolveItemRules, SolveState } from '../../shared/assistant/types.js';
 import { CLASSES } from '../../shared/buildXml.js';
+import { answerQuestion, solveQuestions, standing, type AskEvidence } from '../../shared/assistant/solveQuestions.js';
 import { tileGap } from '../../shared/dpsTile.js';
 import { compactNumber } from '../format';
 import { useGameInfo } from '../gameData';
@@ -59,6 +60,7 @@ const MODE_HINT = {
   bossing: tr('h_c_Solve.hint_bossing'),
   both: tr('h_c_Solve.hint_both'),
 } as const;
+const SITS = { all: 'assistant_SolvePanel.sits_all', p90: 'assistant_SolvePanel.sits_p90', p50: 'assistant_SolvePanel.sits_p50', p10: 'assistant_SolvePanel.sits_p10', low: 'assistant_SolvePanel.sits_low' } as const;
 const WEALTH_HINT: Record<SolveWealth, string> = {
   'league-start': tr('h_c_Solve.hint_league_start'),
   'mid-league': tr('h_c_Solve.hint_mid_league'),
@@ -213,22 +215,60 @@ function elapsed(ms: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+/** The best row's weakest target as a percent of the ask (100 when every target is met); null when no target has a number. */
+export function askPercent(r: SolveResultSummary | undefined): number | null {
+  const ps = (r?.targets ?? []).filter((t) => t.target !== null && t.target > 0).map((t) => Math.min(1, Math.max(0, (t.shown ?? t.value) / t.target!)));
+  return ps.length ? Math.floor(Math.min(...ps) * 100) : null;
+}
+const bestOf = (snap: SolveSnapshot | null): SolveResultSummary | undefined => (snap?.results ?? [])[snap?.picks?.[0] ?? 0];
+
+/** The line for a solve that is not running. */
 function progressLine(st: SolveState, snap: SolveSnapshot | null): string {
   if (st.status === 'error') return st.error ?? tr('assistant_SolvePanel.the_solver_stopped_with_an_error');
   if (st.status === 'shortlisting') return tr('assistant_SolvePanel.shortlisting_candidates');
   if (st.status === 'stalled') return tr('assistant_SolvePanel.every_lead_stalled_short_of_the');
-  if (!snap) return st.status === 'running' ? tr('assistant_SolvePanel.starting') : '';
+  if (!snap) return '';
   const leads = snap.leads ?? [];
   const kept = (snap.picks ?? []).length;
   if (st.status === 'done' && leads.length && kept) return tr('assistant_SolvePanel.done_directions_tried_kept', { leads: leads.length, kept: kept });
-  const word = st.status === 'running' ? tr('assistant_SolvePanel.running') : st.status === 'done' ? tr('assistant_SolvePanel.done') : tr('assistant_SolvePanel.stopped');
-  const bits = [...((st.round ?? 1) > 1 ? [tr('assistant_SolvePanel.round', { round: st.round })] : []), word, elapsed(snap.elapsedMs), tr('assistant_SolvePanel.evaluations', { US: snap.evaluations.toLocaleString('en-US') })];
-  if (st.status === 'running') {
+  const word = st.status === 'done' ? tr('assistant_SolvePanel.done') : tr('assistant_SolvePanel.stopped');
+  const pct = askPercent(bestOf(snap));
+  return [...((st.round ?? 1) > 1 ? [tr('assistant_SolvePanel.round', { round: st.round })] : []), word, elapsed(snap.elapsedMs), tr('assistant_SolvePanel.evaluations', { US: snap.evaluations.toLocaleString('en-US') }), ...(pct === null ? [] : [tr('assistant_SolvePanel.solve_best_so_far', { pct })])].join(' · ');
+}
+
+/** The running line: it ticks every second on the panel's own clock, so the text changes even inside a stage that sends nothing. */
+export function StatusLine({ st, snap }: { st: SolveState; snap: SolveSnapshot | null }) {
+  const [now, setNow] = useState(() => Date.now());
+  const arrived = useRef(now);
+  const gain = useRef({ id: '', score: -Infinity, at: now });
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, []);
+  // a push arrived: remember when, and whether the best build got better
+  useEffect(() => {
+    const t = Date.now();
+    arrived.current = t;
+    const score = bestOf(snap)?.score ?? -Infinity;
+    const id = `${snap?.solveId ?? ''}:${st.block ?? 1}`;
+    const g = gain.current;
+    if (g.id !== id) gain.current = { id, score, at: t };
+    else if (score > g.score) gain.current = { id, score, at: t };
+    setNow(t);
+  }, [snap, st.block]);
+  if (!snap) return <>{tr('assistant_SolvePanel.starting')}</>;
+  const ms = snap.elapsedMs + Math.max(0, now - arrived.current);
+  const pct = askPercent(bestOf(snap));
+  const leads = snap.leads ?? [];
+  const bits = [...((st.round ?? 1) > 1 ? [tr('assistant_SolvePanel.round', { round: st.round })] : []), ...((st.block ?? 1) > 1 ? [tr('assistant_SolvePanel.solve_block_n', { n: st.block })] : []), tr('assistant_SolvePanel.running'), elapsed(ms)];
+  if (pct !== null) bits.push(tr('assistant_SolvePanel.solve_best_so_far', { pct }), tr('assistant_SolvePanel.solve_last_gain', { s: Math.max(0, Math.floor((now - gain.current.at) / 1000)) }));
+  const n = snap.evaluations;
+  bits.push(tr('assistant_SolvePanel.evaluations', { US: n.toLocaleString('en-US') }));
+  if (leads.length) {
     const left = leads.filter((l) => l.status !== 'dropped').length;
-    if (leads.length) bits.push(kept ? tr(left === 1 ? 'h_c_Solve.direction_left' : 'h_c_Solve.directions_left', { left }) : tr('assistant_SolvePanel.trying_directions', { leads: leads.length }));
-    else bits.push(snap.candidate ? `${snap.layer} · ${snap.candidate}` : snap.layer);
+    bits.push((snap.picks ?? []).length ? tr(left === 1 ? 'h_c_Solve.direction_left' : 'h_c_Solve.directions_left', { left }) : tr('assistant_SolvePanel.trying_directions', { leads: leads.length }));
   }
-  return bits.join(' · ');
+  return <>{bits.join(' · ')}</>;
 }
 
 // ---- the AI's plan (the AI plans, the solver tests) ------------------------------------------------
@@ -355,12 +395,57 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
     if (st?.status === 'running' || st?.status === 'shortlisting') setEditing(false);
   }, [st?.status]);
   const showForm = !started || editing;
+  // The real-builds pack's reading for the typed skill (ascendancies, gem versions, where the ask sits); nothing until it answers.
+  const [evRead, setEvRead] = useState<{ skill: string; ev: AskEvidence | null }>({ skill: '', ev: null });
+  const skillKey = form.skill.trim();
+  useEffect(() => {
+    if (!skillKey) return;
+    let live = true;
+    const t = setTimeout(() => void Promise.resolve(window.pom.assistant.solveEvidence?.(skillKey)).then((r) => live && setEvRead({ skill: skillKey, ev: r?.ok ? r.value : null }), () => live && setEvRead({ skill: skillKey, ev: null })), 250);
+    return () => { live = false; clearTimeout(t); };
+  }, [skillKey]);
+  const ev = evRead.skill === skillKey ? evRead.ev : null;
+  // The ascendancy question stays on screen after the app picked one for this skill (the model hides it once the goal holds one).
+  const [ascAsked, setAscAsked] = useState('');
+  const asked = ascAsked === skillKey;
+  const { ascendancy: _own, ...goalNoAsc } = toGoal(form);
+  const qs = solveQuestions(asked ? goalNoAsc : toGoal(form), ev ?? undefined);
+  // The most played ascendancy is picked once per skill, so Run works at once; one tap picks another (never again overridden).
+  const autoAsc = useRef('');
+  const suggestedAsc = qs.find((q) => q.id === 'ascendancy')?.suggested;
+  useEffect(() => {
+    if (!suggestedAsc || started || autoAsc.current === skillKey) return;
+    autoAsc.current = skillKey;
+    setAscAsked(skillKey);
+    setForm((f) => { const g = answerQuestion(toGoal(f), 'ascendancy', suggestedAsc); return { ...f, ascendancy: g.ascendancy ?? f.ascendancy, className: g.className ?? f.className }; });
+  }, [suggestedAsc, started, skillKey]);
   const snap = st && st.buildKey === build.id ? st.snapshot : null;
   const results = snap?.results ?? [];
-  const line = st && st.buildKey === build.id ? progressLine(st, snap) : '';
+  const mine = !!st && st.buildKey === build.id;
+  const line = mine && st.status !== 'running' ? progressLine(st, snap) : '';
+  const missed = mine && (st.status === 'done' || st.status === 'stopped') && !!bestOf(snap) && (bestOf(snap)!.targets.some((t) => t.target !== null && !t.met));
+  const keepImproving = () => void Promise.resolve(window.pom.assistant.solveContinue?.()).then((r) => r && !r.ok && toast({ text: r.error, kind: 'error' }), () => toast({ text: tr('assistant_SolvePanel.solve_keep_failed'), kind: 'error' }));
+  const cores = typeof navigator === 'undefined' ? 0 : navigator.hardwareConcurrency || 0;
+  const cpuSeg = (
+    <Segmented
+      ariaLabel={tr('assistant_SolvePanel.cpu_use')}
+      value={form.cpu}
+      onChange={(v) => set('cpu', v)}
+      options={[
+        { value: 'normal', label: tr('assistant_SolvePanel.normal') },
+        { value: 'gentle', label: tr('assistant_SolvePanel.gentle') },
+      ]}
+    />
+  );
+  const cpuLine = cores > 0 && <span className="sv-sub sv-cpu">{tr(form.cpu === 'gentle' ? 'assistant_SolvePanel.solve_threads_gentle' : 'assistant_SolvePanel.solve_threads', { n: form.cpu === 'gentle' ? Math.max(1, Math.floor(cores / 4)) : Math.max(1, cores - 2), g: form.cpu === 'gentle' ? Math.max(1, cores - 2) : Math.max(1, Math.floor(cores / 4)), cores })}</span>;
   // The solver's best leads that differ (lead search); without them the plain results list shows.
   const picks = (snap?.picks ?? []).filter((x) => results[x]).slice(0, 3);
   const others = results.flatMap((r, i): Array<[SolveResultSummary, number]> => (picks.includes(i) ? [] : [[r, i]]));
+  // A run started from a kept build: its row is whole and checked, so it stays first with Apply while the searched rows are still in progress.
+  const keptI = running && st?.startFrom ? results.findIndex((r) => r.start) : -1;
+  const keptLabel = st?.startFrom?.label;
+  const picked = picks.filter((p) => p !== keptI);
+  const rest = others.filter(([, i]) => i !== keptI);
   const toggleOffer = (k: string) => set('configOn', form.configOn.includes(k) ? form.configOn.filter((x) => x !== k) : [...form.configOn, k]);
 
   const setTarget = (i: number, patch: Partial<Form['targets'][number]>) => set('targets', form.targets.map((x, j) => (j === i ? { ...x, ...patch } : x)));
@@ -405,6 +490,29 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
   );
   const uniques = Object.entries(form.items.slotRarities ?? {}).filter(([, r]) => r.join() === 'unique').map(([k]) => (() => { const b = k.replace(/ \d$/, ''), w = label(b); return tr('h_c_Solve.unique_slot', { slot: w === b ? b.toLowerCase() : w }); })());
   const itemWords = [...uniques, ...form.items.mustUse];
+  const pctOf = (note?: string) => note?.match(/\d+%/)?.[0] ?? '';
+  const extraRows = qs.filter((q) => q.id === 'ascendancy' || q.id === 'gem').map((q) => {
+    const top = q.options.find((o) => o.note);
+    const cur = q.id === 'gem' ? q.answer ?? '' : form.ascendancy;
+    return (
+      <div className="sv-q" key={q.id}>
+        <b>{tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem' : 'assistant_SolvePanel.q_ascendancy')}</b>
+        <Segmented ariaLabel={tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem' : 'assistant_SolvePanel.q_ascendancy')} value={cur} onChange={(v) => { if (q.id === 'ascendancy') setAscAsked(skillKey); setForm((f) => { const g = answerQuestion(toGoal(f), q.id, v); return q.id === 'gem' ? { ...f, skill: g.skill } : { ...f, ascendancy: g.ascendancy ?? '', className: g.className ?? f.className }; }); }} options={q.options.map((o) => ({ value: o.value, label: o.label }))} />
+        {top && <span className="sv-sub">{tr(q.id === 'gem' ? 'assistant_SolvePanel.q_gem_note' : 'assistant_SolvePanel.q_asc_note', { name: top.label, pct: pctOf(top.note), skill: form.skill.trim() })}</span>}
+      </div>
+    );
+  });
+  // Where the ask sits among the real builds of this skill: information only, nothing when the pack has none.
+  const sitsParts = form.targets.flatMap((t) => {
+    const v = parseAmount(t.value);
+    const where = v && ev?.sits ? standing(v, DPS_METRICS.includes(t.metric) ? ev.sits.dps : t.metric === 'ehp' ? ev.sits.ehp : undefined) : null;
+    return where ? [`${compactNumber(v!)} ${t.name || t.metric} ${tr(SITS[where])}`] : [];
+  });
+  const sitsLine = ev?.sits && sitsParts.length > 0 && (
+    <span className="sv-sub sv-sits" title={tr('assistant_SolvePanel.sits_caveat')}>
+      {tr('assistant_SolvePanel.sits_line', { parts: sitsParts.join('; '), n: ev.sits.builds, skill: form.skill.trim(), league: ev.sits.league ?? '' })}
+    </span>
+  );
   const tokenEditor = (() => {
     if (!tok) return null;
     if (tok === 'class') return <Select ariaLabel={tr('assistant_SolvePanel.class')} width="100%" value={form.className} onChange={(v) => set('className', v)} options={[{ value: '', label: tr('assistant_SolvePanel.solver_picks') }, ...CLASSES.map((c) => ({ value: c.name, label: c.name }))]} />;
@@ -490,6 +598,13 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
           <h4>{tr('assistant_SolvePanel.questions')}</h4>
           {wealthRow}
           {modeRow}
+          {extraRows}
+          {sitsLine}
+          <div className="sv-row">
+            <span>{tr('assistant_SolvePanel.cpu')}</span>
+            {cpuSeg}
+          </div>
+          {cpuLine}
         </section>
         <button type="button" className="abtn quiet sv-add" onClick={() => setFull(true)}>
           <Icon name="edit" size={13} />
@@ -636,54 +751,54 @@ export function SolvePanel({ a, build }: { a: Assistant; build: OpenBuild }) {
             </label>
             <div className="sv-row">
               <span>{tr('assistant_SolvePanel.cpu')}</span>
-              <Segmented
-                ariaLabel={tr('assistant_SolvePanel.cpu_use')}
-                value={form.cpu}
-                onChange={(v) => set('cpu', v)}
-                options={[
-                  { value: 'normal', label: tr('assistant_SolvePanel.normal') },
-                  { value: 'gentle', label: tr('assistant_SolvePanel.gentle') },
-                ]}
-              />
+              {cpuSeg}
             </div>
           </div>
+          {cpuLine}
         </section>
         </>)}
 
         {st && st.buildKey === build.id && <PlanList st={st} snap={snap} />}
         {st?.verdict && st.buildKey === build.id && (
           <div className="sv-note warn sv-verdict" role="status">
-            <b>{tr('assistant_SolvePanel.goal_not_reachable_at_this_wealth')}</b>
+            <b>{tr('assistant_SolvePanel.not_reached_in_this_search')}</b>
             <span>{st.verdict.why}</span>
             {st.verdict.gaps.length > 0 && <span>{tr('assistant_SolvePanel.best_found')} {st.verdict.gaps.join(' · ')}</span>}
           </div>
         )}
-        {(line || results.length > 0) && (
+        {(running || line || results.length > 0) && (
           <section className="sv-sec" aria-label={tr('assistant_SolvePanel.results')}>
             <h4>{tr('assistant_SolvePanel.results')}</h4>
             <div className={'sv-prog' + (st?.status === 'error' ? ' bad' : '')} role="status">
               {(running || shortlisting || stalled) && <span className="spin" />}
-              {line}
+              {running && st ? <StatusLine st={st} snap={snap} /> : line}
             </div>
-            {picks.length > 0 && (
+            {missed && (
+              <button type="button" className="abtn sv-keep" onClick={keepImproving} title={tr('assistant_SolvePanel.solve_keep_tip')}>
+                <Icon name="play" size={13} />
+                {tr('assistant_SolvePanel.solve_keep_improving')}
+              </button>
+            )}
+            {keptI >= 0 && <ResultRow key={`kept-${keptI}`} r={results[keptI]!} i={keptI} n={1} best={picks[0] === keptI} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />}
+            {picked.length > 0 && (
               <>
-                <ResultRow key={`p0-${picks[0]}`} r={results[picks[0]!]!} i={picks[0]!} n={1} best a={a} configOn={form.configOn} onOffer={toggleOffer} />
-                {picks.length > 1 && <h4 className="sv-sub-h">{tr('assistant_SolvePanel.other_directions_compared_with_1')}</h4>}
-                {picks.slice(1).map((pi, k) => (
-                  <AltRow key={`p${k + 1}-${pi}`} r={results[pi]!} i={pi} n={k + 2} best={results[picks[0]!]!} tag={tagOf(results[pi]!, picks.map((x) => results[x]!))} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+                <ResultRow key={`p0-${picked[0]}`} r={results[picked[0]!]!} i={picked[0]!} n={keptI >= 0 ? 2 : 1} best={picks[0] !== keptI} running={running} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+                {picked.length > 1 && <h4 className="sv-sub-h">{tr('assistant_SolvePanel.other_directions_compared_with_1')}</h4>}
+                {picked.slice(1).map((pi, k) => (
+                  <AltRow key={`p${k + 1}-${pi}`} r={results[pi]!} i={pi} n={k + (keptI >= 0 ? 3 : 2)} best={results[picked[0]!]!} tag={tagOf(results[pi]!, picked.map((x) => results[x]!))} running={running} a={a} configOn={form.configOn} onOffer={toggleOffer} />
                 ))}
               </>
             )}
-            {picks.length > 0 && others.length > 0 && (
+            {picks.length > 0 && rest.length > 0 && (
               <details className="sv-more">
-                <summary>{tr('assistant_SolvePanel.other_results')}{others.length})</summary>
-                {others.map(([r, i]) => (
-                  <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+                <summary>{tr('assistant_SolvePanel.other_results')}{rest.length})</summary>
+                {rest.map(([r, i]) => (
+                  <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} lazy running={running} a={a} configOn={form.configOn} onOffer={toggleOffer} />
                 ))}
               </details>
             )}
-            {picks.length === 0 && results.map((r, i) => (
-              <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} a={a} configOn={form.configOn} onOffer={toggleOffer} />
+            {picks.length === 0 && results.map((r, i) => i === keptI ? null : (
+              <ResultRow key={`${i}-${r.label}-${r.score}`} r={r} i={i} lazy={i > 0} running={running} keptLabel={keptLabel} a={a} configOn={form.configOn} onOffer={toggleOffer} />
             ))}
             {snap?.assumptions && snap.assumptions.length > 0 && <div className="sv-assume">{tr('assistant_SolvePanel.assumed')} {snap.assumptions.join(' · ')}</div>}
           </section>
@@ -769,12 +884,12 @@ function LeadLine({ r }: { r: SolveResultSummary }) {
 }
 
 /** One of the other directions: one line of numbers, the delta against #1, and Show full for the whole card. */
-function AltRow({ r, i, n, best, tag, a, configOn, onOffer }: { r: SolveResultSummary; i: number; n: number; best: SolveResultSummary; tag: string | null; a: Assistant; configOn: string[]; onOffer: (key: string) => void }) {
+function AltRow({ r, i, n, best, tag, running, a, configOn, onOffer }: { r: SolveResultSummary; i: number; n: number; best: SolveResultSummary; tag: string | null; running: boolean; a: Assistant; configOn: string[]; onOffer: (key: string) => void }) {
   const [full, setFull] = useState(false);
   if (full) {
     return (
       <>
-        <ResultRow r={r} i={i} n={n} a={a} configOn={configOn} onOffer={onOffer} />
+        <ResultRow r={r} i={i} n={n} running={running} a={a} configOn={configOn} onOffer={onOffer} />
         <button type="button" className="abtn quiet sv-add" onClick={() => setFull(false)}>{tr('assistant_SolvePanel.show_less')}</button>
       </>
     );
@@ -845,6 +960,7 @@ const verdictOf = (v: AssessedCandidate['verdict']): { tone: 'ok' | 'warn' | 'ba
   ({
     ready: { tone: 'ok', text: tr('assistant_SolvePanel.verdict_ready') },
     fix: { tone: 'warn', text: tr('assistant_SolvePanel.verdict_fix') },
+    objections: { tone: 'warn', text: tr('assistant_SolvePanel.verdict_needs_fixes') },
     notReady: { tone: 'bad', text: tr('assistant_SolvePanel.verdict_not_ready') },
     unresolved: { tone: 'warn', text: tr('assistant_SolvePanel.verdict_unresolved') },
   } as Record<AssessedCandidate['verdict'], { tone: 'ok' | 'warn' | 'bad'; text: string }>)[v];
@@ -860,11 +976,12 @@ function gapNote(g: ReturnType<typeof tileGap>): string {
   return tr('assistant_SolvePanel.gap_higher', { parts: parts.join(tr('assistant_SolvePanel.gap_and')) });
 }
 
-/** The assessed record's verdict, what it needs, and the price of the kit (uniques only: crafted rares have no market price). */
+/** The assessed record's verdict, what it needs, and the price of the kit (uniques only: crafted rares have no market price). Three states a player reads at a glance: ready, needs fixes (listed, Apply stays), not ready (the reason, no Apply). */
 function AssessLine({ a }: { a: AssessedCandidate | undefined }) {
   if (!a) return <div className="sv-block">{tr('assistant_SolvePanel.checking_this_build')}</div>;
   const v = verdictOf(a.verdict);
   const { divines, coverage, unpriced } = a.price;
+  const items = a.verdict === 'ready' ? [] : (a.verdict === 'notReady' ? a.findings.filter((f) => f.hard && !f.fix) : a.findings).map((f) => f.text);
   return (
     <>
       <div className="sv-block" data-verdict={a.verdict}>
@@ -872,8 +989,12 @@ function AssessLine({ a }: { a: AssessedCandidate | undefined }) {
           <Icon name={v.tone === 'ok' ? 'check-circle' : 'warning'} size={12} />
           {v.text}
         </span>{' '}
-        {a.verdict !== 'ready' && a.why}
+        {a.verdict !== 'ready' && !items.length && a.why}
       </div>
+      {items.slice(0, 6).map((t, k) => (
+        <div key={k} className="sv-block sv-item">{t}</div>
+      ))}
+      {items.length > 6 && <div className="sv-block">{tr('assistant_SolvePanel.solve_and_more', { n: items.length - 6 })}</div>}
       {a.fixes.map((f) => (
         <div key={f.what} className="sv-block">{tr('assistant_SolvePanel.fix_line', { what: f.what })}{f.delta ? ` (${f.delta})` : ''}</div>
       ))}
@@ -886,7 +1007,8 @@ function AssessLine({ a }: { a: AssessedCandidate | undefined }) {
   );
 }
 
-export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: { r: SolveResultSummary; i: number; n?: number; best?: boolean; a: Assistant; configOn?: string[]; onOffer?: (key: string) => void }) {
+/** `running`: the solve is still going, so the row is a work in progress: no assessment, no Apply. `lazy`: not the top pick, assessed when the player opens it. */
+export function ResultRow({ r, i, n, best = false, running = false, lazy = false, keptLabel, a, configOn = [], onOffer }: { r: SolveResultSummary; i: number; n?: number; best?: boolean; running?: boolean; lazy?: boolean; keptLabel?: string; a: Assistant; configOn?: string[]; onOffer?: (key: string) => void }) {
   const toast = useToast();
   const [details, setDetails] = useState<SolveDetails | null>(null);
   const [show, setShow] = useState<'open' | 'compare' | null>(null);
@@ -907,12 +1029,13 @@ export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: 
     setDetails(res.value);
     return res.value;
   };
-  // the headline is the sidebar's tile, so read it as soon as the row shows
+  // the headline is the sidebar's tile, so read it once the solve has ended, for the top pick (an assessment is dozens of engine calls)
   useEffect(() => {
+    if (running || lazy) return;
     let live = true;
     const t = window.setTimeout(() => void window.pom.assistant.solveDetails(i).then((res) => { if (live && res.ok) setDetails(res.value); }), 600);
     return () => { live = false; window.clearTimeout(t); };
-  }, [i, r.score]);
+  }, [i, r.score, running, lazy]);
   const toggle = async (what: 'open' | 'compare') => {
     if (show === what) {
       setShow(null);
@@ -931,6 +1054,7 @@ export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: 
     // Apply takes the record the card was drawn from, never the list position (a re-sort moves it)
     const d = details ?? (await load());
     if (!d?.assessed) return;
+    if (d.assessed.verdict === 'notReady') return toast({ text: d.assessed.why, kind: 'error' });
     setBusy(true);
     const res = await window.pom.assistant.solveCard(d.assessed.id);
     setBusy(false);
@@ -954,7 +1078,7 @@ export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: 
       <div className="sv-rh">
         <b>{n ?? i + 1}</b>
         <span className="sv-who">
-          {r.start ? tr('assistant_SolvePanel.your_build') : who}
+          {r.start ? (keptLabel ?? tr('assistant_SolvePanel.your_build')) : who}
           {r.start ? <i>{who}</i> : r.ascendancy && <i>{r.className}</i>}
         </span>
         {best && <span className="sv-tag">{tr('assistant_SolvePanel.best')}</span>}
@@ -994,7 +1118,7 @@ export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: 
       {block &&<div className="sv-block">{block}</div>}
       {below.length > 0 && <div className="sv-block">{tr('assistant_SolvePanel.below_your_build')} {below.join(', ')}</div>}
       {r.honest?.flagged && <div className="sv-block">{r.honest.text}</div>}
-      <AssessLine a={details?.assessed} />
+      {running ? <div className="sv-block sv-wip" data-verdict="running">{askPercent(r) === null ? tr('assistant_SolvePanel.solve_in_progress') : tr('assistant_SolvePanel.solve_in_progress_pct', { pct: askPercent(r) })}</div> : (details?.assessed || !lazy) && <AssessLine a={details?.assessed} />}
       <CheckChips r={r} />
       {((r.configOn?.length ?? 0) > 0 || (r.offers?.length ?? 0) > 0 || (r.bossChips?.length ?? 0) > 0) && (
         <div className="sv-chips sv-cfg" role="group" aria-label={tr('assistant_SolvePanel.config_switches_of_result', { i: i + 1 })}>
@@ -1052,10 +1176,10 @@ export function ResultRow({ r, i, n, best = false, a, configOn = [], onOffer }: 
             
             {tr('assistant_SolvePanel.compare')}
           </button>
-          <button type="button" className="abtn primary" disabled={busy || a.applying !== null} onClick={() => void apply()} title={tr('assistant_SolvePanel.puts_this_whole_build_on_the')}>
+          {!running && details?.assessed?.verdict !== 'notReady' && <button type="button" className="abtn primary" disabled={busy || a.applying !== null} onClick={() => void apply()} title={tr('assistant_SolvePanel.puts_this_whole_build_on_the')}>
             {busy ? <span className="spin" style={{ width: 12, height: 12 }} /> : <Icon name="check" size={13} />}
             {r.lead ? tr('assistant_SolvePanel.apply_to_build') : tr('assistant_SolvePanel.apply')}
-          </button>
+          </button>}
         </div>
       )}
     </div>

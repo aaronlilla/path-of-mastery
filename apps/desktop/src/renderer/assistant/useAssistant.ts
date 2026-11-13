@@ -4,6 +4,7 @@ import { clearSignIn } from '../../shared/assistant/account.js';
 import { plainText, type TabName } from '../../shared/assistant/blocks.js';
 import { afterRetry } from '../../shared/assistant/retry.js';
 import { resolveOnly, trimStore, type ResultStore } from '../../shared/assistant/refs.js';
+import { flushReplanUpdate } from './replan';
 import {
   DEFAULT_PREFS,
   type ApplyResult,
@@ -211,13 +212,7 @@ export function useAssistant(build: OpenBuild, opts: { onEngineEdited: (xml: str
   const replanRef = useRef<{ key: string; text: string } | null>(null);
   const replanSent = useRef('');
   const startTurnRef = useRef<(text: string, skipRouter?: boolean) => Promise<boolean>>(async () => false);
-  const flushReplan = useCallback(() => {
-    const r = replanRef.current;
-    if (!r || turnRef.current || replanSent.current === r.key) return;
-    replanSent.current = r.key;
-    replanRef.current = null;
-    void startTurnRef.current(r.text, true);
-  }, []);
+  const flushReplan = useCallback(() => flushReplanUpdate(replanRef, replanSent, !!turnRef.current, (text) => startTurnRef.current(text, true)), []);
   /** A change went into the build (the player's Apply, or the assistant's live change): record it, then open and highlight it. */
   const landed = useCallback(
     (r: ApplyResult) => {

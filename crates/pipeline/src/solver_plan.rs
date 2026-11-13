@@ -6,22 +6,22 @@
 //! first; the solver's own leads (the goal as asked, every class that fits the skill) run after it as one more lead.
 //!
 //! With a time budget the leads share it, one round each. Without one (0 or left out) the run has no clock: each round
-//! gives every live lead a solve with twice the tries of its last; a lead stalls when its best gains less than
-//! `STALL_GAIN` over `STALL_WINDOW_MS` of its own search time (a plateau ends its round there). Each stalled lead is published at once in the snapshot's `stalls` (how close it
+//! gives every live lead a solve with twice the tries of its last (`ROUND_TRIES` first); a lead stalls when a whole
+//! round gains less than `STALL_GAIN` over its best so far. Each stalled lead is published at once in the snapshot's `stalls` (how close it
 //! came, what held it back, whether more time helps) while the others keep running; the AI may send replacement leads
 //! into the running solve (`Handle::add_leads`), which join the loop at their own first round. The run ends when a
 //! result meets every target (`met`). With a plan, a run whose every lead has stalled waits (`idle`, no work) for new
-//! leads or Stop; without one it ends `stalled`.
+//! leads or Stop (the app stops it when the AI's answer to that adds none); without one it ends `stalled`.
 
 use super::*;
 
-/// The first round's time budget per lead with no time budget (its tries are DEFAULT_EVALS_PER_SEC per second of
-/// it, or the options' `maxEvals`); each later round doubles it.
-const ROUND_MS: u64 = 60_000;
-/// A lead stalls when its best gains less than this (5%) on its goal progress over `STALL_WINDOW_MS`.
+/// The first round's tries per lead with no time budget (or the options' `maxEvals`); each later round doubles them.
+/// The round has no clock: the work is its tries, so a busy PC takes longer, never does less.
+const ROUND_TRIES: u64 = 37_500;
+/// A lead stalls when a whole round (twice the tries of the one before, as many as all earlier rounds and one more
+/// first round) gains less than this (5%) on its goal progress. Judged at the round's end only: a round finds its best
+/// in its last phases (P1 trace: 1.48M at 48k of 75k tries, 3.31M at 77k), so a cut mid-round would cut the gain.
 const STALL_GAIN: f64 = 0.05;
-/// The plateau window, in the lead's own search time (60 min of doubling rounds never stalled a lead).
-const STALL_WINDOW_MS: u64 = 180_000;
 /// Results kept per lead (its best round's best).
 const KEEP: usize = 3;
 
@@ -37,6 +37,9 @@ struct PlanLead {
     why: Option<String>,
     /// The stalled lead this one replaces (the AI's swap; the panel shows it under that lead).
     replaces: Option<String>,
+    /// The lead's own start build (build XML text playing the goal's skill, e.g. a compiled route): every round of this
+    /// lead starts from it as a whole build instead of the open build.
+    start_build: Option<String>,
 }
 
 fn plan_leads(goal: &Value) -> Vec<PlanLead> {
@@ -76,6 +79,8 @@ struct Lead {
     ascendancy: Option<String>,
     why: Option<String>,
     replaces: Option<String>,
+    /// The lead's own start build (None: the open build).
+    xml: Option<String>,
     goal: Value,
     notes: Vec<String>,
     status: Status,
@@ -88,24 +93,6 @@ struct Lead {
     /// The best round was cut by the clock before its tries were spent (a slow PC), not proven out.
     clock_cut: bool,
     error: Option<String>,
-    /// Search time this lead has had, over all its rounds.
-    run_ms: u64,
-    /// The plateau watch: the best when it last gained `STALL_GAIN`, and the lead's own time then.
-    mark: Option<(bool, f64)>,
-    mark_ms: u64,
-    plateaued: bool,
-}
-
-impl Lead {
-    /// Sees the lead's best at its own search time `t`; true (and `plateaued`) once it gained under `STALL_GAIN` for a window.
-    fn watch(&mut self, best: Option<(bool, f64)>, t: u64) -> bool {
-        if best.is_some() && (self.mark.is_none() || gain(best, self.mark) >= STALL_GAIN) {
-            (self.mark, self.mark_ms) = (best, t);
-        } else if t.saturating_sub(self.mark_ms) >= STALL_WINDOW_MS {
-            self.plateaued = true;
-        }
-        self.plateaued
-    }
 }
 
 /// Gain of `b` over `o` (feasibility first, then progress in log terms).
@@ -117,11 +104,6 @@ fn gain(b: Option<(bool, f64)>, o: Option<(bool, f64)>) -> f64 {
         (Some(_), None) => f64::INFINITY,
         (None, _) => -1.0,
     }
-}
-
-/// The best progress among results, the open build's own row aside.
-fn best_of<'a>(rs: impl Iterator<Item = &'a Value>) -> Option<(bool, f64)> {
-    rs.filter(|r| r["start"].as_bool() != Some(true)).map(progress).fold(None, |a, p| if a.is_none_or(|a| better(p, a)) { Some(p) } else { a })
 }
 
 /// Goal progress of one result: (every limit met, the parent scorer's own score: weights, limits and soft pushes).
@@ -280,7 +262,7 @@ struct Driver {
 }
 
 fn new_lead(name: String, p: &PlanLead, (goal, notes): (Value, Vec<String>)) -> Lead {
-    Lead { name, class_name: p.class_name.clone(), ascendancy: p.ascendancy.clone(), why: p.why.clone(), replaces: p.replaces.clone(), goal, notes, status: Status::Live, rounds: 0, evals: 0, kept: Vec::new(), baseline: None, last_gain: None, clock_cut: false, error: None, run_ms: 0, mark: None, mark_ms: 0, plateaued: false }
+    Lead { name, class_name: p.class_name.clone(), ascendancy: p.ascendancy.clone(), why: p.why.clone(), replaces: p.replaces.clone(), xml: p.start_build.clone().filter(|x| !x.trim().is_empty()), goal, notes, status: Status::Live, rounds: 0, evals: 0, kept: Vec::new(), baseline: None, last_gain: None, clock_cut: false, error: None }
 }
 
 /// One lead's best against every target value and limit, what limits it and whether time helps (`SolveEnd` and `stalls` rows).
@@ -365,7 +347,11 @@ impl Driver {
             let k = self.leads[i].rounds;
             let (ms, evals) = match budget {
                 Some(b) => ((b / n).max(1000), self.opts.max_evals.map(|m| (m / n).max(1))),
-                None => (ROUND_MS << k.min(10), self.opts.max_evals.map(|m| m << k.min(10))),
+                None => {
+                    let tries = self.opts.max_evals.unwrap_or(ROUND_TRIES) << k.min(10);
+                    // (no clock: a second per try never binds, so the round always does its tries)
+                    (tries.saturating_mul(1000), Some(tries))
+                }
             };
             if let Some((snap, xmls)) = solve(self, i, ms, evals, k + 1) {
                 self.record(i, snap, xmls);
@@ -529,13 +515,15 @@ impl Driver {
         let mut opts = self.opts.clone();
         opts.time_budget_ms = Some(ms);
         opts.max_evals = evals;
+        opts.in_plan = true;
         // (each round from its own seed: a fresh search, not the last one again)
         opts.seed = Some(self.opts.seed.unwrap_or(0).wrapping_add(round as u64 - 1));
         let sub = Arc::new((Mutex::new(Shared { snapshot: json!({ "results": [] }), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
-        // (its own stop: Stop reaches it below, and so does a plateau, which ends this lead's round only)
+        // (its own stop: Stop reaches it below)
         let sub_cancel = Arc::new(AtomicBool::new(false));
-        let (xml, sh, ca) = (self.xml.clone(), sub.clone(), sub_cancel.clone());
+        let (xml, sh, ca) = (self.leads[i].xml.clone().unwrap_or_else(|| self.xml.clone()), sub.clone(), sub_cancel.clone());
         let t = std::thread::Builder::new().name("solve-lead".into()).stack_size(WORKER_STACK).spawn(move || {
+            crate::solver::below_normal();
             let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), String> {
                 pom_engine::modparser::text_rules::set_active(true);
                 Solver::new(xml, goal, opts, sh.clone(), ca)?.run()
@@ -560,8 +548,6 @@ impl Driver {
             return None;
         };
         let mut seen = 0;
-        let round_start = Instant::now();
-        let clockless = self.opts.time_budget_ms.unwrap_or(0) == 0;
         let (snap, xmls) = loop {
             if self.cancel.load(Ordering::Relaxed) {
                 sub_cancel.store(true, Ordering::Relaxed);
@@ -582,15 +568,6 @@ impl Driver {
             };
             if done {
                 break (snap, xmls);
-            }
-            if clockless {
-                let l = &mut self.leads[i];
-                let live = best_of(snap["results"].as_array().into_iter().flatten());
-                let kept = best_of(l.kept.iter().map(|(r, _)| r));
-                let best = if gain(live, kept) > 0.0 { live } else { kept };
-                if l.watch(best, l.run_ms + round_start.elapsed().as_millis() as u64) {
-                    sub_cancel.store(true, Ordering::Relaxed);
-                }
             }
             self.publish(Some((i, &snap, &xmls)), None);
         };
@@ -622,7 +599,6 @@ impl Driver {
         let old = l.kept.iter().find(|(r, _)| r["start"].as_bool() != Some(true)).map(|(r, _)| progress(r));
         // Gain of this round's best over the lead's best so far.
         let gain = gain(best, old);
-        l.run_ms += snap["elapsedMs"].as_u64().unwrap_or(0);
         let clock_cut = snap["assumptions"].as_array().is_some_and(|a| a.iter().any(|x| x.as_str().is_some_and(|s| s.starts_with("Stopped at the time limit"))));
         if gain > 0.0 {
             l.kept = rs.into_iter().take(KEEP).collect();
@@ -632,12 +608,11 @@ impl Driver {
         if l.rounds >= 2 {
             l.last_gain = Some(gain.min(10.0));
         }
-        let now_best = if gain > 0.0 { best } else { old };
         if self.cancel.load(Ordering::Relaxed) {
             l.status = Status::Stopped;
         } else if l.kept.iter().any(|(r, _)| all_met(r)) {
             l.status = Status::Met;
-        } else if self.opts.time_budget_ms.unwrap_or(0) == 0 && l.watch(now_best, l.run_ms) {
+        } else if self.opts.time_budget_ms.unwrap_or(0) == 0 && l.rounds >= 2 && gain < STALL_GAIN {
             l.status = Status::Stalled;
         }
     }
@@ -787,6 +762,20 @@ mod tests {
         assert!(notes.iter().any(|n| n.starts_with("Headhunter left out")) && notes.iter().any(|n| n.starts_with("Not A Gem")), "{notes:?}");
     }
 
+    /// A lead's `startBuild` is that lead's start (an added lead's too); a lead without one and the solver's own leads
+    /// start from the open build, and the build text never reaches a lead's goal.
+    #[test]
+    fn lead_carries_its_start_build() {
+        let goal = r#"{"skill":"Poisonous Concoction","plan":{"leads":[{"name":"A","startBuild":"<route-a/>"},{"name":"B"}]}}"#;
+        let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
+        let inbox = Arc::new(Mutex::new(vec![json!({ "name": "C", "startBuild": "<route-c/>" })]));
+        let mut d = Driver::new("<open/>".into(), serde_json::from_str(goal).unwrap(), Options::default(), shared, Arc::new(AtomicBool::new(false)), inbox).unwrap();
+        assert!(d.take_new());
+        let starts: Vec<(&str, Option<&str>)> = d.leads.iter().map(|l| (l.name.as_str(), l.xml.as_deref())).collect();
+        assert_eq!(starts, vec![("A", Some("<route-a/>")), ("B", None), ("Solver's own leads", None), ("C", Some("<route-c/>"))]);
+        assert!(d.leads.iter().all(|l| !l.goal.to_string().contains("route-")));
+    }
+
     /// The four SRS lead results of one run, all limits met: the parent scorer puts Necromancer first;
     /// the unweighted sum of ln(value) put the solver's own leads first (11.7165 against 11.7074).
     #[test]
@@ -805,18 +794,23 @@ mod tests {
         assert_eq!(rows.iter().map(old).max_by(|a, b| if better(progress(a), progress(b)) { std::cmp::Ordering::Greater } else { std::cmp::Ordering::Less }).unwrap()["planLead"], "Solver's own leads");
     }
 
-    /// A plateaued lead (best gains under 5%) stalls once the window of its own search time has passed, not before;
-    /// a real gain restarts the window.
+    /// No clock: round k does ROUND_TRIES << (k-1) tries; a round that gains 5% or more keeps the lead going, a round
+    /// under 5% stalls it, however long the PC took.
     #[test]
-    fn plateau_stalls_within_window() {
-        let raw: Value = serde_json::from_str(r#"{"skill":"Poisonous Concoction","assume":{"playMode":"mapping"}}"#).unwrap();
-        let mut l = new_lead("A".into(), &PlanLead::default(), (raw, Vec::new()));
-        let p = |v: f64| Some((true, f64::ln(v)));
-        assert!(!l.watch(p(100.0), 0));
-        assert!(!l.watch(p(101.0), 60_000));
-        assert!(!l.watch(p(110.0), 170_000), "a 9% gain restarts the window");
-        assert!(!l.watch(p(111.0), 170_000 + STALL_WINDOW_MS - 1));
-        assert!(l.watch(p(112.0), 170_000 + STALL_WINDOW_MS), "plateaued for the whole window");
+    fn a_flat_round_stalls_a_lead() {
+        let goal = r#"{"skill":"Poisonous Concoction","assume":{"playMode":"mapping"},"targets":[{"name":"DPS","value":1000000000}]}"#;
+        let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
+        let mut d = Driver::new(String::new(), serde_json::from_str(goal).unwrap(), Options::default(), shared, Arc::new(AtomicBool::new(false)), Arc::new(Mutex::new(Vec::new()))).unwrap();
+        let mut tries = Vec::new();
+        // (DPS per round: +50%, +9%, +2%; an hour per round: the clock does not count)
+        let mut fake = |_d: &mut Driver, _i: usize, ms: u64, ev: Option<u64>, round: u32| {
+            tries.push((ev, ms >= 1000 * ev.unwrap_or(0)));
+            let v = [100.0, 150.0, 163.5, 166.8][round as usize - 1];
+            Some((json!({ "evaluations": ev, "elapsedMs": 3_600_000, "results": [{ "limitsMet": true, "score": f64::ln(v), "targets": [{ "name": "DPS", "value": v, "target": 1e9, "met": false }] }] }), vec![Arc::new(format!("x{v}"))]))
+        };
+        assert_eq!(d.run(&mut fake), "stalled");
+        assert_eq!(tries, vec![(Some(37_500), true), (Some(75_000), true), (Some(150_000), true), (Some(300_000), true)]);
+        assert_eq!((d.leads[0].status, d.leads[0].rounds), (Status::Stalled, 4), "+9% keeps going, +2% stalls");
     }
 
     /// Lead A stalls while the others run and is published in `stalls`; a lead sent into the running solve is picked
@@ -830,7 +824,7 @@ mod tests {
         let t = std::thread::spawn(move || {
             let mut d = Driver::new(String::new(), serde_json::from_str(goal).unwrap(), Options::default(), sh, ca, ib.clone()).unwrap();
             let mut sent = false;
-            // (each fake round: 2 minutes, the lead's base value plus 1% per round: a plateau)
+            // (each fake round: the lead's base value plus 1% per round: a plateau)
             let mut fake = |d: &mut Driver, i: usize, _ms: u64, _ev: Option<u64>, round: u32| {
                 if d.leads[0].status == Status::Stalled && !sent {
                     sent = true;
@@ -855,10 +849,10 @@ mod tests {
         cancel.store(true, Ordering::Relaxed);
         let (reason, leads) = t.join().unwrap();
         assert_eq!(reason, "stopped");
-        assert_eq!(leads.iter().map(|l| (l.0.as_str(), l.1, l.2)).collect::<Vec<_>>(), vec![("A", Status::Stalled, 3), ("Solver's own leads", Status::Stalled, 3), ("C", Status::Stalled, 3)]);
+        assert_eq!(leads.iter().map(|l| (l.0.as_str(), l.1, l.2)).collect::<Vec<_>>(), vec![("A", Status::Stalled, 2), ("Solver's own leads", Status::Stalled, 2), ("C", Status::Stalled, 2)]);
         let rs = snap["results"].as_array().unwrap();
         assert_eq!(rs[0]["planLead"], "C", "{snap}");
-        assert!(rs.iter().any(|r| r["planLead"] == "A" && r["targets"][0]["value"].as_f64() > Some(101.5)), "A's best kept: {snap}");
+        assert!(rs.iter().any(|r| r["planLead"] == "A" && r["targets"][0]["value"].as_f64() > Some(100.5)), "A's best kept: {snap}");
         let stalls = snap["stalls"].as_array().unwrap();
         assert_eq!(stalls.len(), 3, "{snap}");
         assert_eq!(stalls[0]["name"], "A");

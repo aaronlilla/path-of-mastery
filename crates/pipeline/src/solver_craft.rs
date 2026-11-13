@@ -810,7 +810,8 @@ impl Solver {
         let perfect = b.perfect;
         let local = !matches!(t, "Helmet" | "Boots" | "Gloves" | "Belt");
         for e in pick {
-            for opt in &e.lines {
+            // (no flask enchant that stops the flask gaining charges: "Gains no Charges during Effect")
+            for opt in e.lines.iter().filter(|o| !o.contains("Gains no Charges")) {
                 let lines: Vec<String> = opt.split('/').map(|s| s.to_string()).collect();
                 b.fams.push(Fam { key: format!("E|{}|{opt}", e.tier), keys: group_pair("Enchant", "enchant"), group: "Enchant".into(), prefix: false, lines: roll(&lines, None, perfect), req: 0, source: "enchant", influence: None, implicit: true, tags: Vec::new(), local, tier: 0, tries: 1.0, lower: Vec::new() });
             }

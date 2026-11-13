@@ -108,8 +108,11 @@ export const IPC = {
   SOLVE_GOAL: 'pom:solve-goal',
   SOLVE_RUN: 'pom:solve-run',
   SOLVE_STOP: 'pom:solve-stop',
+  SOLVE_CONTINUE: 'pom:solve-continue',
   SOLVE_DETAILS: 'pom:solve-details',
   SOLVE_CARD: 'pom:solve-card',
+  /** The real-builds pack's reading for one skill: ascendancies, gem versions, where an ask sits (null when the pack holds none). */
+  SOLVE_EVIDENCE: 'pom:solve-evidence',
   /** main -> renderer: send, an AssistantPush (turn events, new proposals, connector clients). */
   ASSISTANT_PUSH: 'pom:assistant-push',
   /** Game knowledge base: status, a forced refresh, and a main -> renderer push of the status. */

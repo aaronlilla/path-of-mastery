@@ -782,6 +782,9 @@ pub struct Options {
     /// The kicks' random start (the same goal and seed give the same result).
     pub seed: Option<u64>,
     pub threads: Option<usize>,
+    /// Set by the plan driver on each lead round: it keeps the clock itself, so the heartbeat leaves elapsedMs alone.
+    #[serde(skip)]
+    pub in_plan: bool,
 }
 
 /// The engine stats a metric reads (summed when more than one) and whether it sets the enemy to a pinnacle boss.
@@ -1360,6 +1363,8 @@ struct Pool {
     tx: Option<mpsc::Sender<Task>>,
     handles: Vec<std::thread::JoinHandle<()>>,
     threads: usize,
+    /// Tasks sent and not yet answered: the evaluation count shown to the player leaves them out (display only).
+    pending: Arc<AtomicU64>,
 }
 
 const WORKER_STACK: usize = 64 * 1024 * 1024;
@@ -1691,6 +1696,7 @@ impl Pool {
             let flicker = flicker.clone();
             let limit_only = limit_only.clone();
             if let Ok(h) = std::thread::Builder::new().name(format!("solve-{t}")).stack_size(WORKER_STACK).spawn(move || {
+                below_normal();
                 crate::set_item_cache_max(256);
                 LIMIT_ONLY.with(|l| *l.borrow_mut() = limit_only.to_vec());
                 // (text rules read unread lines in solver evaluations only, solver_clear.rs)
@@ -1732,12 +1738,13 @@ impl Pool {
             }
         }
         let threads = handles.len();
-        Pool { tx: Some(tx), handles, threads }
+        Pool { tx: Some(tx), handles, threads, pending: Arc::new(AtomicU64::new(0)) }
     }
 
     /// One batch to the workers.
     fn send(&self, cands: Vec<Cand>, names: &Arc<Vec<String>>, cancel: &Arc<AtomicBool>) -> Vec<Option<Vals>> {
         let n = cands.len();
+        self.pending.fetch_add(n as u64, Ordering::Relaxed);
         let (rtx, rrx) = mpsc::channel();
         if let Some(tx) = &self.tx {
             for (i, cand) in cands.into_iter().enumerate() {
@@ -1746,9 +1753,13 @@ impl Pool {
         }
         drop(rtx);
         let mut out = vec![None; n];
+        let mut got = 0;
         for (i, v) in rrx {
             out[i] = v;
+            got += 1;
+            self.pending.fetch_sub(1, Ordering::Relaxed);
         }
+        self.pending.fetch_sub((n - got) as u64, Ordering::Relaxed);
         out
     }
 
@@ -1938,6 +1949,33 @@ fn gem_name(id: &str) -> String {
         return id.split('+').map(gem_name).collect::<Vec<_>>().join(" + ");
     }
     gd::game_data().gems.get(id).and_then(|g| g.name.clone()).unwrap_or_else(|| id.to_string())
+}
+
+type Kit<'a> = (&'a [String], &'a [String], &'a [(String, String)]);
+
+/// What a result changed from the open build, one line each: main link and other skills out and in, each flask slot
+/// that differs. Each (main link, other skills, (flask slot, item)).
+fn changes_from_start(s: Kit, r: Kit) -> Vec<String> {
+    let mut out = Vec::new();
+    let less = |a: &[String], b: &[String]| a.iter().filter(|x| !b.contains(x)).cloned().collect::<Vec<_>>().join(", ");
+    for (what, a, b) in [("main link", s.0, r.0), ("other skills", s.1, r.1)] {
+        for (gems, way) in [(less(a, b), "out"), (less(b, a), "in")] {
+            if !gems.is_empty() {
+                out.push(format!("{what}: {gems} {way}"));
+            }
+        }
+    }
+    let at = |k: Kit, slot: &str| k.2.iter().find(|(s, _)| s == slot).map_or("nothing".to_string(), |(_, i)| i.clone());
+    let mut slots: Vec<&String> = s.2.iter().chain(r.2).map(|(s, _)| s).collect();
+    slots.sort();
+    slots.dedup();
+    for slot in slots {
+        let (was, now) = (at(s, slot), at(r, slot));
+        if was != now {
+            out.push(format!("{slot}: {was} -> {now}"));
+        }
+    }
+    out
 }
 
 /// The gem a utility entry stands for (an aura linked to Generosity counts as the aura).
@@ -2482,6 +2520,7 @@ pub fn start(xml: String, goal_json: &str, options_json: &str) -> Result<Handle,
         .name("solve".into())
         .stack_size(WORKER_STACK)
         .spawn(move || {
+            below_normal();
             let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), String> {
                 pom_engine::modparser::text_rules::set_active(true);
                 if planned {
@@ -2515,6 +2554,48 @@ pub fn start(xml: String, goal_json: &str, options_json: &str) -> Result<Handle,
 // ---------------------------------------------------------------------------------------------------------------
 // The solver
 
+/// Runs the solver's threads below normal priority, so the rest of the PC gets the CPU first.
+pub(crate) fn below_normal() {
+    #[cfg(windows)]
+    {
+        extern "system" {
+            fn GetCurrentThread() -> isize;
+            fn SetThreadPriority(thread: isize, priority: i32) -> i32;
+        }
+        // (THREAD_PRIORITY_BELOW_NORMAL = -1)
+        unsafe {
+            SetThreadPriority(GetCurrentThread(), -1);
+        }
+    }
+}
+
+/// Once a second writes the live evaluation count (and the clock) into the shared snapshot, so a long stage between
+/// publishes still moves. Display only: nothing in the search reads these. Ends when the returned sender drops.
+fn heartbeat(shared: Arc<(Mutex<Shared>, std::sync::Condvar)>, evals: Arc<AtomicU64>, pending: Arc<AtomicU64>, started: Instant, clock: bool) -> mpsc::Sender<()> {
+    let (tx, rx) = mpsc::channel::<()>();
+    let _ = std::thread::Builder::new().name("solve-beat".into()).spawn(move || {
+        while let Err(mpsc::RecvTimeoutError::Timeout) = rx.recv_timeout(std::time::Duration::from_secs(1)) {
+            let (m, cv) = &*shared;
+            let mut g = m.lock().unwrap_or_else(|e| e.into_inner());
+            let n = evals.load(Ordering::Relaxed).saturating_sub(pending.load(Ordering::Relaxed));
+            let ms = started.elapsed().as_millis() as u64;
+            let Some(o) = g.snapshot.as_object_mut() else { continue };
+            // (never back: a publish may have just written a later count)
+            if o.get("evaluations").and_then(Value::as_u64).is_some_and(|e| e > n) {
+                continue;
+            }
+            o.insert("evaluations".into(), json!(n));
+            if clock {
+                o.insert("elapsedMs".into(), json!(ms));
+                o.insert("evalsPerSec".into(), json!(if ms > 0 { (n as f64 * 1000.0 / ms as f64).round() } else { 0.0 }));
+            }
+            g.version += 1;
+            cv.notify_all();
+        }
+    });
+    tx
+}
+
 struct Solver {
     goal: Goal,
     scorer: Scorer,
@@ -2525,7 +2606,9 @@ struct Solver {
     started: Instant,
     budget_ms: u64,
     max_evals: u64,
-    evals: AtomicU64,
+    evals: Arc<AtomicU64>,
+    /// Ends the heartbeat thread when the solver drops.
+    _beat: mpsc::Sender<()>,
     prof_pool_us: AtomicU64,
     prof_batches: AtomicU64,
     shared: Arc<(Mutex<Shared>, std::sync::Condvar)>,
@@ -2831,7 +2914,10 @@ impl Solver {
             }
         };
         gems.retain(|g| g.kind == Kind::Support || g.id.contains('+') || required.contains(&g.id) || fits(g.id));
-        let mut s = Solver { goal, scorer, weights, names, pool, cancel, started: Instant::now(), budget_ms, max_evals: opts.max_evals.unwrap_or(budget_ms * DEFAULT_EVALS_PER_SEC / 1000).max(1), evals: AtomicU64::new(0), prof_pool_us: AtomicU64::new(0), prof_batches: AtomicU64::new(0), shared, session, level, points, asc_points, base_xml: reset, seed, ctx: Vec::new(), gems, main_gem, required, archive: Vec::new(), layer: "starting".into(), layers: Vec::new(), current: String::new(), assumptions, skills_open: String::new(), group_memo: RefCell::new(HashMap::default()), tree_sockets: Vec::new(), rules: ItemRules::default(), slots: Vec::new(), start_gear: Arc::new(Gear::default()), item_level: level.clamp(1, 100) as u32, weapon_types, uniques: Vec::new(), bases: RefCell::new(HashMap::default()), slot_base_memo: RefCell::new(HashMap::default()), gear_enum_memo: RefCell::new(None), gear_all_memo: RefCell::new(HashMap::default()), ranks: HashMap::default(), lead_hint: Vec::new(), plan_lead: Vec::new(), ignore_budget: std::cell::Cell::new(false), phase_end: std::cell::Cell::new(u64::MAX), start_xml, player_pieces: Vec::new(), fixers: (Vec::new(), Vec::new()), blocked: Default::default(), sustain_tried: Default::default(), totem: spell_totem(), node_memo: Default::default(), main_part: Default::default(), keystone_memo: Default::default(), banned: Default::default(), own_gems: own_gems(&xml), large_sockets: Vec::new(), cluster_ids: RefCell::new(HashMap::default()), sub_sockets: HashMap::default(), live_axes: Default::default(), cfg_items: Default::default(), cfg_flagged: Default::default(), cfg_tree: Default::default(), gens: Vec::new(), book: Default::default(), lead_gear: None, baseline: None, picked: None, rng_seed: opts.seed.unwrap_or(0), behind: Default::default(), leads_tries: Default::default(), finalizing: Default::default(), notable_reach: Default::default(), avoid: Default::default() };
+        let started = Instant::now();
+        let evals = Arc::new(AtomicU64::new(0));
+        let _beat = heartbeat(shared.clone(), evals.clone(), pool.pending.clone(), started, !opts.in_plan);
+        let mut s = Solver { goal, scorer, weights, names, pool, cancel, started, budget_ms, max_evals: opts.max_evals.unwrap_or(budget_ms * DEFAULT_EVALS_PER_SEC / 1000).max(1), evals, _beat, prof_pool_us: AtomicU64::new(0), prof_batches: AtomicU64::new(0), shared, session, level, points, asc_points, base_xml: reset, seed, ctx: Vec::new(), gems, main_gem, required, archive: Vec::new(), layer: "starting".into(), layers: Vec::new(), current: String::new(), assumptions, skills_open: String::new(), group_memo: RefCell::new(HashMap::default()), tree_sockets: Vec::new(), rules: ItemRules::default(), slots: Vec::new(), start_gear: Arc::new(Gear::default()), item_level: level.clamp(1, 100) as u32, weapon_types, uniques: Vec::new(), bases: RefCell::new(HashMap::default()), slot_base_memo: RefCell::new(HashMap::default()), gear_enum_memo: RefCell::new(None), gear_all_memo: RefCell::new(HashMap::default()), ranks: HashMap::default(), lead_hint: Vec::new(), plan_lead: Vec::new(), ignore_budget: std::cell::Cell::new(false), phase_end: std::cell::Cell::new(u64::MAX), start_xml, player_pieces: Vec::new(), fixers: (Vec::new(), Vec::new()), blocked: Default::default(), sustain_tried: Default::default(), totem: spell_totem(), node_memo: Default::default(), main_part: Default::default(), keystone_memo: Default::default(), banned: Default::default(), own_gems: own_gems(&xml), large_sockets: Vec::new(), cluster_ids: RefCell::new(HashMap::default()), sub_sockets: HashMap::default(), live_axes: Default::default(), cfg_items: Default::default(), cfg_flagged: Default::default(), cfg_tree: Default::default(), gens: Vec::new(), book: Default::default(), lead_gear: None, baseline: None, picked: None, rng_seed: opts.seed.unwrap_or(0), behind: Default::default(), leads_tries: Default::default(), finalizing: Default::default(), notable_reach: Default::default(), avoid: Default::default() };
         s.fixers = s.cost_fixers();
         s.setup_items(&xml)?;
         Ok(s)
@@ -3618,7 +3704,7 @@ impl Solver {
             self.layers.push((self.layer.clone(), self.spent()));
         }
         let elapsed = self.elapsed();
-        let evals = self.evals.load(Ordering::Relaxed);
+        let evals = self.evals.load(Ordering::Relaxed).saturating_sub(self.pool.pending.load(Ordering::Relaxed));
         let results: Vec<Value> = self.archive.iter().enumerate().map(|(i, e)| self.entry_json(i, e)).collect();
         let snap = json!({
             "active": true,
@@ -3756,6 +3842,8 @@ impl Solver {
             "bandit": e.bandit,
             "start": e.start,
             "belowStart": below,
+            // What the result changed from the open build (gems, other skills, flasks), with its score against the open build's.
+            "fromStart": start.map(|s| json!({ "changes": changes_from_start((&s.main, &s.utils, &self.flasks_of(&s.gear)), (&e.main, &e.utils, &self.flasks_of(&e.gear))), "scoreGain": e.score - s.score })),
             "assumptions": self.entry_assumptions(e),
             "bossBreakdown": self.boss_breakdown_text(e),
             "bossChips": e.boss_chips,
@@ -3766,6 +3854,11 @@ impl Solver {
             "configOn": e.switches.iter().map(|o| json!({ "key": o.key, "label": config::short_label(&o.label), "reason": o.reason, "player": o.player })).collect::<Vec<_>>(),
             "offers": e.offers.iter().map(|(o, d, t)| json!({ "key": o.key, "label": config::short_label(&o.label), "reason": o.reason, "delta": d, "text": t })).collect::<Vec<_>>(),
         })
+    }
+
+    /// The flasks worn, as (slot, item).
+    fn flasks_of(&self, g: &Gear) -> Vec<(String, String)> {
+        g.pieces.iter().enumerate().filter(|(i, _)| self.slots.get(*i).is_some_and(|d| d.kind == SlotKind::Flask)).filter_map(|(i, p)| p.as_ref().map(|p| (self.slots[i].name.clone(), p.label.clone()))).collect()
     }
 
     /// The pack-clear breakdown of a result's text when a target scores clear ("Hits 5.0 of a 5-monster pack ...").
@@ -3923,7 +4016,10 @@ impl Solver {
         gear.ready = true;
         let label = format!("Your build ({})", asc_name.clone().unwrap_or_else(|| class_name.clone()));
         let clear = self.clear_line(&xml);
-        let e = Entry { id: xml_hash(&xml), honest: None, boss_chips: Vec::new(), clear, xml, vals, score, viol, label, class_name, asc_name, points, asc_points, main: Vec::new(), utils: Vec::new(), bandit: String::new(), gear: Arc::new(gear), start: true, parts: Arc::default(), switches: Vec::new(), offers: Vec::new(), lead: None };
+        // (its gems as the rows name them, so each result can say what it changed from the open build)
+        let (main, utils) = self.gems_of(&xml);
+        let (main, utils) = (main.iter().map(|g| gem_name(g)).collect(), utils.iter().map(|g| gem_name(g)).collect());
+        let e = Entry { id: xml_hash(&xml), honest: None, boss_chips: Vec::new(), clear, xml, vals, score, viol, label, class_name, asc_name, points, asc_points, main, utils, bandit: String::new(), gear: Arc::new(gear), start: true, parts: Arc::default(), switches: Vec::new(), offers: Vec::new(), lead: None };
         self.archive_insert(e);
         self.publish();
         Ok(())
@@ -5408,6 +5504,10 @@ impl Solver {
         })();
         self.phase_end.set(u64::MAX);
         r?;
+        // A complete build first: when the 14% mark cut the item step short (a small block: run A's rows had 8 bare slots
+        // until its round ended at 123 s), every bare armour and jewellery slot still gets its one line, so the root and
+        // every lead seeded from its gear are whole builds (one slot per pass, a few hundred tries).
+        while self.bare_slot_pass(&mut root)? {}
         // Both: the root's two sides are the bars until cut 1 (unless the open build set them), and the root is scored on them.
         self.scorer.provisional_bars(&root.vals);
         (root.score, root.viol) = self.score(&root.vals);
@@ -5450,8 +5550,30 @@ impl Solver {
         }
         scouted.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
         // Expert phase over the survivors' roots (each keeps its weapon held): beam leaves made into real
-        // builds compete with the survivors for the three finals by full score.
-        let mut pool = self.expert(&scouted)?;
+        // builds compete with the survivors for the three finals by full score. It runs only when its marks (screen 8%,
+        // beam 12%, realize 15% of the budget) fit before its 60% cap: round 1 of run A gave it 8,400 tries and 50 s and it
+        // kept nothing. When it runs, the best survivor first gets the thorough gem and item passes (modifier swaps,
+        // uniques, bases, anoint, jewels) and is listed, so the expert starts from a whole build; when it is skipped the
+        // finals' converge runs those passes next.
+        let covered = (b * 60 / 100).saturating_sub(self.spent()) >= b * 35 / 100;
+        let mut pool = if covered {
+            if let Some(st) = scouted.first_mut() {
+                self.phase_end.set(b * 60 / 100);
+                let r = (|| -> Result<(), String> {
+                    self.gem_layer(st, true)?;
+                    self.items_layer(st, true)?;
+                    Ok(())
+                })();
+                self.phase_end.set(u64::MAX);
+                r?;
+                self.archive_add(st)?;
+            }
+            self.expert(&scouted)?
+        } else {
+            let left = (b * 60 / 100).saturating_sub(self.spent()) * self.max_evals / b.max(1);
+            self.assumptions.push(format!("Expert stage skipped: {left} tries were left for it before its cap, it needs {}", self.max_evals * 35 / 100));
+            Vec::new()
+        };
         pool.extend(scouted);
         // The finals are the best build of each of the best three leads.
         let mut pool = leads::one_per_lead(pool);
@@ -5469,7 +5591,22 @@ impl Solver {
         let after = |pct: u64| e + b.saturating_sub(e) * pct / 100;
         let converge_until = after(20);
         let mut finals: Vec<State> = Vec::new();
-        let picked: Vec<State> = pool.into_iter().take(3).collect();
+        let mut picked: Vec<State> = pool.into_iter().take(3).collect();
+        // The open build as a whole (tree, gems, auras, curses, flasks, items) is a final too: the refinement and kicks
+        // below keep a change to it only when the score rises, and its rows name what changed (`fromStart`).
+        if let Some(x) = self.start_xml.clone().filter(|_| self.seed.is_some()) {
+            match self.frozen_state(&x) {
+                Ok(mut st) => {
+                    (st.score, st.viol) = self.score(&st.vals);
+                    let t: Vec<String> = self.scorer.targets.iter().map(|t| format!("{} {}", t.name, short_num(self.scorer.target_value(t, &st.vals)))).collect();
+                    self.assumptions.push(format!("Your build is searched as a whole build too (its tree, gems, auras, flasks and items; a change kept only when the score rises). On the search's terms it reads {}", t.join(", ")));
+                    self.archive_add(&st)?;
+                    // (first, so it gets its share of the refinement before the time runs out)
+                    picked.insert(0, st);
+                }
+                Err(e) => self.assumptions.push(format!("Your build did not seed the search as a whole build: {e}")),
+            }
+        }
         let n = picked.len();
         for (k, mut st) in picked.into_iter().enumerate() {
             if let Some(l) = st.lead {
@@ -5636,7 +5773,7 @@ impl Solver {
                 let main = sc.both_sides(&e.vals).map_or_else(|| sc.target_value(main_t, &e.vals), |(c, b, _)| c.min(b));
                 let weakest = hits.iter().filter_map(|&k| e.vals.get(k).copied().flatten()).reduce(f64::min);
                 let credit = |x: f64| weakest.map_or(x, |m| x.min(m * EHP_MAX_HIT_MULT));
-                plan::Cand { main, other: ehp.map_or(0.0, |k| credit(Scorer::get(&e.vals, k))), met: sc.targets.iter().all(|t| t.value.is_none_or(|tv| sc.target_value(t, &e.vals) >= tv)), hard: e.viol <= 0.0, survives: e.boss_chips.is_empty(), score: e.score }
+                plan::Cand { main, other: ehp.map_or(0.0, |k| credit(Scorer::get(&e.vals, k))), met: sc.targets.iter().all(|t| t.value.is_none_or(|tv| sc.target_value(t, &e.vals) >= tv)), hard: e.viol <= 0.0, survives: e.boss_chips.iter().all(|c| c.starts_with("Mechanic: ")), score: e.score }
             })
             .collect();
         let Some(p) = plan::pick_final(&cands, rule) else { return };
@@ -5650,6 +5787,18 @@ impl Solver {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A result that kept the open build's gems and flasks names no change; one that swapped a support, dropped an aura
+    /// and changed a flask names each.
+    #[test]
+    fn changes_from_start_names_each_change() {
+        let v = |x: &[&str]| x.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        let f = |x: &[(&str, &str)]| x.iter().map(|(a, b)| (a.to_string(), b.to_string())).collect::<Vec<_>>();
+        let (m, u, fl) = (v(&["Poisonous Concoction", "Void Manipulation"]), v(&["Grace", "Despair"]), f(&[("Flask 1", "Divine Life Flask"), ("Flask 2", "Silver Flask")]));
+        assert!(changes_from_start((&m, &u, &fl), (&m, &u, &fl)).is_empty());
+        let (m2, u2, fl2) = (v(&["Poisonous Concoction", "Momentum"]), v(&["Grace"]), f(&[("Flask 1", "Divine Life Flask"), ("Flask 2", "Jade Flask")]));
+        assert_eq!(changes_from_start((&m, &u, &fl), (&m2, &u2, &fl2)), vec!["main link: Void Manipulation out", "main link: Momentum in", "other skills: Despair out", "Flask 2: Silver Flask -> Jade Flask"]);
+    }
 
     #[test]
     fn own_gems_skips_disabled_groups_and_other_skill_sets() {
@@ -6251,7 +6400,7 @@ Implicits: 0</Item><ItemSet useSecondWeaponSet=\"nil\" id=\"1\"><Slot name=\"Fla
     }
     /// Budgeted by evaluation count, not the clock, so machine load cannot change what the solve gets done.
     /// A short solve from blank spends all 8 ascendancy points; solving again from its result keeps that build listed
-    /// (as the start) and returns nothing worse than it on the goal's score. Both solves run the expert beam.
+    /// (as the start) and returns nothing worse than it on the goal's score. Both solves run the expert beam or say it was skipped.
     #[test]
     fn open_build_kept_and_ascendancy_full() {
         let goal = r#"{"assume":{"playMode":"mapping"},"skill":"Boneshatter","ascendancy":"Slayer","level":90,"targets":[{"name":"DPS","value":1000000},{"name":"EHP","metric":"ehp","value":50000}],"items":{"rarities":["rare"],"mustUse":[],"neverUse":[],"lockSlots":["Ring 2"]}}"#;
@@ -6261,7 +6410,9 @@ Implicits: 0</Item><ItemSet useSecondWeaponSet=\"nil\" id=\"1\"><Slot name=\"Fla
             let (snap, _) = h.step(0, 0);
             assert!(snap.get("error").is_none(), "{snap}");
             println!("layers: {}", snap["layers"]);
-            assert!(snap["layers"].as_array().unwrap().iter().any(|l| l["layer"] == "expert: beam"), "{}", snap["layers"]);
+            // (a 40k block skips the expert when its marks do not fit; the snapshot says so)
+            let skipped = snap["assumptions"].as_array().unwrap().iter().any(|a| a.as_str().is_some_and(|s| s.starts_with("Expert stage skipped")));
+            assert!(skipped || snap["layers"].as_array().unwrap().iter().any(|l| l["layer"] == "expert: beam"), "{}", snap["layers"]);
             for r in snap["results"].as_array().unwrap() {
                 println!("result {} score {:.4} parts {}", r["label"], r["score"].as_f64().unwrap_or(0.0), r["parts"]);
             }

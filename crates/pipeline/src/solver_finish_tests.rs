@@ -915,7 +915,7 @@ fn one_shot_chip_fails_the_survive_limit() {
     let chips = s.boss_check(&xml, &mut v);
     assert!(!chips.is_empty(), "the fixture is one-shot by a preset");
     let long: Vec<String> = crate::solver_boss::preset_names().into_iter().filter(|n| crate::solver_boss::long_windup(n)).collect();
-    let counted = chips.iter().any(|c| !long.iter().any(|n| c.starts_with(&format!("One-shot by {n} "))));
+    let counted = chips.iter().any(|c| !long.iter().any(|n| c.starts_with(&format!("Mechanic: {n}, "))));
     let d = limit(&s, &v, "Survives every boss skill");
     assert!(if counted { d > 0.0 } else { d == 0.0 }, "chips {chips:?} with the limit at {d}");
 }
@@ -1094,4 +1094,21 @@ fn finishing_reserve_evaluates_then_stops() {
     assert!(s.eval(cand())[0].is_some(), "a finishing pass evaluates inside the reserve");
     s.evals.store(s.max_evals, Ordering::Relaxed);
     assert!(s.stop() && s.eval(cand())[0].is_none(), "nothing beyond the reserve");
+}
+
+/// Run A's best build (Poisonous Concoction, bossing) failed "Survives every boss skill" by 0.20 on Maven Memory Game
+/// alone (7.5 s of pattern the player follows): now a mechanic chip and no shortfall.
+#[test]
+fn run_a_memory_game_is_a_mechanic_not_a_shortfall() {
+    let goal: Goal = serde_json::from_str(&GOAL.replace(r#""metric":"combined""#, r#""metric":"boss""#).replace("mapping", "bossing")).unwrap();
+    let shared = Arc::new((Mutex::new(Shared { snapshot: json!({}), results: Vec::new(), by_id: Default::default(), version: 0, done: false }), std::sync::Condvar::new()));
+    let s = Solver::new(blank_build_xml(95), goal, Options::default(), shared, Arc::new(AtomicBool::new(false))).unwrap();
+    let xml = Arc::new(std::fs::read_to_string(format!("{}/testdata/run-a-best.xml", env!("CARGO_MANIFEST_DIR"))).unwrap());
+    let names: Vec<&str> = s.scorer.names.iter().map(|n| n.as_str()).collect();
+    let mut v = eval_one(&mut None, &Cand::Xml(xml.clone()), &names).unwrap();
+    let chips = s.boss_check(&xml, &mut v);
+    println!("chips {chips:?}");
+    assert!(chips.iter().any(|c| c.starts_with("Mechanic: Maven Memory Game, ")), "no mechanic chip: {chips:?}");
+    assert!(!chips.iter().any(|c| c.contains("Memory Game") && c.starts_with("One-shot")), "{chips:?}");
+    assert_eq!(limit(&s, &v, "Survives every boss skill"), 0.0, "run A was short by 0.20 on Memory Game");
 }

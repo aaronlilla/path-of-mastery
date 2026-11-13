@@ -1424,6 +1424,12 @@ impl Solver {
                     return None;
                 }
             }
+            // At most two life flasks (a player's floor; the rest are utility): the slot `life_flask_slot` reserves is
+            // never refused, any other life flask is when two are already worn.
+            let life = |q: &Piece| q.base().and_then(|b| pom_calc::data::flask_base_info(&b.name)).is_some_and(|f| f.is_life);
+            if self.life_flask_slot() != Some(i) && p.as_ref().is_some_and(life) && gear.pieces.iter().enumerate().filter(|(k, q)| *k != i && self.slots[*k].kind == SlotKind::Flask && q.as_ref().is_some_and(life)).count() >= 2 {
+                return None;
+            }
         }
         // The one legality check: no crafted item reaches an evaluation unless `CraftRules` holds for all its families.
         if let Some(Design::Craft { base, mods, .. }) = p.as_ref().map(|p| &p.design) {
@@ -1668,7 +1674,7 @@ impl Solver {
     /// A bare crafted armour or jewellery slot gets one ordinary line (life, a resistance, an attribute) at its lowest
     /// tier even when the budget is spent: another crafted piece steps its lines down to make room (`step_to_budget`).
     /// Kept by `budget_order`, so it never opens a failed limit.
-    fn bare_slot_pass(&mut self, st: &mut State) -> Result<bool, String> {
+    pub(super) fn bare_slot_pass(&mut self, st: &mut State) -> Result<bool, String> {
         let bare: Vec<usize> = (0..self.slots.len()).filter(|&i| self.is_bare(&st.gear, i)).collect();
         if bare.is_empty() || self.stop() {
             return Ok(false);

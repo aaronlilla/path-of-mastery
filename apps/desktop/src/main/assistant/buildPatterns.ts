@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { ToolError, type ToolDef } from './tools.js';
+import { keptEvidence } from './skeletons.js';
 
 /**
  * buildPatterns: what real builds of the current league use, from the bundled, aggregated pack
@@ -17,6 +18,8 @@ interface Share { name: string; count: number; share: number }
 interface Spread { p10: number | null; p50: number | null; p90: number | null; max: number | null }
 interface Group {
   builds: number;
+  /** Counts from poe.ninja's search (the kept builds' census): no supports, uniques or spreads behind them. */
+  countsOnly?: boolean;
   ascendancies?: Share[]; supports?: Share[]; keystones?: Share[]; notables?: Share[]; uniques?: Share[]; auras?: Share[]; heralds?: Share[]; guards?: Share[];
   dps?: Spread; ehp?: Spread; life?: Spread; energyShield?: Spread;
 }
@@ -38,7 +41,13 @@ export function loadPatterns(): PatternsPack {
   if (cached) return cached;
   const f = packFile();
   if (!f) throw new ToolError('The build patterns data is not part of this install.');
-  return (cached = JSON.parse(readFileSync(f, 'utf8')) as PatternsPack);
+  const pack = JSON.parse(readFileSync(f, 'utf8')) as PatternsPack;
+  // the gem versions and ascendancies the kept builds' census knows, so the wizard's questions have evidence where the pack holds no group
+  // (a skill the pack already answers keeps the pack for every version: its counts and the census's are on different scales)
+  const base = (n: string) => n.replace(/^Vaal /, '').replace(/ of .*$/, '').toLowerCase();
+  const packed = new Set(Object.entries(pack.bySkill).filter(([, g]) => g.builds >= MIN_SAMPLE).map(([n]) => base(n)));
+  for (const [name, g] of Object.entries(keptEvidence())) if (!packed.has(base(name))) pack.bySkill[name] = { ...g, countsOnly: true };
+  return (cached = pack);
 }
 
 const LISTS = ['ascendancies', 'supports', 'keystones', 'notables', 'uniques', 'auras', 'heralds', 'guards'] as const;
@@ -49,6 +58,7 @@ function present(label: string, g: Group, topN: number) {
   if (g.builds < MIN_SAMPLE) {
     return { label, sampleSize: g.builds, tooSmall: true, note: `Only ${g.builds} real build(s) in the sample, fewer than ${MIN_SAMPLE}: too small to show a pattern. Do not infer one; say the sample is too small.` };
   }
+  if (g.countsOnly) return { label, sampleSize: g.builds, ascendancies: top(g.ascendancies, topN), note: "Counts only (poe.ninja search totals): no supports, uniques, auras or DPS and EHP spread behind them. Say so; show no pattern beyond the counts." };
   return {
     label, sampleSize: g.builds,
     ...Object.fromEntries(LISTS.map((k) => [k, top(g[k], topN)])),

@@ -1007,6 +1007,10 @@ export interface SolveOptions {
   /** 0 or left out: no clock; the run ends when every target is met or every lead has stalled (`SolveSnapshot.endReason`). */
   timeBudgetMs?: number;
   threads?: number;
+  /** Tries for the whole run (a block); with a clock too, the phases are measured in tries and the clock cuts only on a slow PC. */
+  maxEvals?: number;
+  /** Search seed; "Keep improving" sends the next one. */
+  seed?: number;
 }
 
 export interface SolveResultSummary {

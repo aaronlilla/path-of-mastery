@@ -27,6 +27,8 @@ export interface GroupRead {
   enabled: boolean;
   includeInFullDPS: boolean;
   isMain: boolean;
+  /** Granted by an item (not socketed in it). */
+  fromItem: boolean;
   gems: GemRead[];
 }
 
@@ -51,6 +53,7 @@ export function readSkills(xml: string): GroupRead[] {
     enabled: g.attrs.enabled !== 'false',
     includeInFullDPS: g.attrs.includeInFullDPS === 'true',
     isMain: i + 1 === mainGroup,
+    fromItem: !!g.attrs.source,
     gems: kids(g, 'Gem').map((gem, j) => {
       const name = gem.attrs.nameSpec || gem.attrs.skillId || '';
       const lv = parseInt(gem.attrs.level ?? '', 10);

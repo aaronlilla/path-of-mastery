@@ -17,9 +17,10 @@ export const TOOL_SCOPES: Readonly<Record<string, AiScope>> = Object.freeze({
   searchGame: 'mcp:read', lookupGame: 'mcp:read', patchChanges: 'mcp:read', getMechanic: 'mcp:read', kbStatus: 'mcp:read',
   getLevelingGuide: 'mcp:read', explainGuideStep: 'mcp:read', proposeLevelingSkill: 'mcp:propose',
   startSolve: 'mcp:propose', getSolve: 'mcp:read', stopSolve: 'mcp:propose', addLeads: 'mcp:propose', applySolveResult: 'mcp:propose',
+  openSolveDraft: 'mcp:propose', askPlayer: 'mcp:propose', checkBuild: 'mcp:read',
   getBuildFilterStages: 'mcp:read', showInApp: 'mcp:read', explainLootItem: 'mcp:read', proposeBuildFilterChange: 'mcp:propose',
   bestUnique: 'mcp:read', spendPoints: 'mcp:read', takeNode: 'mcp:read',
-  bestSupport: 'mcp:read', diagnoseBuild: 'mcp:read', buildPatterns: 'mcp:read', setPlayerProfile: 'mcp:propose',
+  bestSupport: 'mcp:read', diagnoseBuild: 'mcp:read', buildPatterns: 'mcp:read', keptBuilds: 'mcp:read', setPlayerProfile: 'mcp:propose',
 });
 
 /** Tools only the app's own panel may call: a solver result replaces the whole build, which the panel applies live. The engine-ranked bestUnique/spendPoints/takeNode are open to outside clients: they only return edits, which an outside client's proposeEdit applies live. */
@@ -27,7 +28,7 @@ export const PANEL_ONLY_TOOLS: ReadonlySet<string> = new Set(['applySolveResult'
 
 /** Tools the selected-document gate always closes for outside clients (the panel keeps some of them). */
 export const UNRELATED_TOOLS = new Set(['compareBuilds', 'listLibrary', 'listSharedItems', 'equipSharedItem', 'listCharacters',
-  'importCharacter', 'getWealth', 'searchTrade', 'upgradeCandidates', 'startSolve', 'getSolve', 'stopSolve', 'addLeads', 'applySolveResult']);
+  'importCharacter', 'getWealth', 'searchTrade', 'upgradeCandidates', 'startSolve', 'getSolve', 'stopSolve', 'addLeads', 'applySolveResult', 'openSolveDraft', 'askPlayer']);
 
 /** Scope approval never authorizes the legacy account-wide mutation tools. */
 export function externalToolAllowed(name: string): boolean {

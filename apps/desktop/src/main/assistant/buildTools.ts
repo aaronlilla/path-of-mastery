@@ -9,6 +9,7 @@ import { skillIdOf } from '../../shared/skillsLogic.js';
 import { withSpecClassNames } from '../../renderer/buildSkills.js';
 import { APP_TOOLS } from './appTools.js';
 import { PATTERN_TOOLS } from './buildPatterns.js';
+import { KEPT_TOOLS } from './keptTools.js';
 import { KB_TOOLS } from './kbTools.js';
 import { countedTattoos, label as tattooLabel, tattooEligible, tattoosFor } from '../../renderer/tree/tattoos.js';
 import { encodeBuildCode } from '../library/buildCode.js';
@@ -18,6 +19,7 @@ import type { Proposal } from '../../shared/assistant/types.js';
 import type { LibraryListing } from '../../shared/library.js';
 import { readBuildMeta, readEquipped, readSkills, xmlHash } from './buildReaders.js';
 import { SOLVE_TOOLS } from './solve.js';
+import { SLOT_BILL_TOOLS } from './slotBill.js';
 import { playerSaysLevel, pointBudget, RANK_TOOLS } from './rankTools.js';
 import { PLAN_TOOLS } from './planTools.js';
 import { buildWarnings, fixManaShortfall, fixOldShortfalls, fixRequirements } from './playerSense.js';
@@ -669,7 +671,7 @@ export const PARITY_TOOLS: ToolDef[] = [
     name: 'realBuilds',
     chip: 'Find real builds',
     description:
-      "Real characters of one skill from poe.ninja's builds for the current league, at a stage: league-start (day-3 snapshot), week-1, or mid (now). Each comes back already imported as a scratch draft (draftId) from its build code at that snapshot, with its name, level, ascendancy, life and poe.ninja's own EHP. Score them with the draft read tools and draftId; poe.ninja's DPS is not given because the numbers that count are the engine's. Takes a few seconds per character.",
+      "Real characters of one skill from poe.ninja's builds for the current league, at a stage: league-start (day-3 snapshot), week-1, or mid (now). Each comes back already imported as a scratch draft (draftId) from its build code at that snapshot, with its name, level, ascendancy, life and poe.ninja's own EHP and DPS text. poe.ninja's DPS is the player's own config (buffs on), a way to pick whom to read, never the bar: score them with the draft read tools and draftId, the numbers that count are the engine's. Takes a few seconds per character.",
     shape: { skill: z.string().min(1).max(80), stage: z.enum(['league-start', 'week-1', 'mid']), ascendancy: z.string().max(30).optional(), limit: z.number().int().min(1).max(5).optional() },
     async run(args, ctx) {
       let got;
@@ -683,7 +685,7 @@ export const PARITY_TOOLS: ToolDef[] = [
         try {
           const imp = await importFromText(c.buildCode);
           const d = await drafts(ctx).create(imp.xml, { name: c.name, from: 'import', baseKey: null, baseHash: null });
-          characters.push({ draftId: d.id, name: c.name, level: c.level, class: c.className, ascendancy: c.ascendancy, life: c.life, energyShield: c.energyShield, poeNinjaEhp: c.ninjaEhp ?? null });
+          characters.push({ draftId: d.id, name: c.name, level: c.level, class: c.className, ascendancy: c.ascendancy, life: c.life, energyShield: c.energyShield, poeNinjaEhp: c.ninjaEhp ?? null, poeNinjaDps: c.ninjaDps ?? null });
         } catch { /* a code the importer cannot read is skipped */ }
       }
       return { league: got.league, snapshot: got.snapshot, listed: got.total, source: 'poe.ninja', characters, note: 'Config in each draft is the player\'s own: turn off what the build cannot keep up (audit.fixAll) before reading its numbers. Nothing is saved.' };
@@ -937,7 +939,7 @@ export const PARITY_TOOLS: ToolDef[] = [
 ];
 
 /** Every build tool the assistant has. */
-export const BUILD_TOOLS: ToolDef[] =[...TOOLS, ...PARITY_TOOLS, ...RANK_TOOLS, ...PLAN_TOOLS, ...DIAGNOSE_TOOLS, ...APP_TOOLS, ...SOLVE_TOOLS, ...KB_TOOLS, ...PATTERN_TOOLS];
+export const BUILD_TOOLS: ToolDef[] =[...TOOLS, ...PARITY_TOOLS, ...RANK_TOOLS, ...PLAN_TOOLS, ...DIAGNOSE_TOOLS, ...APP_TOOLS, ...SOLVE_TOOLS, ...SLOT_BILL_TOOLS, ...KB_TOOLS, ...PATTERN_TOOLS, ...KEPT_TOOLS];
 export const BUILD_TOOL_CHIP: Record<string, string> = Object.fromEntries(BUILD_TOOLS.map((t) => [t.name, t.chip]));
 
 export type { ToolEdit };

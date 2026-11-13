@@ -52,7 +52,7 @@ export function slotItemText(xml: string, slot: string): string | null {
 
 /** Colours (R/G/B/W) of every gem socketed in `slot`, in group order, with the gem names. */
 export async function slotGems(ctx: ToolContext, xml: string, slot: string): Promise<Array<{ name: string; colour: string }>> {
-  const gems = readSkills(xml).filter((g) => g.slot === slot).flatMap((g) => g.gems).filter((g) => g.name);
+  const gems = readSkills(xml).filter((g) => g.slot === slot && !g.fromItem).flatMap((g) => g.gems).filter((g) => g.name);
   const colours = ctx.gems ?? new GemColours();
   return Promise.all(gems.map(async (g) => ({ name: g.name, colour: COLOUR[await colours.of(g.name)] })));
 }

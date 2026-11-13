@@ -4,6 +4,8 @@ import type { SolveGoal } from '@pom/protocol';
 import type { AssistantContextInfo, AssistantPrefs, AssistantPush, ProviderId, SendRequest, SolveCpu, Thread } from '../shared/assistant/types.js';
 import type { Result } from '../shared/library.js';
 import type { AssistantService } from './assistant/service.js';
+import { loadPatterns } from './assistant/buildPatterns.js';
+import { evidenceFor } from '../shared/assistant/solveQuestions.js';
 
 async function wrap<T>(fn: () => Promise<T> | T): Promise<Result<T>> {
   try {
@@ -57,10 +59,12 @@ export function registerAssistantIpc(ready: Promise<AssistantService>, getWindow
   handle(IPC.SOLVE_GOAL, (service, goal: SolveGoal, opts: SolveOpts) => service.solve.setGoal(goal, opts, 'panel'));
   handle(IPC.SOLVE_RUN, (service, goal: SolveGoal, opts: SolveOpts) => service.solve.run(goal, opts));
   handle(IPC.SOLVE_STOP, (service) => service.solve.stop());
+  handle(IPC.SOLVE_CONTINUE, (service) => service.solve.keepImproving());
   handle(IPC.SOLVE_DETAILS, async (service, index: number) => {
     const { xml: _xml, baseHash: _h, ...d } = await service.solve.details(index);
     return d;
   });
+  handle(IPC.SOLVE_EVIDENCE, (_service, skill: string) => { try { return evidenceFor(loadPatterns(), String(skill)); } catch { return null; } });
   handle(IPC.SOLVE_CARD, (service, ref: number | string) => service.solve.propose(ref, 'panel'));
 }
 

@@ -855,8 +855,8 @@ export function settle(ctx: ToolContext, buildId: string, startedFullDps: boolea
  * Runs `edits` on a scratch copy of the open build and returns what changed. The player's own session is never
  * touched: this is what makes a proposal safe to create. The copy is closed before returning.
  */
-export async function trial(ctx: ToolContext, edits: ToolEdit[]) {
-  const open = need(ctx);
+export async function trial(ctx: ToolContext, edits: ToolEdit[], args?: Record<string, unknown>) {
+  const open = need(ctx, args);
   const { buildXml } = await ctx.engine.send('getBuildXml', { buildId: open.buildId });
   let before = await statMap(ctx, open.buildId);
   const fullDps = typeof before.FullDPS === 'number' && before.FullDPS > 0;
@@ -1681,17 +1681,19 @@ export const TOOLS: ToolDef[] = [
     shape: {
       slot: z.string().min(1).max(40).describe('Slot name such as "Ring 1", "Body Armour", "Weapon 1".'),
       rank: z.enum(['dps', 'ehp']).optional().describe('Rank by damage (default) or by effective HP.'),
+      draftId: DRAFT_ARG,
     },
     async run(args, ctx) {
       if (!ctx.trade) throw new ToolError('Trade search is not available in this app right now.');
-      const open = need(ctx);
+      const open = need(ctx, args);
       const { buildXml } = await ctx.engine.send('getBuildXml', { buildId: open.buildId });
       const r = await ctx.trade.upgrades({ buildXml, buildKey: open.buildKey, name: open.name, slot: String(args.slot), rank: args.rank === 'ehp' ? 'ehp' : 'dps' });
       // an empty slot has no item to search better copies of: say what works instead
       if (!r.ok && /^No equipped item/.test(r.message)) throw new ToolError(`${r.message} The slot is empty: searchTrade its category with the mods it needs, then previewEquip the best listing as item text.`);
       if (!r.ok) throw new ToolError(r.kind === 'rate-limited' ? 'The trade site asked the app to wait. Tell the player and try again later.' : r.kind === 'expired' || r.kind === 'no-cookie' ? 'The player\'s Path of Exile session is not connected or was refused. Ask them to reconnect in Wealth.' : r.message);
       // the player's own budget decides what is offered (384c for +0.4% on a 30 div budget; 71% of it, still uncapped)
-      const said = ctx.profiles ? (await ctx.profiles.get(open.buildKey))?.budget : undefined;
+      // a draft keeps the player's own budget: it is a copy of the open build
+      const said = ctx.profiles ? (await ctx.profiles.get(typeof args.draftId === 'string' ? need(ctx).buildKey : open.buildKey))?.budget : undefined;
       const budget = budgetChaos(said, r.chaosPerDivine);
       const priced = r.candidates.map((c) => {
         const gain = c.gain?.percent ?? null;
